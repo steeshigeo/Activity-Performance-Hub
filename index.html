@@ -20,12 +20,6 @@
               600: '#0369a1',
               700: '#075985',
               900: '#0c4a6e',
-            },
-            accent: {
-              pink: '#ec4899',
-              purple: '#8b5cf6',
-              amber: '#f59e0b',
-              emerald: '#10b981'
             }
           }
         }
@@ -39,23 +33,23 @@
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Custom Glassmorphism & Visual Styles -->
+  <!-- Custom Glassmorphism Styles -->
   <style>
     .glass-card {
-      background: rgba(255, 255, 255, 0.65);
+      background: rgba(255, 255, 255, 0.75);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.4);
     }
     .dark .glass-card {
-      background: rgba(15, 23, 42, 0.7);
+      background: rgba(15, 23, 42, 0.75);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     
     .glass-nav {
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(229, 231, 235, 0.8);
     }
@@ -84,7 +78,11 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans transition-colors duration-300">
 
-  <!-- ==================== LOGIN MODAL / PAGE ==================== -->
+  <!-- ==================== TOAST NOTIFICATION CONTAINER ==================== -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+
+  <!-- ==================== LOGIN MODAL / SECTION ==================== -->
   <div id="loginSection" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
     <div class="glass-card w-full max-w-md p-8 rounded-2xl shadow-2xl relative overflow-hidden">
       <!-- Glow Decor -->
@@ -96,41 +94,45 @@
           <i data-lucide="store" class="w-8 h-8"></i>
         </div>
         <h2 class="text-2xl font-bold tracking-tight">DIGIMAP Analytics</h2>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Retail Operations & Store Trainer Dashboard</p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Retail Operations & Store Trainer Portal</p>
       </div>
 
-      <form id="loginForm" class="space-y-4 relative z-10">
+      <!-- Quick Fill Buttons -->
+      <div class="relative z-10 mb-4 grid grid-cols-2 gap-2">
+        <button type="button" onclick="fillQuickLogin('admin')" class="py-1.5 px-3 bg-sky-500/10 hover:bg-sky-500/20 text-sky-600 dark:text-sky-400 rounded-lg text-xs font-semibold border border-sky-500/20 transition-all flex items-center justify-center gap-1">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Auto Admin
+        </button>
+        <button type="button" onclick="fillQuickLogin('staff')" class="py-1.5 px-3 bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-400 rounded-lg text-xs font-semibold border border-purple-500/20 transition-all flex items-center justify-center gap-1">
+          <i data-lucide="user" class="w-3.5 h-3.5"></i> Auto Staff
+        </button>
+      </div>
+
+      <form id="loginForm" class="space-y-4 relative z-10" onsubmit="handleLogin(event)">
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Username</label>
           <div class="relative">
-            <i data-lucide="user" class="absolute left-3 top-3 w-5 h-5 text-slate-400"></i>
-            <input type="text" id="loginUsername" required value="digimap" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm">
+            <i data-lucide="user" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i>
+            <input type="text" id="loginUsername" required value="digimap" class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs">
           </div>
         </div>
 
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Password</label>
           <div class="relative">
-            <i data-lucide="lock" class="absolute left-3 top-3 w-5 h-5 text-slate-400"></i>
-            <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm">
+            <i data-lucide="lock" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i>
+            <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs">
           </div>
         </div>
 
-        <div id="loginError" class="hidden text-xs text-rose-500 bg-rose-500/10 p-3 rounded-lg border border-rose-500/20 text-center">
+        <div id="loginError" class="hidden text-xs text-rose-500 bg-rose-500/10 p-3 rounded-lg border border-rose-500/20 text-center font-medium">
           Username atau password salah!
         </div>
 
-        <button type="submit" class="w-full py-3 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-medium rounded-xl shadow-lg shadow-sky-600/30 transition-all flex items-center justify-center gap-2">
+        <button type="submit" class="w-full py-3 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-semibold rounded-xl shadow-lg shadow-sky-600/30 transition-all flex items-center justify-center gap-2 text-xs">
           <span>Masuk Dashboard</span>
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </button>
       </form>
-
-      <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 text-xs text-center text-slate-400">
-        <p class="font-medium text-slate-500 dark:text-slate-300 mb-1">Default Demo Accounts:</p>
-        <p>Admin: <code class="text-sky-500 font-mono">digimap / maptech</code></p>
-        <p>Staff: <code class="text-sky-500 font-mono">digimap / trainer</code></p>
-      </div>
     </div>
   </div>
 
@@ -138,8 +140,11 @@
   <!-- ==================== MAIN APPLICATION SHELL ==================== -->
   <div id="appShell" class="hidden min-h-screen flex flex-col md:flex-row">
 
+    <!-- BACKDROP OVERLAY FOR MOBILE SIDEBAR -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-30 hidden md:hidden" onclick="closeMobileSidebar()"></div>
+
     <!-- SIDEBAR -->
-    <aside id="sidebar" class="w-full md:w-64 glass-card md:min-h-screen flex-shrink-0 flex flex-col justify-between transition-all duration-300 z-30 border-r border-slate-200 dark:border-slate-800">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 glass-card flex flex-col justify-between transition-transform duration-300 -translate-x-full md:translate-x-0 md:static md:z-auto border-r border-slate-200 dark:border-slate-800 flex-shrink-0">
       <div>
         <!-- Sidebar Brand Header -->
         <div class="p-5 flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/60">
@@ -152,24 +157,24 @@
               <span class="text-[10px] text-sky-500 font-medium tracking-wider uppercase">Retail Ops Portal</span>
             </div>
           </div>
-          <button id="toggleSidebarMobile" class="md:hidden p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <button type="button" onclick="closeMobileSidebar()" class="md:hidden p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
             <i data-lucide="x" class="w-5 h-5"></i>
           </button>
         </div>
 
         <!-- Navigation Links -->
-        <nav class="p-4 space-y-1.5 text-sm font-medium">
-          <button onclick="switchTab('summary')" id="nav-summary" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-sky-600 dark:text-sky-400 bg-sky-500/10">
+        <nav class="p-4 space-y-1.5 text-xs font-medium">
+          <button type="button" onclick="switchTab('summary')" id="nav-summary" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-sky-600 dark:text-sky-400 bg-sky-500/10">
             <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
             <span>Executive Summary</span>
           </button>
 
-          <button onclick="switchTab('directory')" id="nav-directory" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50">
+          <button type="button" onclick="switchTab('directory')" id="nav-directory" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50">
             <i data-lucide="users" class="w-4 h-4"></i>
             <span>Store Trainer & Staff</span>
           </button>
 
-          <button onclick="switchTab('performance')" id="nav-performance" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50">
+          <button type="button" onclick="switchTab('performance')" id="nav-performance" class="nav-item w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-slate-600 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50">
             <i data-lucide="trending-up" class="w-4 h-4"></i>
             <span>Trainer Performance</span>
           </button>
@@ -179,7 +184,7 @@
       <!-- User Info & Logout Footer -->
       <div class="p-4 border-t border-slate-200/60 dark:border-slate-800/60">
         <div class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/80 mb-2">
-          <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white font-bold text-xs uppercase shadow">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white font-bold text-xs uppercase shadow">
             <span id="userAvatarText">AD</span>
           </div>
           <div class="flex-1 min-w-0">
@@ -188,7 +193,7 @@
           </div>
         </div>
 
-        <button id="logoutBtn" class="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors">
+        <button type="button" onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors">
           <i data-lucide="log-out" class="w-4 h-4"></i>
           <span>Keluar Aplikasi</span>
         </button>
@@ -199,37 +204,37 @@
     <div class="flex-1 flex flex-col min-w-0">
 
       <!-- TOP HEADER BAR -->
-      <header class="glass-nav sticky top-0 z-20 px-6 py-3.5 flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <button id="openMobileMenu" class="md:hidden p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">
+      <header class="glass-nav sticky top-0 z-20 px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="openMobileSidebar()" class="md:hidden p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300">
             <i data-lucide="menu" class="w-5 h-5"></i>
           </button>
           <div>
-            <h2 id="pageTitle" class="text-lg font-bold tracking-tight">Executive Summary</h2>
-            <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Pemantauan Aktivitas Store & Performa Store Trainer</p>
+            <h2 id="pageTitle" class="text-base sm:text-lg font-bold tracking-tight">Executive Summary</h2>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">Pemantauan Aktivitas Store & Performa Store Trainer</p>
           </div>
         </div>
 
         <!-- Right Action Items -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2.5">
           
           <!-- Weather Widget Container -->
           <div id="weatherWidget" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs bg-slate-100 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800">
             <i data-lucide="cloud-sun" class="w-4 h-4 text-amber-500"></i>
             <div>
               <span class="font-semibold" id="weatherTemp">29°C</span>
-              <span class="text-slate-400 text-[10px] ml-1" id="weatherLoc">Surabaya, ID</span>
+              <span class="text-slate-400 text-[10px] ml-1">Jakarta, ID</span>
             </div>
           </div>
 
           <!-- Theme Toggle Button -->
-          <button id="themeToggleBtn" title="Ganti Tema" class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <button type="button" onclick="toggleTheme()" title="Ganti Tema" class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
             <i data-lucide="moon" id="moonIcon" class="w-4 h-4 text-slate-600 dark:text-slate-300"></i>
             <i data-lucide="sun" id="sunIcon" class="w-4 h-4 text-amber-400 hidden"></i>
           </button>
 
           <!-- Settings Button -->
-          <button id="openSettingsBtn" title="Pengaturan Modal" class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative">
+          <button type="button" onclick="showModal('settingsModal')" title="Pengaturan Modal" class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
             <i data-lucide="settings" class="w-4 h-4 text-slate-600 dark:text-slate-300"></i>
           </button>
         </div>
@@ -249,7 +254,7 @@
               <div class="flex justify-between items-start">
                 <div>
                   <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Aktivitas</p>
-                  <h3 id="statTotalAct" class="text-2xl font-black mt-1">1,482</h3>
+                  <h3 id="statTotalAct" class="text-2xl font-black mt-1">0</h3>
                   <span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-500 mt-2">
                     <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> +14.2% bulan ini
                   </span>
@@ -265,9 +270,9 @@
               <div class="flex justify-between items-start">
                 <div>
                   <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Modul OPS (Open Studio)</p>
-                  <h3 id="statOpsCount" class="text-2xl font-black mt-1">620</h3>
-                  <span class="inline-flex items-center gap-1 text-[11px] font-medium text-sky-500 mt-2">
-                    41.8% dari total
+                  <h3 id="statOpsCount" class="text-2xl font-black mt-1">0</h3>
+                  <span id="statOpsPct" class="inline-flex items-center gap-1 text-[11px] font-medium text-sky-500 mt-2">
+                    0% dari total
                   </span>
                 </div>
                 <div class="p-3 bg-indigo-500/10 text-indigo-500 rounded-xl">
@@ -281,9 +286,9 @@
               <div class="flex justify-between items-start">
                 <div>
                   <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Modul EMS</p>
-                  <h3 id="statEmsCount" class="text-2xl font-black mt-1">452</h3>
-                  <span class="inline-flex items-center gap-1 text-[11px] font-medium text-purple-500 mt-2">
-                    30.5% dari total
+                  <h3 id="statEmsCount" class="text-2xl font-black mt-1">0</h3>
+                  <span id="statEmsPct" class="inline-flex items-center gap-1 text-[11px] font-medium text-purple-500 mt-2">
+                    0% dari total
                   </span>
                 </div>
                 <div class="p-3 bg-purple-500/10 text-purple-500 rounded-xl">
@@ -297,9 +302,9 @@
               <div class="flex justify-between items-start">
                 <div>
                   <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Modul PnR</p>
-                  <h3 id="statPnrCount" class="text-2xl font-black mt-1">410</h3>
-                  <span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-500 mt-2">
-                    27.7% dari total
+                  <h3 id="statPnrCount" class="text-2xl font-black mt-1">0</h3>
+                  <span id="statPnrPct" class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-500 mt-2">
+                    0% dari total
                   </span>
                 </div>
                 <div class="p-3 bg-emerald-500/10 text-emerald-500 rounded-xl">
@@ -311,7 +316,7 @@
 
           <!-- Charts Row 1 -->
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Line Chart: Trend Pertumbuhan Aktivitas -->
+            <!-- Line Chart: Growth Trend -->
             <div class="lg:col-span-2 glass-card p-5 rounded-2xl flex flex-col justify-between">
               <div class="flex items-center justify-between mb-4">
                 <div>
@@ -335,21 +340,21 @@
                 <h4 class="font-bold text-base">Proporsi Aktivitas Global</h4>
                 <p class="text-xs text-slate-500 dark:text-slate-400">Perbandingan kontribusi modul OPS, EMS, & PnR</p>
               </div>
-              <div class="h-56 relative flex items-center justify-center">
+              <div class="h-52 relative flex items-center justify-center">
                 <canvas id="moduleRatioChart"></canvas>
               </div>
               <div class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 text-xs flex justify-around text-center">
                 <div>
-                  <span class="block text-slate-400">OPS</span>
-                  <span class="font-bold text-sky-500">620</span>
+                  <span class="block text-slate-400 text-[10px]">OPS</span>
+                  <span class="font-bold text-sky-500" id="ratioOpsVal">0</span>
                 </div>
                 <div>
-                  <span class="block text-slate-400">EMS</span>
-                  <span class="font-bold text-purple-500">452</span>
+                  <span class="block text-slate-400 text-[10px]">EMS</span>
+                  <span class="font-bold text-purple-500" id="ratioEmsVal">0</span>
                 </div>
                 <div>
-                  <span class="block text-slate-400">PnR</span>
-                  <span class="font-bold text-emerald-500">410</span>
+                  <span class="block text-slate-400 text-[10px]">PnR</span>
+                  <span class="font-bold text-emerald-500" id="ratioPnrVal">0</span>
                 </div>
               </div>
             </div>
@@ -407,9 +412,9 @@
             <div class="flex items-center gap-2">
               <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Filter Waktu:</span>
               <div class="inline-flex rounded-xl bg-slate-200/60 dark:bg-slate-800 p-1 text-xs font-semibold">
-                <button onclick="setDirectoryTimeframe('daily')" id="time-daily" class="px-3 py-1.5 rounded-lg transition-all bg-white dark:bg-slate-700 shadow text-sky-600 dark:text-sky-400">Daily</button>
-                <button onclick="setDirectoryTimeframe('weekly')" id="time-weekly" class="px-3 py-1.5 rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900">Weekly</button>
-                <button onclick="setDirectoryTimeframe('monthly')" id="time-monthly" class="px-3 py-1.5 rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900">Monthly</button>
+                <button type="button" onclick="setDirectoryTimeframe('daily')" id="time-daily" class="px-3 py-1.5 rounded-lg transition-all bg-white dark:bg-slate-700 shadow text-sky-600 dark:text-sky-400">Daily</button>
+                <button type="button" onclick="setDirectoryTimeframe('weekly')" id="time-weekly" class="px-3 py-1.5 rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900">Weekly</button>
+                <button type="button" onclick="setDirectoryTimeframe('monthly')" id="time-monthly" class="px-3 py-1.5 rounded-lg transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900">Monthly</button>
               </div>
             </div>
           </div>
@@ -421,41 +426,50 @@
                 <span id="trainerCategoryBadge" class="inline-block px-2.5 py-1 text-[10px] font-bold tracking-wider rounded-md bg-sky-500/10 text-sky-600 dark:text-sky-400 mb-1">
                   Store Trainer [ST]
                 </span>
-                <h3 id="trainerNameText" class="text-lg font-bold">Efkar El Hikam</h3>
-                <p id="trainerStoreText" class="text-xs text-slate-500 dark:text-slate-400">M116 Digimap Beachwalk Bali</p>
+                <h3 id="trainerNameText" class="text-lg font-bold">-</h3>
+                <p id="trainerStoreText" class="text-xs text-slate-500 dark:text-slate-400">-</p>
               </div>
               <div>
                 <p class="text-[11px] text-slate-400 uppercase font-medium">NIK Employee</p>
-                <p id="trainerNikText" class="text-xs font-bold font-mono mt-0.5">25019459</p>
+                <p id="trainerNikText" class="text-xs font-bold font-mono mt-0.5">-</p>
                 <p class="text-[11px] text-slate-400 uppercase font-medium mt-2">Type Store</p>
-                <p id="trainerTypeStoreText" class="text-xs font-bold mt-0.5">APP</p>
+                <p id="trainerTypeStoreText" class="text-xs font-bold mt-0.5">-</p>
               </div>
               <div>
                 <p class="text-[11px] text-slate-400 uppercase font-medium">Work Experience</p>
-                <p id="trainerExpText" class="text-xs font-bold mt-0.5">0 Tahun 11 Bulan 29 Hari</p>
+                <p id="trainerExpText" class="text-xs font-bold mt-0.5">-</p>
                 <p class="text-[11px] text-slate-400 uppercase font-medium mt-2">Trainer HO</p>
-                <p id="trainerHoText" class="text-xs font-bold mt-0.5">Novi Riyanto</p>
+                <p id="trainerHoText" class="text-xs font-bold mt-0.5">-</p>
               </div>
               <div class="flex flex-col justify-center items-end border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 pt-3 md:pt-0 md:pl-4">
                 <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Aktivitas Toko Dilaporkan</p>
-                <span id="trainerStoreTotalAct" class="text-2xl font-black text-sky-500">128</span>
+                <span id="trainerStoreTotalAct" class="text-2xl font-black text-sky-500">0</span>
                 <p class="text-[10px] text-slate-400">Akumulasi seluruh staff toko</p>
               </div>
             </div>
           </div>
 
           <!-- Staff Activity Drill-Down Section -->
-          <div class="glass-card p-5 rounded-2xl">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div class="glass-card p-5 rounded-2xl space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h4 class="font-bold text-base">Daftar Staff Toko & Progres Aktivitas</h4>
                 <p class="text-xs text-slate-500 dark:text-slate-400">Rincian aktivitas OPS, EMS, dan PnR yang telah diselesaikan oleh masing-masing staff</p>
               </div>
-              <div id="adminActionGroup" class="hidden">
-                <button onclick="openAddActivityModal()" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-medium flex items-center gap-1 shadow">
-                  <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                  <span>Tambah/Edit Data</span>
-                </button>
+
+              <div class="flex items-center gap-2">
+                <!-- Search Input -->
+                <div class="relative">
+                  <i data-lucide="search" class="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-400"></i>
+                  <input type="text" id="staffSearchInput" onkeyup="filterStaffTable()" placeholder="Cari nama / NIK..." class="pl-8 pr-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 text-xs focus:outline-none focus:ring-2 focus:ring-sky-500">
+                </div>
+
+                <div id="adminActionGroup" class="hidden">
+                  <button type="button" onclick="openAddActivityModal()" class="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-medium flex items-center gap-1 shadow">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>Input Data</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -471,8 +485,9 @@
                     <th class="pb-3 px-3 text-center">EMS</th>
                     <th class="pb-3 px-3 text-center">PnR</th>
                     <th class="pb-3 px-3 text-center">Total</th>
-                    <th class="pb-3 px-3 w-36">Progress Bar</th>
+                    <th class="pb-3 px-3 w-32">Progress Target</th>
                     <th class="pb-3 px-3">Catatan Khusus (Any Comment)</th>
+                    <th class="pb-3 px-3 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="staffDrilldownTableBody" class="divide-y divide-slate-200/60 dark:divide-slate-800/60 font-medium">
@@ -525,14 +540,14 @@
 
 
   <!-- ==================== SETTINGS MODAL ==================== -->
-  <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-    <div class="glass-card w-full max-w-lg p-6 rounded-2xl shadow-2xl space-y-5">
+  <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onclick="handleBackdropClick(event, 'settingsModal')">
+    <div class="glass-card w-full max-w-lg p-6 rounded-2xl shadow-2xl space-y-5" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
         <div class="flex items-center gap-2">
           <i data-lucide="settings" class="w-5 h-5 text-sky-500"></i>
           <h3 class="font-bold text-base">Pengaturan Dashboard</h3>
         </div>
-        <button id="closeSettingsBtn" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+        <button type="button" onclick="hideModal('settingsModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -553,7 +568,7 @@
             <p class="font-bold text-slate-700 dark:text-slate-200">Sinkronisasi Data Google Sheets</p>
             <p class="text-[11px] text-slate-400">Muat ulang data terbaru dari Master Store & Operational Log</p>
           </div>
-          <button onclick="refreshDataFromSheets()" class="px-3 py-2 bg-sky-600 hover:bg-sky-500 text-white font-medium rounded-lg flex items-center gap-1.5 transition-all">
+          <button type="button" onclick="refreshDataFromSheets()" class="px-3 py-2 bg-sky-600 hover:bg-sky-500 text-white font-medium rounded-lg flex items-center gap-1.5 transition-all">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refreshIcon"></i>
             <span>Refresh</span>
           </button>
@@ -576,11 +591,10 @@
           <p class="font-bold text-slate-700 dark:text-slate-200">Ganti Password Akun</p>
           <div class="grid grid-cols-2 gap-2">
             <input type="password" id="newPasswordInput" placeholder="Password Baru" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50">
-            <button onclick="changePassword()" class="px-3 py-1.5 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 text-white rounded-lg font-medium">
+            <button type="button" onclick="changePassword()" class="px-3 py-1.5 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 text-white rounded-lg font-medium">
               Simpan Password
             </button>
           </div>
-          <p id="changePassMsg" class="hidden text-[11px] text-emerald-500 font-medium">Password berhasil diperbarui!</p>
         </div>
       </div>
     </div>
@@ -588,11 +602,11 @@
 
 
   <!-- ==================== EDIT / ADD DATA MODAL (ADMIN ONLY) ==================== -->
-  <div id="addActivityModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-    <div class="glass-card w-full max-w-md p-6 rounded-2xl shadow-2xl space-y-4">
+  <div id="addActivityModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onclick="handleBackdropClick(event, 'addActivityModal')">
+    <div class="glass-card w-full max-w-md p-6 rounded-2xl shadow-2xl space-y-4" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
         <h3 class="font-bold text-base">Input / Update Aktivitas Staff</h3>
-        <button onclick="closeAddActivityModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+        <button type="button" onclick="hideModal('addActivityModal')" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -601,7 +615,7 @@
         <div>
           <label class="block font-semibold mb-1 text-slate-400">Pilih Staff</label>
           <select id="modalStaffSelect" class="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800">
-            <!-- Dynamic staff -->
+            <!-- Dynamic staff list -->
           </select>
         </div>
         <div class="grid grid-cols-3 gap-2">
@@ -622,7 +636,7 @@
           <label class="block font-semibold mb-1 text-slate-400">Catatan Khusus (Any Comment) - EMS/PnR</label>
           <textarea id="modalCommentInput" rows="2" placeholder="Tuliskan catatan observasi atau feedback..." class="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800"></textarea>
         </div>
-        <button type="submit" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-xl shadow">
+        <button type="submit" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-semibold rounded-xl shadow transition-all">
           Simpan Data Aktivitas
         </button>
       </form>
@@ -634,7 +648,6 @@
   <script>
     /* ================= 1. STATE & MOCK MASTER DATA ================= */
     
-    // User credentials state
     let users = JSON.parse(localStorage.getItem('digimap_users')) || {
       'admin': { pass: 'maptech', role: 'admin', name: 'Super Admin' },
       'staff': { pass: 'trainer', role: 'staff', name: 'Staff View-Only' }
@@ -646,7 +659,6 @@
     let directoryTimeframe = 'daily';
 
     // MASTER STORE & TRAINER DATA (Database A Mapping Rules Applied)
-    // Rule: 'Store Trainer' -> Store Trainer [ST], 'Store Trainer (Pt)' -> Store Trainer [PT]
     let storeMasterData = [
       {
         store: "M116 Digimap Beachwalk Bali",
@@ -728,62 +740,73 @@
     ];
 
     // MOCK OPERATIONAL ACTIVITY DATA (Database B)
-    // Map of Staff NIK / Name -> Activity Counts & Comments
     let staffActivityLogs = JSON.parse(localStorage.getItem('digimap_activity_logs')) || {
-      "25003371": { ops: 12, ems: 8, pnr: 7, comment: "Membantu demo Smart Script iPad dengan sangat baik." },
-      "25019459": { ops: 25, ems: 18, pnr: 16, comment: "Sesi pelatihan EMS produk Apple Watch berjalan terstruktur." },
+      "25003371": { ops: 12, ems: 8, pnr: 7, comment: "Membantu demo Smart Script iPad dengan baik." },
+      "25019459": { ops: 25, ems: 18, pnr: 16, comment: "Sesi pelatihan EMS Apple Watch terstruktur." },
       "23007058": { ops: 10, ems: 6, pnr: 5, comment: "Memahami flow kasir & penawaran AppleCare+." },
       "26031619": { ops: 8, ems: 5, pnr: 4, comment: "Perlu peningkatan pada modul PnR iPhone." },
-      "25018857": { ops: 15, ems: 9, pnr: 8, comment: "Sangat aktif mengedukasi pelanggan tentang Mac." },
+      "25018857": { ops: 15, ems: 9, pnr: 8, comment: "Sangat aktif mengedukasi pelanggan Mac." },
       "25001973": { ops: 14, ems: 7, pnr: 6, comment: "Pendampingan fitur Preview App memuaskan." },
-      "24011408": { ops: 18, ems: 14, pnr: 12, comment: "Supervisor aktif memantau jalannya Open Studio." },
-      "24023795": { ops: 28, ems: 22, pnr: 20, comment: "Roleplay PnR dilaksanakan rutin setiap awal minggu." },
+      "24011408": { ops: 18, ems: 14, pnr: 12, comment: "Supervisor aktif memantau Open Studio." },
+      "24023795": { ops: 28, ems: 22, pnr: 20, comment: "Roleplay PnR dilaksanakan rutin." },
       "24011568": { ops: 11, ems: 8, pnr: 7, comment: "Aktif mengikuti instruksi Trainer." },
-      "24007871": { ops: 9, ems: 6, pnr: 5, comment: "Penjelasan fitur kamera iPhone sangat lugas." },
+      "24007871": { ops: 9, ems: 6, pnr: 5, comment: "Penjelasan fitur kamera iPhone lugas." },
       "24019681": { ops: 13, ems: 10, pnr: 9, comment: "Paham terkait ekosistem Apple Watch." },
       "22021400": { ops: 16, ems: 12, pnr: 10, comment: "Monitoring rutin terlaksana." },
       "23024161": { ops: 20, ems: 15, pnr: 14, comment: "Melakukan refresher course mingguan." },
-      "24002731": { ops: 30, ems: 24, pnr: 22, comment: "Store Trainer terbaik untuk pencapaian EMS bulan ini." },
+      "24002731": { ops: 30, ems: 24, pnr: 22, comment: "Store Trainer terbaik pencapaian EMS." },
       "23014489": { ops: 7, ems: 4, pnr: 4, comment: "Perlu bimbingan lebih pada PnR." },
       "21009633": { ops: 12, ems: 9, pnr: 8, comment: "Antusias saat sesi Open Studio." },
       "22008213": { ops: 15, ems: 11, pnr: 10, comment: "Koordinasi toko sangat solid." },
-      "23010954": { ops: 26, ems: 20, pnr: 19, comment: "Pencapaian modul PnR di Tunjungan Plaza konsisten." },
-      "26040046": { ops: 6, ems: 5, pnr: 3, comment: "Staff baru, progres belajar cukup pesat." },
+      "23010954": { ops: 26, ems: 20, pnr: 19, comment: "Pencapaian modul PnR konsisten." },
+      "26040046": { ops: 6, ems: 5, pnr: 3, comment: "Staff baru, progres belajar pesat." },
       "23018195": { ops: 14, ems: 10, pnr: 9, comment: "Keterampilan selling pitch teruji." },
       "24012033": { ops: 11, ems: 8, pnr: 7, comment: "Selalu melengkapi checklist EMS." }
     };
 
-    // Chart Global Instances
+    // Chart Instances
     let growthTrendChartInstance = null;
     let moduleRatioChartInstance = null;
     let staffComparisonChartInstance = null;
     let trainerPerformanceChartInstance = null;
 
 
-    /* ================= 2. INITIALIZATION & AUTHENTICATION ================= */
+    /* ================= 2. INITIALIZATION & LIFECYCLE ================= */
 
     document.addEventListener("DOMContentLoaded", () => {
-      lucide.createIcons();
       initTheme();
       checkAuthStatus();
-
-      // Event Listeners
-      document.getElementById("loginForm").addEventListener("submit", handleLogin);
-      document.getElementById("logoutBtn").addEventListener("click", handleLogout);
-      document.getElementById("themeToggleBtn").addEventListener("click", toggleTheme);
-      document.getElementById("openSettingsBtn").addEventListener("click", () => showModal("settingsModal"));
-      document.getElementById("closeSettingsBtn").addEventListener("click", () => hideModal("settingsModal"));
-      document.getElementById("openMobileMenu").addEventListener("click", () => {
-        document.getElementById("sidebar").classList.remove("-translate-x-full");
-      });
-      document.getElementById("toggleSidebarMobile").addEventListener("click", () => {
-        document.getElementById("sidebar").classList.add("-translate-x-full");
-      });
-
-      // Populate Trainer Dropdown
       populateTrainerDropdown();
       updateWeatherDisplay();
+
+      // Keyboard Esc close modal
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          hideModal('settingsModal');
+          hideModal('addActivityModal');
+          closeMobileSidebar();
+        }
+      });
     });
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `p-3 px-4 rounded-xl text-xs font-semibold text-white shadow-xl flex items-center gap-2 transform transition-all duration-300 translate-y-5 opacity-0 ${type === 'success' ? 'bg-emerald-600' : 'bg-sky-600'}`;
+      toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-4 h-4"></i> <span>${message}</span>`;
+      
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-5', 'opacity-0');
+      }, 50);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
 
     function initTheme() {
       if (currentTheme === 'dark') {
@@ -802,14 +825,19 @@
       localStorage.setItem('digimap_theme', currentTheme);
       initTheme();
       renderAllCharts();
+      showToast(`Tema diganti ke mode ${currentTheme.toUpperCase()}`);
+    }
+
+    function fillQuickLogin(role) {
+      document.getElementById('loginUsername').value = 'digimap';
+      document.getElementById('loginPassword').value = role === 'admin' ? 'maptech' : 'trainer';
     }
 
     function handleLogin(e) {
-      e.preventDefault();
+      if (e) e.preventDefault();
       const u = document.getElementById("loginUsername").value.trim().toLowerCase();
       const p = document.getElementById("loginPassword").value.trim();
 
-      // Validate Admin or Staff credentials
       if (u === "digimap" && p === (users.admin.pass || "maptech")) {
         currentUser = { username: "digimap", role: "admin", name: "Super Admin Digimap" };
       } else if (u === "digimap" && p === (users.staff.pass || "trainer")) {
@@ -819,8 +847,10 @@
         return;
       }
 
+      document.getElementById("loginError").classList.add("hidden");
       localStorage.setItem('digimap_current_user', JSON.stringify(currentUser));
       checkAuthStatus();
+      showToast(`Selamat datang, ${currentUser.name}!`);
     }
 
     function checkAuthStatus() {
@@ -831,7 +861,6 @@
         document.getElementById("loginSection").classList.add("hidden");
         document.getElementById("appShell").classList.remove("hidden");
 
-        // Update UI based on Role
         document.getElementById("userNameDisplay").textContent = currentUser.name;
         document.getElementById("userRoleBadge").textContent = currentUser.role + " Access";
         document.getElementById("userAvatarText").textContent = currentUser.role === "admin" ? "AD" : "ST";
@@ -843,10 +872,10 @@
           document.getElementById("adminActionGroup").classList.add("hidden");
         }
 
-        // Render Active Tab Data
         renderSummaryView();
         renderDirectoryView();
         renderPerformanceView();
+        lucide.createIcons();
       }
     }
 
@@ -854,13 +883,25 @@
       currentUser = null;
       localStorage.removeItem('digimap_current_user');
       checkAuthStatus();
+      showToast('Sesi telah diakhiri.');
     }
 
 
-    /* ================= 3. NAVIGATION & TABS ================= */
+    /* ================= 3. NAVIGATION & MOBILE SIDEBAR ================= */
+
+    function openMobileSidebar() {
+      document.getElementById('sidebar').classList.remove('-translate-x-full');
+      document.getElementById('sidebarOverlay').classList.remove('hidden');
+    }
+
+    function closeMobileSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('sidebarOverlay').classList.add('hidden');
+    }
 
     function switchTab(tab) {
-      // Hide all views
+      closeMobileSidebar();
+
       ['summary', 'directory', 'performance'].forEach(t => {
         document.getElementById(`view-${t}`).classList.add('hidden');
         const nav = document.getElementById(`nav-${t}`);
@@ -868,13 +909,11 @@
         nav.classList.add('text-slate-600', 'dark:text-slate-400');
       });
 
-      // Show selected
       document.getElementById(`view-${tab}`).classList.remove('hidden');
       const activeNav = document.getElementById(`nav-${tab}`);
       activeNav.classList.add('bg-sky-500/10', 'text-sky-600', 'dark:text-sky-400');
       activeNav.classList.remove('text-slate-600', 'dark:text-slate-400');
 
-      // Update Header Title
       const titles = {
         'summary': 'Executive Summary',
         'directory': 'Directory Store Trainer & Staff Drill-down',
@@ -882,17 +921,18 @@
       };
       document.getElementById('pageTitle').textContent = titles[tab];
 
-      // Re-trigger chart layouts
-      setTimeout(() => renderAllCharts(), 50);
+      setTimeout(() => {
+        renderAllCharts();
+        lucide.createIcons();
+      }, 50);
     }
 
 
-    /* ================= 4. DATA CALCULATION & VIEWS ================= */
+    /* ================= 4. DASHBOARD RENDERERS ================= */
 
     function renderSummaryView() {
       let totalOps = 0, totalEms = 0, totalPnr = 0;
 
-      // Accumulate metrics
       Object.values(staffActivityLogs).forEach(log => {
         totalOps += log.ops || 0;
         totalEms += log.ems || 0;
@@ -904,6 +944,18 @@
       document.getElementById('statOpsCount').textContent = totalOps.toLocaleString();
       document.getElementById('statEmsCount').textContent = totalEms.toLocaleString();
       document.getElementById('statPnrCount').textContent = totalPnr.toLocaleString();
+
+      const opsPct = grandTotal ? Math.round((totalOps / grandTotal) * 100) : 0;
+      const emsPct = grandTotal ? Math.round((totalEms / grandTotal) * 100) : 0;
+      const pnrPct = grandTotal ? Math.round((totalPnr / grandTotal) * 100) : 0;
+
+      document.getElementById('statOpsPct').textContent = `${opsPct}% dari total`;
+      document.getElementById('statEmsPct').textContent = `${emsPct}% dari total`;
+      document.getElementById('statPnrPct').textContent = `${pnrPct}% dari total`;
+
+      document.getElementById('ratioOpsVal').textContent = totalOps;
+      document.getElementById('ratioEmsVal').textContent = totalEms;
+      document.getElementById('ratioPnrVal').textContent = totalPnr;
 
       // Render Store Summary Table
       const tbody = document.getElementById('summaryStoreTableBody');
@@ -919,8 +971,7 @@
         });
 
         const sTotal = sOps + sEms + sPnr;
-        const target = 150; // Nominal store target for completion %
-        const progress = Math.min(100, Math.round((sTotal / target) * 100));
+        const progress = Math.min(100, Math.round((sTotal / 150) * 100));
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors";
@@ -965,7 +1016,6 @@
       const selectedIndex = document.getElementById('trainerDropdown').value;
       const storeObj = storeMasterData[selectedIndex];
 
-      // Fill Store Trainer Info Card
       document.getElementById('trainerCategoryBadge').textContent = storeObj.trainer.category;
       document.getElementById('trainerNameText').textContent = storeObj.trainer.name;
       document.getElementById('trainerStoreText').textContent = storeObj.store;
@@ -994,8 +1044,7 @@
       const tbody = document.getElementById('staffDrilldownTableBody');
       tbody.innerHTML = '';
 
-      // Time multiplier factor for daily/weekly filter simulation
-      const factor = directoryTimeframe === 'daily' ? 0.15 : (directoryTimeframe === 'weekly' ? 0.45 : 1);
+      const factor = directoryTimeframe === 'daily' ? 0.2 : (directoryTimeframe === 'weekly' ? 0.5 : 1);
 
       let storeTotal = 0;
       let chartLabels = [];
@@ -1011,7 +1060,7 @@
         const total = calcOps + calcEms + calcPnr;
         storeTotal += total;
 
-        const target = 30 * factor;
+        const target = Math.round(30 * factor);
         const progressPct = Math.min(100, Math.round((total / (target || 1)) * 100));
 
         chartLabels.push(staff.name.split(' ')[0]);
@@ -1020,7 +1069,8 @@
         chartDataPnr.push(calcPnr);
 
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors";
+        tr.className = "staff-row hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors";
+        tr.setAttribute('data-search', `${staff.name.toLowerCase()} ${staff.nik}`);
         tr.innerHTML = `
           <td class="py-3 px-3 font-semibold text-slate-900 dark:text-slate-100">
             ${staff.name}
@@ -1035,7 +1085,7 @@
           <td class="py-3 px-3">
             <div class="space-y-1">
               <div class="flex justify-between text-[10px] font-bold">
-                <span>Target Progress</span>
+                <span>Progress</span>
                 <span>${progressPct}%</span>
               </div>
               <div class="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
@@ -1046,6 +1096,13 @@
           <td class="py-3 px-3 italic text-slate-500 dark:text-slate-400 max-w-xs truncate" title="${log.comment}">
             "${log.comment}"
           </td>
+          <td class="py-3 px-3 text-center">
+            ${currentUser && currentUser.role === 'admin' ? `
+              <button type="button" onclick="quickEditStaff('${staff.nik}')" class="px-2 py-1 bg-sky-500/10 hover:bg-sky-500/20 text-sky-500 rounded text-[10px] font-bold transition-all">
+                Edit
+              </button>
+            ` : `<span class="text-slate-400 text-[10px]">-</span>`}
+          </td>
         `;
         tbody.appendChild(tr);
       });
@@ -1053,6 +1110,20 @@
       document.getElementById('trainerStoreTotalAct').textContent = storeTotal;
 
       renderStaffComparisonChart(chartLabels, chartDataOps, chartDataEms, chartDataPnr);
+      lucide.createIcons();
+    }
+
+    function filterStaffTable() {
+      const q = document.getElementById('staffSearchInput').value.toLowerCase().trim();
+      const rows = document.querySelectorAll('.staff-row');
+      rows.forEach(row => {
+        const text = row.getAttribute('data-search') || '';
+        if (text.includes(q)) {
+          row.classList.remove('hidden');
+        } else {
+          row.classList.add('hidden');
+        }
+      });
     }
 
     function renderPerformanceView() {
@@ -1075,7 +1146,6 @@
         };
       });
 
-      // Sort descending
       trainerScores.sort((a, b) => b.score - a.score);
 
       trainerScores.forEach((t, idx) => {
@@ -1093,7 +1163,7 @@
           </div>
           <div class="w-1/3 space-y-1">
             <div class="flex justify-between text-xs font-bold">
-              <span class="text-slate-400 text-[10px]">Performa Progress</span>
+              <span class="text-slate-400 text-[10px]">Score Performa</span>
               <span class="text-sky-500">${t.score}%</span>
             </div>
             <div class="w-full bg-slate-200 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
@@ -1105,10 +1175,11 @@
       });
 
       renderTrainerPerformanceChart(trainerScores);
+      lucide.createIcons();
     }
 
 
-    /* ================= 5. CHART.JS VISUALIZATIONS ================= */
+    /* ================= 5. CHART.JS CHARTS ================= */
 
     function isDark() {
       return document.documentElement.classList.contains('dark');
@@ -1124,7 +1195,6 @@
       const textColor = isDark() ? '#94a3b8' : '#64748b';
       const gridColor = isDark() ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
 
-      // 1. Line Growth Chart
       const ctxLine = document.getElementById('growthTrendChart').getContext('2d');
       if (growthTrendChartInstance) growthTrendChartInstance.destroy();
 
@@ -1163,16 +1233,22 @@
         }
       });
 
-      // 2. Doughnut Module Ratio
       const ctxDoughnut = document.getElementById('moduleRatioChart').getContext('2d');
       if (moduleRatioChartInstance) moduleRatioChartInstance.destroy();
+
+      let totalOps = 0, totalEms = 0, totalPnr = 0;
+      Object.values(staffActivityLogs).forEach(l => {
+        totalOps += l.ops || 0;
+        totalEms += l.ems || 0;
+        totalPnr += l.pnr || 0;
+      });
 
       moduleRatioChartInstance = new Chart(ctxDoughnut, {
         type: 'doughnut',
         data: {
           labels: ['OPS', 'EMS', 'PnR'],
           datasets: [{
-            data: [620, 452, 410],
+            data: [totalOps, totalEms, totalPnr],
             backgroundColor: ['#0284c7', '#8b5cf6', '#10b981'],
             borderWidth: 0
           }]
@@ -1218,7 +1294,6 @@
     }
 
     function renderTrainerPerformanceChart(trainers) {
-      const textColor = isDark() ? '#94a3b8' : '#64748b';
       const ctx = document.getElementById('trainerPerformanceChart').getContext('2d');
       if (trainerPerformanceChartInstance) trainerPerformanceChartInstance.destroy();
 
@@ -1246,20 +1321,28 @@
     }
 
 
-    /* ================= 6. SETTINGS & ADMIN ACTIONS ================= */
+    /* ================= 6. MODALS & ADMIN ACTIONS ================= */
 
     function showModal(id) {
       document.getElementById(id).classList.remove('hidden');
+      lucide.createIcons();
     }
 
     function hideModal(id) {
       document.getElementById(id).classList.add('hidden');
     }
 
+    function handleBackdropClick(event, modalId) {
+      if (event.target.id === modalId) {
+        hideModal(modalId);
+      }
+    }
+
     function toggleWeatherWidget() {
       weatherEnabled = document.getElementById('weatherToggleCheck').checked;
       localStorage.setItem('digimap_weather', weatherEnabled);
       updateWeatherDisplay();
+      showToast(weatherEnabled ? 'Widget cuaca diaktifkan' : 'Widget cuaca disembunyikan', 'info');
     }
 
     function updateWeatherDisplay() {
@@ -1277,19 +1360,21 @@
       const icon = document.getElementById('refreshIcon');
       icon.classList.add('animate-spin');
 
-      // Simulating live fetch delay
       setTimeout(() => {
         icon.classList.remove('animate-spin');
         renderSummaryView();
         onTrainerSelected();
         renderPerformanceView();
-        alert('Data berhasil diperbarui dari Google Sheets!');
-      }, 1200);
+        showToast('Data berhasil disinkronkan!');
+      }, 1000);
     }
 
     function changePassword() {
       const newP = document.getElementById('newPasswordInput').value.trim();
-      if (!newP) return;
+      if (!newP) {
+        showToast('Password tidak boleh kosong!', 'info');
+        return;
+      }
 
       if (currentUser.role === 'admin') {
         users.admin.pass = newP;
@@ -1299,9 +1384,7 @@
 
       localStorage.setItem('digimap_users', JSON.stringify(users));
       document.getElementById('newPasswordInput').value = '';
-      const msg = document.getElementById('changePassMsg');
-      msg.classList.remove('hidden');
-      setTimeout(() => msg.classList.add('hidden'), 3000);
+      showToast('Password berhasil diperbarui!');
     }
 
     function openAddActivityModal() {
@@ -1319,11 +1402,26 @@
         select.appendChild(opt);
       });
 
+      document.getElementById('modalOpsInput').value = 1;
+      document.getElementById('modalEmsInput').value = 1;
+      document.getElementById('modalPnrInput').value = 1;
+      document.getElementById('modalCommentInput').value = '';
+
       showModal('addActivityModal');
     }
 
-    function closeAddActivityModal() {
-      hideModal('addActivityModal');
+    function quickEditStaff(nik) {
+      if (currentUser.role !== 'admin') return;
+      openAddActivityModal();
+      document.getElementById('modalStaffSelect').value = nik;
+      
+      const log = staffActivityLogs[nik];
+      if (log) {
+        document.getElementById('modalOpsInput').value = log.ops || 0;
+        document.getElementById('modalEmsInput').value = log.ems || 0;
+        document.getElementById('modalPnrInput').value = log.pnr || 0;
+        document.getElementById('modalCommentInput').value = log.comment || '';
+      }
     }
 
     function saveActivityData(e) {
@@ -1332,23 +1430,17 @@
       const ops = parseInt(document.getElementById('modalOpsInput').value) || 0;
       const ems = parseInt(document.getElementById('modalEmsInput').value) || 0;
       const pnr = parseInt(document.getElementById('modalPnrInput').value) || 0;
-      const comment = document.getElementById('modalCommentInput').value.trim() || "Aktivitas terverifikasi oleh Admin.";
+      const comment = document.getElementById('modalCommentInput').value.trim() || "Aktivitas diperbarui.";
 
-      if (!staffActivityLogs[nik]) {
-        staffActivityLogs[nik] = { ops: 0, ems: 0, pnr: 0, comment: "" };
-      }
-
-      staffActivityLogs[nik].ops += ops;
-      staffActivityLogs[nik].ems += ems;
-      staffActivityLogs[nik].pnr += pnr;
-      if (comment) staffActivityLogs[nik].comment = comment;
+      staffActivityLogs[nik] = { ops, ems, pnr, comment };
 
       localStorage.setItem('digimap_activity_logs', JSON.stringify(staffActivityLogs));
 
-      closeAddActivityModal();
+      hideModal('addActivityModal');
       renderSummaryView();
       onTrainerSelected();
       renderPerformanceView();
+      showToast('Data aktivitas staff berhasil disimpan!');
     }
   </script>
 </body>
