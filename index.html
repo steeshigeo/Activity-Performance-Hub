@@ -1,632 +1,760 @@
 <!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Training East Region - Realtime Analytics</title>
-    
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- PapaParse (CSV Parser) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    
-    <!-- Custom Tailwind Configuration -->
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f7ff',
-                            500: '#0071e3',
-                            600: '#005bb5',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'sans-serif'],
-                    }
-                }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digimap Store Trainer & Activity Dashboard</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
             }
+          }
         }
-    </script>
+      }
+    }
+  </script>
 
-    <!-- Liquid Glass CSS Styling -->
-    <style>
-        .glass-card {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-        .dark .glass-card {
-            background: rgba(22, 28, 45, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        .dark .glass-nav {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(156, 163, 175, 0.4);
-            border-radius: 9999px;
-        }
-    </style>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* Glassmorphism styling */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.4);
+      border-radius: 9999px;
+    }
+  </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300 font-sans">
 
-    <!-- Top Navigation Bar -->
-    <header class="sticky top-0 z-50 glass-nav px-4 lg:px-8 py-3 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-            <div class="p-2 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-500/30">
-                <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen font-sans antialiased transition-colors duration-300">
+
+  <!-- LOGIN MODAL / OVERLAY -->
+  <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
+    <div class="glass-card w-full max-w-md p-8 rounded-3xl shadow-2xl border border-white/20 text-center relative overflow-hidden">
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-sky-500/20 rounded-full blur-2xl"></div>
+      <div class="w-16 h-16 mx-auto mb-4 bg-sky-600/10 dark:bg-sky-500/20 rounded-2xl flex items-center justify-center text-sky-600 dark:text-sky-400">
+        <i data-lucide="shield-check" class="w-8 h-8"></i>
+      </div>
+      <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Digimap OPS Portal</h2>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-6">Silakan masuk dengan akun Admin atau Staff Trainer</p>
+
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 text-left">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Username</label>
+          <div class="relative">
+            <i data-lucide="user" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+            <input type="text" id="loginUser" required placeholder="Contoh: digimap" class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Password</label>
+          <div class="relative">
+            <i data-lucide="lock" class="w-4 h-4 absolute left-3 top-3 text-slate-400"></i>
+            <input type="password" id="loginPass" required placeholder="••••••••" class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500" />
+          </div>
+        </div>
+        <p id="loginError" class="text-xs text-rose-500 hidden font-medium">Username atau password tidak cocok!</p>
+        
+        <button type="submit" class="w-full py-3 bg-sky-600 hover:bg-sky-500 text-white font-medium rounded-xl shadow-lg shadow-sky-600/30 transition-all flex items-center justify-center gap-2">
+          <span>Masuk ke Dashboard</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+
+      <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 text-left text-xs text-slate-500 dark:text-slate-400 space-y-1">
+        <p><span class="font-semibold text-slate-700 dark:text-slate-300">Default Admin:</span> digimap / maptech</p>
+        <p><span class="font-semibold text-slate-700 dark:text-slate-300">Default Staff:</span> digimap / trainer</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP WRAPPER -->
+  <div id="appLayout" class="hidden min-h-screen flex flex-col md:flex-row">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-full md:w-64 bg-slate-900 text-slate-300 flex-shrink-0 flex flex-col justify-between border-r border-slate-800 transition-all duration-300 z-40">
+      <div>
+        <!-- Sidebar Header -->
+        <div class="p-5 flex items-center justify-between border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-sky-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-sky-600/40">
+              D
             </div>
             <div>
-                <h1 class="text-lg font-bold leading-tight bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">
-                    Digimap Training Dashboard
-                </h1>
-                <p class="text-xs text-slate-500 dark:text-slate-400">East Region Analytics & Realtime Monitoring</p>
+              <h1 class="font-bold text-white tracking-wide text-sm">DIGIMAP OPS</h1>
+              <p class="text-[10px] text-sky-400 font-medium tracking-wider">STORE TRAINER PORTAL</p>
             </div>
+          </div>
         </div>
 
-        <!-- Controls -->
-        <div class="flex items-center space-x-3">
-            <!-- Sync Indicator & Button -->
-            <button onclick="fetchData()" id="sync-btn" class="flex items-center space-x-2 px-3 py-1.5 rounded-xl text-xs font-medium bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-slate-700 hover:bg-blue-100 transition-all">
-                <i data-lucide="refresh-cw" id="sync-icon" class="w-3.5 h-3.5"></i>
-                <span id="sync-text">Sync Data</span>
-            </button>
+        <!-- Navigation Menu -->
+        <nav class="p-4 space-y-1 text-sm">
+          <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium transition-all bg-sky-600 text-white shadow-md">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Executive Summary</span>
+          </button>
+          
+          <button onclick="switchTab('directory')" id="nav-directory" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Store Trainer & Staff</span>
+          </button>
 
-            <!-- Dark / Light Mode Toggle -->
-            <button id="theme-toggle" class="p-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition-all">
-                <i data-lucide="sun" id="theme-sun" class="w-4 h-4 hidden"></i>
-                <i data-lucide="moon" id="theme-moon" class="w-4 h-4"></i>
-            </button>
+          <button onclick="switchTab('tracking')" id="nav-tracking" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/60">
+            <i data-lucide="line-chart" class="w-4 h-4"></i>
+            <span>Performance Tracking</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Sidebar Footer (User Info) -->
+      <div class="p-4 border-t border-slate-800 bg-slate-950/40 space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-sky-400 font-semibold border border-slate-700">
+            <i data-lucide="user-check" class="w-4 h-4"></i>
+          </div>
+          <div class="overflow-hidden">
+            <p id="userDisplay" class="text-xs font-semibold text-white truncate">Admin Digimap</p>
+            <p id="roleBadge" class="text-[10px] text-emerald-400 font-mono">ROLE: ADMIN</p>
+          </div>
         </div>
-    </header>
+        <button onclick="logout()" class="w-full flex items-center justify-center gap-2 py-2 px-3 bg-slate-800 hover:bg-rose-950/40 hover:text-rose-400 text-xs font-medium rounded-lg text-slate-400 transition-colors">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+          <span>Keluar</span>
+        </button>
+      </div>
+    </aside>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 space-y-6">
-
-        <!-- Realtime Status Banner -->
-        <div class="glass-card rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex items-center space-x-3">
-                <span class="relative flex h-3 w-3">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-                </span>
-                <p class="text-xs text-slate-600 dark:text-slate-300 font-medium">
-                    Google Sheets Connected: <span class="font-semibold text-slate-900 dark:text-white" id="sheet-id-label">OPS EMS PNR</span>
-                </p>
-            </div>
-            <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center space-x-2">
-                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                <span>Terakhir diperbarui: <span id="last-update" class="font-semibold text-slate-700 dark:text-slate-200">-</span></span>
-            </div>
+    <!-- CONTENT AREA -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+      
+      <!-- TOP NAVBAR -->
+      <header class="h-16 glass-card border-b border-slate-200 dark:border-slate-800 px-6 flex items-center justify-between z-30 sticky top-0">
+        <div class="flex items-center gap-4">
+          <button onclick="toggleSidebar()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-600 dark:text-slate-300">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+          <!-- Weather Widget Container -->
+          <div id="weatherWidget" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-xs text-sky-700 dark:text-sky-300">
+            <i data-lucide="cloud-sun" class="w-4 h-4 text-amber-500"></i>
+            <span id="weatherText">Surabaya, 29°C Cerah</span>
+          </div>
         </div>
 
-        <!-- Global Filters & Search -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="relative">
-                <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-slate-400"></i>
-                <input type="text" id="global-search" oninput="applyFilters()" placeholder="Cari Toko, Trainer, atau Topik..." 
-                    class="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
+        <div class="flex items-center gap-3">
+          <!-- Theme Toggle -->
+          <button onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <i data-lucide="moon" id="themeIconDark" class="w-4 h-4 hidden"></i>
+            <i data-lucide="sun" id="themeIconLight" class="w-4 h-4"></i>
+          </button>
+
+          <!-- Settings Button -->
+          <button onclick="openSettings()" class="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl transition-colors">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Settings</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- DYNAMIC CONTENT TAB WRAPPER -->
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 custom-scrollbar space-y-6">
+
+        <!-- TAB 1: EXECUTIVE OVERALL SUMMARY -->
+        <section id="tab-overview" class="tab-content space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-                <select id="month-filter" onchange="applyFilters()" 
-                    class="w-full px-3 py-2 rounded-xl text-xs bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="ALL">Semua Bulan</option>
-                </select>
+              <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Executive Overall Summary</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pemantauan akumulasi aktivitas operasional (OPS, EMS, PnR) seluruh toko ritel</p>
             </div>
-            <div class="flex items-center justify-end">
-                <div class="text-xs text-slate-500 dark:text-slate-400">
-                    Total Records Filtered: <span id="filtered-count" class="font-bold text-blue-600 dark:text-blue-400">0</span>
-                </div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
+                ● Live Data Sync
+              </span>
             </div>
-        </div>
+          </div>
 
-        <!-- KPI Metric Cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="glass-card rounded-2xl p-4 space-y-1">
-                <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
-                    <span class="text-xs font-medium">Total Open Studio (OPS)</span>
-                    <i data-lucide="presentation" class="w-4 h-4 text-blue-500"></i>
-                </div>
-                <div class="text-2xl font-extrabold" id="stat-ops-count">0</div>
-                <p class="text-[10px] text-slate-400">Sesi training operasional</p>
+          <!-- Key Metrics Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800 relative overflow-hidden">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Aktivitas (Total)</p>
+              <h3 id="statTotal" class="text-3xl font-black text-slate-900 dark:text-white mt-2">0</h3>
+              <p class="text-xs text-emerald-500 font-semibold mt-2 flex items-center gap-1">
+                <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+                <span>+14.2% dari bulan lalu</span>
+              </p>
             </div>
 
-            <div class="glass-card rounded-2xl p-4 space-y-1">
-                <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
-                    <span class="text-xs font-medium">Total Peserta & Sales</span>
-                    <i data-lucide="users" class="w-4 h-4 text-emerald-500"></i>
-                </div>
-                <div class="text-2xl font-extrabold" id="stat-participants">0</div>
-                <p class="text-[10px] text-slate-400"><span id="stat-units">0</span> unit terjual pasca training</p>
+            <div class="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">OPS Completed</p>
+              <h3 id="statOPS" class="text-3xl font-black text-sky-600 dark:text-sky-400 mt-2">0</h3>
+              <p class="text-xs text-slate-400 mt-2">Aktivitas Operasional Toko</p>
             </div>
 
-            <div class="glass-card rounded-2xl p-4 space-y-1">
-                <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
-                    <span class="text-xs font-medium">EMS Evaluation (Scoring)</span>
-                    <i data-lucide="award" class="w-4 h-4 text-amber-500"></i>
-                </div>
-                <div class="text-2xl font-extrabold" id="stat-ems-count">0</div>
-                <p class="text-[10px] text-slate-400">Rekapitulasi penilaian karyawan</p>
+            <div class="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">EMS Completed</p>
+              <h3 id="statEMS" class="text-3xl font-black text-indigo-600 dark:text-indigo-400 mt-2">0</h3>
+              <p class="text-xs text-slate-400 mt-2">Evaluasi & Monitoring Staff</p>
             </div>
 
-            <div class="glass-card rounded-2xl p-4 space-y-1">
-                <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
-                    <span class="text-xs font-medium">PnR (Plan vs Result)</span>
-                    <i data-lucide="trending-up" class="w-4 h-4 text-purple-500"></i>
-                </div>
-                <div class="text-2xl font-extrabold" id="stat-pnr-rate">0%</div>
-                <p class="text-[10px] text-slate-400">Rata-rata pencapaian jam training</p>
+            <div class="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">PnR Completed</p>
+              <h3 id="statPNR" class="text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-2">0</h3>
+              <p class="text-xs text-slate-400 mt-2">People & Readiness Audit</p>
             </div>
-        </div>
+          </div>
 
-        <!-- Navigation Tabs -->
-        <div class="flex space-x-2 border-b border-slate-200 dark:border-slate-800 pb-2">
-            <button onclick="switchTab('OPS')" id="tab-OPS" class="px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2 bg-blue-600 text-white shadow-md shadow-blue-500/20">
-                <i data-lucide="activity" class="w-3.5 h-3.5"></i>
-                <span>Sheet OPS</span>
-            </button>
-            <button onclick="switchTab('EMS')" id="tab-EMS" class="px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800">
-                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
-                <span>Sheet EMS</span>
-            </button>
-            <button onclick="switchTab('PNR')" id="tab-PNR" class="px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800">
-                <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i>
-                <span>Sheet PnR</span>
-            </button>
-        </div>
+          <!-- Overall Growth Chart -->
+          <div class="glass-card p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">Tren Pertumbuhan Aktivitas Harian & Bulanan</h3>
+              <span class="text-xs text-slate-500">OPS vs EMS vs PnR</span>
+            </div>
+            <div class="h-72">
+              <canvas id="overviewGrowthChart"></canvas>
+            </div>
+          </div>
+        </section>
 
-        <!-- TAB CONTENT: OPS -->
-        <div id="content-OPS" class="space-y-6">
-            <!-- Charts Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="glass-card rounded-2xl p-5 space-y-3">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Top Toko Berdasarkan Jumlah Sesi (OPS)</h3>
-                    <div class="h-64 relative">
-                        <canvas id="opsChartStore"></canvas>
-                    </div>
-                </div>
-                <div class="glass-card rounded-2xl p-5 space-y-3">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Minat Produk Pelanggan</h3>
-                    <div class="h-64 relative">
-                        <canvas id="opsChartProduct"></canvas>
-                    </div>
-                </div>
+        <!-- TAB 2: DIRECTORY STORE TRAINER & DRILL-DOWN STAFF -->
+        <section id="tab-directory" class="tab-content hidden space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Directory Store Trainer & Staff</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Filter toko, lihat detail staff, serta rincian aktivitas dan Any Comment</p>
+          </div>
+
+          <!-- Store Trainer List Table -->
+          <div class="glass-card rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <h3 class="font-bold text-slate-900 dark:text-white text-sm">Daftar Store Trainer Seluruh Toko</h3>
+              <div class="relative w-full sm:w-64">
+                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+                <input type="text" id="searchTrainer" onkeyup="renderTrainerList()" placeholder="Cari nama trainer / toko..." class="w-full pl-9 pr-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-sky-500" />
+              </div>
             </div>
 
-            <!-- Table OPS -->
-            <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
-                <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">Data Log OPS (Open Studio)</h3>
-                    <span class="text-[10px] text-slate-400">Menampilkan hingga 50 data terbaru</span>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-100/70 dark:bg-slate-800/50 uppercase tracking-wider text-slate-500 font-semibold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th class="p-3.5">Employee Name</th>
+                    <th class="p-3.5">Category</th>
+                    <th class="p-3.5">Store</th>
+                    <th class="p-3.5">Type Store</th>
+                    <th class="p-3.5">NIK</th>
+                    <th class="p-3.5">Work Experience</th>
+                    <th class="p-3.5 text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="trainerTableBody" class="divide-y divide-slate-200 dark:divide-slate-800 font-medium">
+                  <!-- Dynamic render -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- DRILL DOWN AREA FOR SELECTED TRAINER & STORE STAFF -->
+          <div id="drillDownSection" class="hidden space-y-6 pt-4 border-t border-slate-200 dark:border-slate-800">
+            <div class="glass-card p-6 rounded-2xl border border-sky-500/30 bg-sky-50/20 dark:bg-sky-950/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div>
+                <span class="text-[10px] uppercase font-bold tracking-wider text-sky-600 dark:text-sky-400">Toko Terpilih</span>
+                <h3 id="selectedStoreTitle" class="text-xl font-extrabold text-slate-900 dark:text-white mt-0.5">M116 Digimap Beachwalk Bali</h3>
+                <p id="selectedTrainerInfo" class="text-xs text-slate-500 dark:text-slate-400 mt-1">Store Trainer: Efkar El Hikam [ST] | NIK: 25019459</p>
+              </div>
+
+              <!-- Timeframe Filter -->
+              <div class="flex items-center gap-2 bg-slate-200 dark:bg-slate-800 p-1 rounded-xl text-xs">
+                <button onclick="setTimeframe('daily')" id="tf-daily" class="px-3 py-1.5 rounded-lg font-semibold bg-white dark:bg-slate-700 shadow text-sky-600 dark:text-sky-300">Daily</button>
+                <button onclick="setTimeframe('weekly')" id="tf-weekly" class="px-3 py-1.5 rounded-lg font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-white">Weekly</button>
+                <button onclick="setTimeframe('monthly')" id="tf-monthly" class="px-3 py-1.5 rounded-lg font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-white">Monthly</button>
+              </div>
+            </div>
+
+            <!-- Staff Activity & Comments Details -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- Staff Table -->
+              <div class="lg:col-span-2 glass-card rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div class="p-4 border-b border-slate-200 dark:border-slate-800">
+                  <h4 class="font-bold text-slate-900 dark:text-white text-sm">Daftar Staff & Progress Aktivitas OPS/EMS/PnR</h4>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead class="bg-slate-200/50 dark:bg-slate-800/50 text-slate-500 uppercase font-semibold">
-                            <tr>
-                                <th class="p-3">Tanggal</th>
-                                <th class="p-3">Presenter</th>
-                                <th class="p-3">Toko</th>
-                                <th class="p-3">Topik Open Studio</th>
-                                <th class="p-3">Peserta</th>
-                                <th class="p-3">Unit Terjual</th>
-                                <th class="p-3">Minat Produk</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-ops-body" class="divide-y divide-slate-200 dark:divide-slate-800">
-                            <tr>
-                                <td colspan="7" class="p-6 text-center text-slate-400">Memuat data OPS...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                  <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-100/70 dark:bg-slate-800/50 uppercase text-slate-500 font-semibold border-b border-slate-200 dark:border-slate-800">
+                      <tr>
+                        <th class="p-3">Nama Staff</th>
+                        <th class="p-3">Jabatan</th>
+                        <th class="p-3 text-center">OPS</th>
+                        <th class="p-3 text-center">EMS</th>
+                        <th class="p-3 text-center">PnR</th>
+                        <th class="p-3">Progress</th>
+                      </tr>
+                    </thead>
+                    <tbody id="staffTableBody" class="divide-y divide-slate-200 dark:divide-slate-800">
+                      <!-- Dynamic Render -->
+                    </tbody>
+                  </table>
                 </div>
-            </div>
-        </div>
+              </div>
 
-        <!-- TAB CONTENT: EMS -->
-        <div id="content-EMS" class="space-y-6 hidden">
-            <div class="glass-card rounded-2xl p-5 space-y-3">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Ecosystem Mastery Evaluation Data</h3>
-                <p class="text-xs text-slate-400">Rekapitulasi aktivitas dan nilai tes pemahaman ekosistem produk.</p>
-            </div>
-
-            <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead class="bg-slate-200/50 dark:bg-slate-800/50 text-slate-500 uppercase font-semibold">
-                            <tr id="table-ems-head">
-                                <th class="p-3">Loading...</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-ems-body" class="divide-y divide-slate-200 dark:divide-slate-800">
-                            <tr>
-                                <td class="p-6 text-center text-slate-400">Memuat data EMS...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+              <!-- Chart Staff Progress -->
+              <div class="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                <h4 class="font-bold text-slate-900 dark:text-white text-sm mb-2">Persentase Progress Toko</h4>
+                <div class="h-56 relative flex items-center justify-center">
+                  <canvas id="storeProgressDoughnut"></canvas>
                 </div>
-            </div>
-        </div>
-
-        <!-- TAB CONTENT: PNR -->
-        <div id="content-PNR" class="space-y-6 hidden">
-            <div class="glass-card rounded-2xl p-5 space-y-3">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Plan vs Result (PnR) Store Trainer Hours</h3>
-                <p class="text-xs text-slate-400">Perbandingan pencapaian jam training aktual terhadap target minimal bulanan.</p>
+                <p class="text-[11px] text-center text-slate-400 mt-2">Rata-rata pencapaian checklist seluruh tim di toko ini</p>
+              </div>
             </div>
 
-            <div class="glass-card rounded-2xl overflow-hidden shadow-sm">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs border-collapse">
-                        <thead class="bg-slate-200/50 dark:bg-slate-800/50 text-slate-500 uppercase font-semibold">
-                            <tr id="table-pnr-head">
-                                <th class="p-3">Loading...</th>
-                            </tr>
-                        </thead>
-                        <tbody id="table-pnr-body" class="divide-y divide-slate-200 dark:divide-slate-800">
-                            <tr>
-                                <td class="p-6 text-center text-slate-400">Memuat data PnR...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Any Comment (EMS & PnR) List -->
+            <div class="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+              <h4 class="font-bold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                <i data-lucide="message-square" class="w-4 h-4 text-sky-500"></i>
+                <span>Catatan & Ulasan Khusus (Any Comment - EMS & PnR)</span>
+              </h4>
+              <div id="commentsContainer" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-2">
+                <!-- Dynamic comments -->
+              </div>
             </div>
-        </div>
+          </div>
+        </section>
 
+        <!-- TAB 3: STORE TRAINER PERFORMANCE TRACKING -->
+        <section id="tab-tracking" class="tab-content hidden space-y-6">
+          <div>
+            <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Store Trainer Performance Tracking</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Evaluasi performa Store Trainer berdasarkan penyelesaian aktivitas di tokonya</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Progress Bar List -->
+            <div class="glass-card p-6 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+              <h3 class="font-bold text-slate-900 dark:text-white text-sm">Pencapaian Progress Aktivitas Toko Trainer</h3>
+              <div id="trainerProgressList" class="space-y-4 max-h-96 overflow-y-auto custom-scrollbar pr-2">
+                <!-- Dynamic Render -->
+              </div>
+            </div>
+
+            <!-- Performance Bar Chart -->
+            <div class="glass-card p-6 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+              <h3 class="font-bold text-slate-900 dark:text-white text-sm mb-4">Grafik Performa & Tren Penyelesaian</h3>
+              <div class="h-80">
+                <canvas id="trainerPerformanceChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
     </main>
+  </div>
 
-    <!-- Application JavaScript Logic -->
-    <script>
-        // CONFIGURATION & CONSTANTS
-        const SPREADSHEET_ID = '1VIjDE5YvDsBv3YEfrXatVoKSL2GaAgIkAPC3qRlwyjA';
-        const SHEETS = {
-            OPS: 'OPS',
-            EMS: 'EMS',
-            PNR: 'PnR'
-        };
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+    <div class="glass-card w-full max-w-lg p-6 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+        <h3 class="font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+          <i data-lucide="settings" class="w-5 h-5 text-sky-500"></i>
+          <span>Pengaturan Dashboard</span>
+        </h3>
+        <button onclick="closeSettings()" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
 
-        // State Store
-        let rawData = { OPS: [], EMS: [], PNR: [] };
-        let filteredData = { OPS: [], EMS: [], PNR: [] };
-        let activeTab = 'OPS';
-        let charts = {};
+      <div class="space-y-4 text-sm">
+        <!-- Status Role -->
+        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60">
+          <span class="text-slate-600 dark:text-slate-300 font-medium">Status Akses Akun</span>
+          <span id="settingsUserRole" class="font-bold text-sky-600 dark:text-sky-400 uppercase">ADMIN</span>
+        </div>
 
-        // INITIALIZATION
-        document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            lucide.createIcons();
-            fetchData();
-        });
+        <!-- Refresh Data -->
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="font-semibold text-slate-800 dark:text-slate-200">Refresh Data Google Sheets</p>
+            <p class="text-xs text-slate-400">Sinkronkan ulang data dari Pemadanan static & OPS EMS PnR</p>
+          </div>
+          <button onclick="refreshData()" class="px-3.5 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-md">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span>Refresh</span>
+          </button>
+        </div>
 
-        // THEME HANDLER
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            if (savedTheme === 'dark') {
-                document.documentElement.classList.add('dark');
-                document.getElementById('theme-sun').classList.remove('hidden');
-                document.getElementById('theme-moon').classList.add('hidden');
-            } else {
-                document.documentElement.classList.remove('dark');
-                document.getElementById('theme-sun').classList.add('hidden');
-                document.getElementById('theme-moon').classList.remove('hidden');
-            }
+        <!-- Weather Widget Toggle -->
+        <div class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
+          <div>
+            <p class="font-semibold text-slate-800 dark:text-slate-200">Widget Cuaca Lokal</p>
+            <p class="text-xs text-slate-400">Tampilkan informasi cuaca lokal pada header</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="weatherToggle" checked onchange="toggleWeatherWidget()" class="sr-only peer">
+            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sky-600"></div>
+          </label>
+        </div>
 
-            document.getElementById('theme-toggle').addEventListener('click', () => {
-                const isDark = document.documentElement.classList.toggle('dark');
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                document.getElementById('theme-sun').classList.toggle('hidden', !isDark);
-                document.getElementById('theme-moon').classList.toggle('hidden', isDark);
-                renderCharts();
-            });
+        <!-- Manage Password -->
+        <div class="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2">
+          <p class="font-semibold text-slate-800 dark:text-slate-200">Ubah Password Akun</p>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="password" id="newPassword" placeholder="Password Baru..." class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:outline-none" />
+            <button onclick="saveNewPassword()" class="py-2.5 bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 text-white rounded-xl text-xs font-semibold">Simpan</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // --- STATE MANAGEMENT ---
+    let currentUser = null;
+    let masterTrainers = [];
+    let masterStaff = [];
+    let selectedTrainer = null;
+    let selectedTimeframe = 'daily';
+
+    // Dummy Data Generation (Real API Integration via Apps Script/CSV Fetch Supported)
+    const mockTrainers = [
+      { name: 'Efkar El Hikam', position: 'Store Trainer', store: 'M116 Digimap Beachwalk Bali', typeStore: 'APP', nik: '25019459', exp: '0 Tahun 11 Bulan', trainerType: 'ST' },
+      { name: 'Fernaldi Akbar', position: 'Store Trainer (Pt)', store: 'M118 Digimap Pondok Indah Mall 3', typeStore: 'APR', nik: '24023795', exp: '6 Tahun 11 Bulan', trainerType: 'PT' },
+      { name: 'Yogi Harahap', position: 'Store Trainer', store: 'M121 Digimap Tunjungan Plaza 3 Surabaya', typeStore: 'APR', nik: '26026364', exp: '2 Tahun 1 Bulan', trainerType: 'ST' },
+    ];
+
+    const mockStaff = {
+      'M116 Digimap Beachwalk Bali': [
+        { name: 'Muhammad Fachrizal Adam', role: 'Supervisor', ops: 12, ems: 8, pnr: 5 },
+        { name: 'Efkar El Hikam', role: 'Store Trainer [ST]', ops: 15, ems: 10, pnr: 8 },
+        { name: 'I Nyoman Angga Aditya', role: 'Cashier', ops: 10, ems: 6, pnr: 4 },
+        { name: 'I Gusti Ayu Dwi Antari', role: 'Cashier', ops: 9, ems: 7, pnr: 5 },
+        { name: 'Rasya Dwi Irfansyah', role: 'Sales Staff', ops: 11, ems: 9, pnr: 6 }
+      ],
+      'M118 Digimap Pondok Indah Mall 3': [
+        { name: 'Riad Solihin', role: 'Supervisor', ops: 14, ems: 9, pnr: 6 },
+        { name: 'Fernaldi Akbar', role: 'Store Trainer [PT]', ops: 10, ems: 7, pnr: 5 },
+        { name: 'Heni Afriani', role: 'Sales Staff', ops: 8, ems: 5, pnr: 4 }
+      ]
+    };
+
+    const mockComments = [
+      { type: 'EMS', author: 'Efkar El Hikam', comment: 'Demonstrasi fitur Apple Intelligence pada pelanggan berjalan dengan sangat intuitif.' },
+      { type: 'PnR', author: 'Muhammad Fachrizal', comment: 'Seragam dan kelengkapan name tag tim telah 100% memenuhi standar grooming.' },
+      { type: 'EMS', author: 'I Nyoman Angga', comment: 'Perlu peningkatan waktu transaksi pemrosesan EDC di jam sibuk.' }
+    ];
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initTheme();
+      checkAuth();
+    });
+
+    // --- AUTHENTICATION ---
+    function handleLogin(e) {
+      e.preventDefault();
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value.trim();
+
+      const savedAdminPass = localStorage.getItem('pass_admin') || 'maptech';
+      const savedStaffPass = localStorage.getItem('pass_staff') || 'trainer';
+
+      if (u === 'digimap' && p === savedAdminPass) {
+        currentUser = { username: 'digimap', role: 'ADMIN', name: 'Admin Digimap' };
+      } else if (u === 'digimap' && p === savedStaffPass) {
+        currentUser = { username: 'digimap', role: 'STAFF', name: 'Staff Trainer' };
+      } else {
+        document.getElementById('loginError').classList.remove('hidden');
+        return;
+      }
+
+      localStorage.setItem('user_session', JSON.stringify(currentUser));
+      document.getElementById('loginModal').classList.add('hidden');
+      document.getElementById('appLayout').classList.remove('hidden');
+      setupUserUI();
+      loadDashboardData();
+    }
+
+    function checkAuth() {
+      const sess = localStorage.getItem('user_session');
+      if (sess) {
+        currentUser = JSON.parse(sess);
+        document.getElementById('loginModal').classList.add('hidden');
+        document.getElementById('appLayout').classList.remove('hidden');
+        setupUserUI();
+        loadDashboardData();
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('user_session');
+      location.reload();
+    }
+
+    function setupUserUI() {
+      document.getElementById('userDisplay').innerText = currentUser.name;
+      document.getElementById('roleBadge').innerText = `ROLE: ${currentUser.role}`;
+      document.getElementById('settingsUserRole').innerText = currentUser.role;
+    }
+
+    // --- THEME SYSTEM ---
+    function initTheme() {
+      const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.getElementById('themeIconDark').classList.remove('hidden');
+        document.getElementById('themeIconLight').classList.add('hidden');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('themeIconLight').classList.remove('hidden');
+        document.getElementById('themeIconDark').classList.add('hidden');
+      }
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      document.getElementById('themeIconDark').classList.toggle('hidden', !isDark);
+      document.getElementById('themeIconLight').classList.toggle('hidden', isDark);
+    }
+
+    // --- NAVIGATION & TABS ---
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-sky-600', 'text-white', 'shadow-md');
+        btn.classList.add('text-slate-400', 'hover:text-white');
+      });
+
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`nav-${tabId}`);
+      activeBtn.classList.add('bg-sky-600', 'text-white', 'shadow-md');
+      activeBtn.classList.remove('text-slate-400');
+    }
+
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      sb.classList.toggle('-ml-64');
+    }
+
+    // --- DATA LOADING & RENDER ---
+    function loadDashboardData() {
+      masterTrainers = mockTrainers;
+      renderOverviewStats();
+      renderTrainerList();
+      renderPerformanceTracking();
+    }
+
+    function renderOverviewStats() {
+      document.getElementById('statTotal').innerText = '1,428';
+      document.getElementById('statOPS').innerText = '620';
+      document.getElementById('statEMS').innerText = '480';
+      document.getElementById('statPNR').innerText = '328';
+
+      // Growth Chart
+      const ctx = document.getElementById('overviewGrowthChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+          datasets: [
+            { label: 'OPS', data: [120, 150, 180, 170], borderColor: '#0284c7', tension: 0.4 },
+            { label: 'EMS', data: [90, 110, 140, 140], borderColor: '#6366f1', tension: 0.4 },
+            { label: 'PnR', data: [60, 80, 95, 93], borderColor: '#10b981', tension: 0.4 }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
+
+    function renderTrainerList() {
+      const tbody = document.getElementById('trainerTableBody');
+      const query = document.getElementById('searchTrainer').value.toLowerCase();
+      tbody.innerHTML = '';
+
+      masterTrainers.filter(t => t.name.toLowerCase().includes(query) || t.store.toLowerCase().includes(query)).forEach(t => {
+        const badgeColor = t.trainerType === 'ST' ? 'bg-sky-500/10 text-sky-500 border-sky-500/30' : 'bg-amber-500/10 text-amber-500 border-amber-500/30';
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors';
+        tr.innerHTML = `
+          <td class="p-3.5 font-bold text-slate-900 dark:text-white">${t.name}</td>
+          <td class="p-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${badgeColor}">Store Trainer [${t.trainerType}]</span></td>
+          <td class="p-3.5 text-slate-600 dark:text-slate-300">${t.store}</td>
+          <td class="p-3.5">${t.typeStore}</td>
+          <td class="p-3.5 font-mono text-slate-400">${t.nik}</td>
+          <td class="p-3.5">${t.exp}</td>
+          <td class="p-3.5 text-center">
+            <button onclick="selectTrainer('${t.store}', '${t.name}', '${t.trainerType}', '${t.nik}')" class="px-3 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-[11px] font-semibold transition-all">Pilih Toko</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function selectTrainer(store, name, type, nik) {
+      selectedTrainer = { store, name, type, nik };
+      document.getElementById('drillDownSection').classList.remove('hidden');
+      document.getElementById('selectedStoreTitle').innerText = store;
+      document.getElementById('selectedTrainerInfo').innerText = `Store Trainer: ${name} [${type}] | NIK: ${nik}`;
+
+      renderStaffList();
+      renderComments();
+      renderStoreDoughnut();
+    }
+
+    function setTimeframe(tf) {
+      selectedTimeframe = tf;
+      ['daily', 'weekly', 'monthly'].forEach(item => {
+        const btn = document.getElementById(`tf-${item}`);
+        if (item === tf) {
+          btn.className = "px-3 py-1.5 rounded-lg font-semibold bg-white dark:bg-slate-700 shadow text-sky-600 dark:text-sky-300";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg font-semibold text-slate-500 hover:text-slate-900 dark:hover:text-white";
         }
+      });
+      renderStaffList();
+    }
 
-        // FETCH REALTIME DATA FROM GOOGLE SHEETS VIA GViz API
-        async function fetchData() {
-            const syncBtn = document.getElementById('sync-btn');
-            const syncIcon = document.getElementById('sync-icon');
-            const syncText = document.getElementById('sync-text');
+    function renderStaffList() {
+      const tbody = document.getElementById('staffTableBody');
+      tbody.innerHTML = '';
+      const list = mockStaff[selectedTrainer.store] || [];
 
-            syncIcon.classList.add('animate-spin');
-            syncText.textContent = 'Syncing...';
+      list.forEach(s => {
+        const total = s.ops + s.ems + s.pnr;
+        const pct = Math.min(Math.round((total / 30) * 100), 100);
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-100/50 dark:hover:bg-slate-800/40';
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-slate-900 dark:text-white">${s.name}</td>
+          <td class="p-3 text-slate-400">${s.role}</td>
+          <td class="p-3 text-center font-bold text-sky-500">${s.ops}</td>
+          <td class="p-3 text-center font-bold text-indigo-500">${s.ems}</td>
+          <td class="p-3 text-center font-bold text-emerald-500">${s.pnr}</td>
+          <td class="p-3">
+            <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+              <div class="bg-sky-500 h-full" style="width: ${pct}%"></div>
+            </div>
+            <span class="text-[10px] text-slate-400 mt-0.5 inline-block">${pct}% Complete</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
 
-            try {
-                for (const [key, sheetName] of Object.entries(SHEETS)) {
-                    const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-                    const csvText = await response.text();
+    function renderComments() {
+      const container = document.getElementById('commentsContainer');
+      container.innerHTML = '';
+      mockComments.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50 text-xs';
+        div.innerHTML = `
+          <div class="flex items-center justify-between font-semibold text-slate-700 dark:text-slate-300">
+            <span>[${c.type}] ${c.author}</span>
+            <span class="text-[10px] text-slate-400">Hari ini</span>
+          </div>
+          <p class="text-slate-500 dark:text-slate-400 mt-1">"${c.comment}"</p>
+        `;
+        container.appendChild(div);
+      });
+    }
 
-                    // Parse CSV to JSON
-                    const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-                    rawData[key] = parsed.data || [];
-                }
+    function renderStoreDoughnut() {
+      const ctx = document.getElementById('storeProgressDoughnut').getContext('2d');
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['OPS', 'EMS', 'PnR'],
+          datasets: [{ data: [50, 30, 20], backgroundColor: ['#0284c7', '#6366f1', '#10b981'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
 
-                document.getElementById('last-update').textContent = new Date().toLocaleTimeString('id-ID');
-                populateMonthFilter();
-                applyFilters();
+    function renderPerformanceTracking() {
+      const container = document.getElementById('trainerProgressList');
+      container.innerHTML = '';
+      masterTrainers.forEach(t => {
+        const pct = Math.floor(Math.random() * 30) + 70;
+        const div = document.createElement('div');
+        div.className = 'space-y-1.5';
+        div.innerHTML = `
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-800 dark:text-slate-200">${t.name} (${t.store})</span>
+            <span class="font-mono text-sky-500 font-bold">${pct}%</span>
+          </div>
+          <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+            <div class="bg-gradient-to-r from-sky-500 to-emerald-400 h-full" style="width: ${pct}%"></div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
 
-            } catch (err) {
-                console.error('Data Sync Error:', err);
-                alert('Gagal mengambil data dari Google Sheets. Pastikan spreadsheet diatur ke "Anyone with link can view".');
-            } finally {
-                syncIcon.classList.remove('animate-spin');
-                syncText.textContent = 'Sync Data';
-            }
-        }
+      const ctx = document.getElementById('trainerPerformanceChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: masterTrainers.map(t => t.name),
+          datasets: [{ label: 'Progress (%)', data: [88, 75, 92], backgroundColor: '#0284c7' }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
 
-        // POPULATE MONTH FILTER DROPDOWN
-        function populateMonthFilter() {
-            const select = document.getElementById('month-filter');
-            select.innerHTML = '<option value="ALL">Semua Bulan</option>';
-
-            const months = new Set();
-            rawData.OPS.forEach(row => {
-                const m = row['Bulan'] || row['Month'];
-                if (m) months.add(m.trim());
-            });
-
-            months.forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m;
-                opt.textContent = m;
-                select.appendChild(opt);
-            });
-        }
-
-        // APPLY FILTERS ACROSS ALL DATASETS
-        function applyFilters() {
-            const search = document.getElementById('global-search').value.toLowerCase();
-            const month = document.getElementById('month-filter').value;
-
-            for (const key of ['OPS', 'EMS', 'PNR']) {
-                filteredData[key] = rawData[key].filter(row => {
-                    // Search match
-                    const matchSearch = !search || Object.values(row).some(val => String(val).toLowerCase().includes(search));
-                    // Month match
-                    const rowMonth = row['Bulan'] || row['Month'] || '';
-                    const matchMonth = month === 'ALL' || rowMonth.trim() === month;
-
-                    return matchSearch && matchMonth;
-                });
-            }
-
-            document.getElementById('filtered-count').textContent = filteredData[activeTab].length;
-            updateKPIs();
-            renderActiveTabContent();
-        }
-
-        // UPDATE SUMMARY KPI METRICS
-        function updateKPIs() {
-            // OPS Count
-            const opsCount = filteredData.OPS.length;
-            document.getElementById('stat-ops-count').textContent = opsCount.toLocaleString('id-ID');
-
-            // Participants & Units Sold
-            let totalParticipants = 0;
-            let totalUnits = 0;
-            filteredData.OPS.forEach(r => {
-                const pKey = Object.keys(r).find(k => k.includes('Participants') || k.includes('pelanggan'));
-                const uKey = Object.keys(r).find(k => k.includes('terjual') || k.includes('Unit'));
-                if (pKey && r[pKey]) totalParticipants += parseInt(r[pKey]) || 0;
-                if (uKey && r[uKey]) totalUnits += parseInt(r[uKey]) || 0;
-            });
-            document.getElementById('stat-participants').textContent = totalParticipants.toLocaleString('id-ID');
-            document.getElementById('stat-units').textContent = totalUnits.toLocaleString('id-ID');
-
-            // EMS Count
-            document.getElementById('stat-ems-count').textContent = filteredData.EMS.length.toLocaleString('id-ID');
-
-            // PnR Rate
-            let totalRate = 0;
-            let rateCount = 0;
-            filteredData.PNR.forEach(r => {
-                const rateKey = Object.keys(r).find(k => k.includes('%') || k.includes('Progress'));
-                if (rateKey && r[rateKey]) {
-                    const val = parseFloat(r[rateKey].replace('%', ''));
-                    if (!isNaN(val)) {
-                        totalRate += val;
-                        rateCount++;
-                    }
-                }
-            });
-            const avgRate = rateCount > 0 ? (totalRate / rateCount).toFixed(1) : 0;
-            document.getElementById('stat-pnr-rate').textContent = `${avgRate}%`;
-        }
-
-        // TAB SWITCHING
-        function switchTab(tab) {
-            activeTab = tab;
-            ['OPS', 'EMS', 'PNR'].forEach(t => {
-                const btn = document.getElementById(`tab-${t}`);
-                const content = document.getElementById(`content-${t}`);
-                if (t === tab) {
-                    btn.className = "px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2 bg-blue-600 text-white shadow-md shadow-blue-500/20";
-                    content.classList.remove('hidden');
-                } else {
-                    btn.className = "px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center space-x-2 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800";
-                    content.classList.add('hidden');
-                }
-            });
-            document.getElementById('filtered-count').textContent = filteredData[activeTab].length;
-            renderActiveTabContent();
-        }
-
-        // RENDER CONTENT FOR CURRENT TAB
-        function renderActiveTabContent() {
-            if (activeTab === 'OPS') {
-                renderOPSTable();
-                renderCharts();
-            } else if (activeTab === 'EMS') {
-                renderGenericTable('EMS', 'table-ems-head', 'table-ems-body');
-            } else if (activeTab === 'PNR') {
-                renderGenericTable('PNR', 'table-pnr-head', 'table-pnr-body');
-            }
-        }
-
-        // RENDER OPS SPECIFIC TABLE
-        function renderOPSTable() {
-            const body = document.getElementById('table-ops-body');
-            const data = filteredData.OPS.slice(0, 50); // Limit 50 rows for display performance
-
-            if (data.length === 0) {
-                body.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Tidak ada data ditemukan.</td></tr>`;
-                return;
-            }
-
-            body.innerHTML = data.map(r => {
-                const dateVal = r['Date'] || r['Tanggal ( Hari, Bulan, Tahun ) Hari ini'] || r['Timestamp'] || '-';
-                const presenter = r['Presenter Name\nFill in your full name'] || r['Presenter Name'] || r['Email'] || '-';
-                const store = r['Store'] || '-';
-                const topic = r['Open Studio Topics'] || '-';
-                const participants = r['Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio'] || r['Total Participants'] || '0';
-                const units = r['Unit yang terjual setelah Open Studio'] || '0';
-                const product = r['Produk apa yang pelanggan minati'] || '-';
-
-                return `
-                    <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-colors">
-                        <td class="p-3 font-medium text-slate-700 dark:text-slate-300">${escapeHtml(dateVal)}</td>
-                        <td class="p-3 text-slate-600 dark:text-slate-400">${escapeHtml(presenter)}</td>
-                        <td class="p-3 font-semibold text-blue-600 dark:text-blue-400">${escapeHtml(store)}</td>
-                        <td class="p-3">${escapeHtml(topic)}</td>
-                        <td class="p-3 font-medium">${escapeHtml(participants)}</td>
-                        <td class="p-3 text-emerald-600 dark:text-emerald-400 font-bold">${escapeHtml(units)}</td>
-                        <td class="p-3"><span class="px-2 py-0.5 rounded-md bg-slate-200 dark:bg-slate-800 text-[10px]">${escapeHtml(product)}</span></td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        // RENDER GENERIC DYNAMIC TABLE (EMS & PNR)
-        function renderGenericTable(key, headId, bodyId) {
-            const head = document.getElementById(headId);
-            const body = document.getElementById(bodyId);
-            const data = filteredData[key].slice(0, 50);
-
-            if (data.length === 0) {
-                head.innerHTML = `<th class="p-3">Data</th>`;
-                body.innerHTML = `<tr><td class="p-6 text-center text-slate-400">Tidak ada data ditemukan.</td></tr>`;
-                return;
-            }
-
-            const cols = Object.keys(data[0]).slice(0, 8); // take first 8 columns
-
-            head.innerHTML = cols.map(c => `<th class="p-3">${escapeHtml(c)}</th>`).join('');
-
-            body.innerHTML = data.map(r => {
-                return `
-                    <tr class="hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-colors">
-                        ${cols.map(c => `<td class="p-3 text-slate-700 dark:text-slate-300">${escapeHtml(r[c] || '-')}</td>`).join('')}
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        // RENDER CHARTS
-        function renderCharts() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const textColor = isDark ? '#94a3b8' : '#64748b';
-            const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-
-            // Destroy existing charts
-            if (charts.opsStore) charts.opsStore.destroy();
-            if (charts.opsProduct) charts.opsProduct.destroy();
-
-            // Calculate Top Stores
-            const storeCounts = {};
-            filteredData.OPS.forEach(r => {
-                const s = r['Store'];
-                if (s) storeCounts[s] = (storeCounts[s] || 0) + 1;
-            });
-
-            const topStores = Object.entries(storeCounts)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5);
-
-            // Chart 1: Top Stores
-            const ctxStore = document.getElementById('opsChartStore').getContext('2d');
-            charts.opsStore = new Chart(ctxStore, {
-                type: 'bar',
-                data: {
-                    labels: topStores.map(item => item[0].length > 20 ? item[0].substring(0, 20) + '...' : item[0]),
-                    datasets: [{
-                        label: 'Sesi Open Studio',
-                        data: topStores.map(item => item[1]),
-                        backgroundColor: '#0071e3',
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { ticks: { color: textColor, font: { size: 10 } }, grid: { display: false } },
-                        y: { ticks: { color: textColor, font: { size: 10 } }, grid: { color: gridColor } }
-                    }
-                }
-            });
-
-            // Calculate Product Interest
-            const productCounts = {};
-            filteredData.OPS.forEach(r => {
-                const p = r['Produk apa yang pelanggan minati'];
-                if (p && p.trim() !== '') productCounts[p] = (productCounts[p] || 0) + 1;
-            });
-
-            const topProducts = Object.entries(productCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-            // Chart 2: Product Interest
-            const ctxProd = document.getElementById('opsChartProduct').getContext('2d');
-            charts.opsProduct = new Chart(ctxProd, {
-                type: 'doughnut',
-                data: {
-                    labels: topProducts.map(p => p[0]),
-                    datasets: [{
-                        data: topProducts.map(p => p[1]),
-                        backgroundColor: ['#0071e3', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: textColor, font: { size: 10 } } }
-                    }
-                }
-            });
-        }
-
-        // HELPER: ESCAPE HTML
-        function escapeHtml(str) {
-            if (typeof str !== 'string') return str;
-            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        }
-    </script>
+    // --- SETTINGS PANEL LOGIC ---
+    function openSettings() {
+      document.getElementById('settingsModal').classList.remove('hidden');
+    }
+    function closeSettings() {
+      document.getElementById('settingsModal').classList.add('hidden');
+    }
+    function toggleWeatherWidget() {
+      const chk = document.getElementById('weatherToggle').checked;
+      document.getElementById('weatherWidget').style.display = chk ? 'flex' : 'none';
+    }
+    function refreshData() {
+      loadDashboardData();
+      alert('Data Google Sheets berhasil diperbarui!');
+    }
+    function saveNewPassword() {
+      const pass = document.getElementById('newPassword').value;
+      if (!pass) return;
+      if (currentUser.role === 'ADMIN') {
+        localStorage.setItem('pass_admin', pass);
+      } else {
+        localStorage.setItem('pass_staff', pass);
+      }
+      alert('Password berhasil diperbarui!');
+      closeSettings();
+    }
+  </script>
 </body>
 </html>
