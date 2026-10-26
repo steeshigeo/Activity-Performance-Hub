@@ -213,10 +213,12 @@
       align-items: center;
       width: 100%;
       margin-bottom: 16px;
+      flex-wrap: wrap;
     }
 
     .search-box {
-      flex: 1;
+      flex: 2;
+      min-width: 200px;
       padding: 10px 16px;
       background: var(--input-bg);
       border: 1px solid var(--glass-border);
@@ -226,6 +228,8 @@
     }
 
     .select-box {
+      flex: 1;
+      min-width: 140px;
       padding: 10px 14px;
       background: var(--input-bg);
       border: 1px solid var(--glass-border);
@@ -358,13 +362,15 @@
             <div class="panel-title">Data Detail OPS</div>
           </div>
           <div class="controls-row">
-            <input type="text" id="opsSearch" class="search-box" placeholder="Cari store, presenter, topik, dll..." oninput="onSearchInput('ops')">
-            <select id="opsPageSize" class="select-box" onchange="onPageSizeChange('ops')">
-              <option value="25">25 per hal</option>
-              <option value="50" selected>50 per hal</option>
-              <option value="100">100 per hal</option>
-              <option value="500">500 per hal</option>
-              <option value="all">Semua Data</option>
+            <input type="text" id="opsSearch" class="search-box" placeholder="Cari pencarian teks..." oninput="onSearchInput('ops')">
+            <select id="opsMonthFilter" class="select-box" onchange="onFilterChange('ops', 'month')">
+              <option value="all">Semua Bulan</option>
+            </select>
+            <select id="opsStoreFilter" class="select-box" onchange="onFilterChange('ops', 'store')">
+              <option value="all">Semua Store</option>
+            </select>
+            <select id="opsTrainerFilter" class="select-box" onchange="onFilterChange('ops', 'trainer')">
+              <option value="all">Semua Trainer</option>
             </select>
           </div>
           <div class="table-container">
@@ -397,12 +403,14 @@
         </div>
         <div class="controls-row">
           <input type="text" id="emsSearch" class="search-box" placeholder="Cari data EMS..." oninput="onSearchInput('ems')">
-          <select id="emsPageSize" class="select-box" onchange="onPageSizeChange('ems')">
-            <option value="25">25 per hal</option>
-            <option value="50" selected>50 per hal</option>
-            <option value="100">100 per hal</option>
-            <option value="500">500 per hal</option>
-            <option value="all">Semua Data</option>
+          <select id="emsMonthFilter" class="select-box" onchange="onFilterChange('ems', 'month')">
+            <option value="all">Semua Bulan</option>
+          </select>
+          <select id="emsStoreFilter" class="select-box" onchange="onFilterChange('ems', 'store')">
+            <option value="all">Semua Store</option>
+          </select>
+          <select id="emsTrainerFilter" class="select-box" onchange="onFilterChange('ems', 'trainer')">
+            <option value="all">Semua Trainer</option>
           </select>
         </div>
         <div class="table-container">
@@ -429,12 +437,14 @@
         </div>
         <div class="controls-row">
           <input type="text" id="pnrSearch" class="search-box" placeholder="Cari data PNR..." oninput="onSearchInput('pnr')">
-          <select id="pnrPageSize" class="select-box" onchange="onPageSizeChange('pnr')">
-            <option value="25">25 per hal</option>
-            <option value="50" selected>50 per hal</option>
-            <option value="100">100 per hal</option>
-            <option value="500">500 per hal</option>
-            <option value="all">Semua Data</option>
+          <select id="pnrMonthFilter" class="select-box" onchange="onFilterChange('pnr', 'month')">
+            <option value="all">Semua Bulan</option>
+          </select>
+          <select id="pnrStoreFilter" class="select-box" onchange="onFilterChange('pnr', 'store')">
+            <option value="all">Semua Store</option>
+          </select>
+          <select id="pnrTrainerFilter" class="select-box" onchange="onFilterChange('pnr', 'trainer')">
+            <option value="all">Semua Trainer</option>
           </select>
         </div>
         <div class="table-container">
@@ -451,6 +461,7 @@
   <script>
     const DATA_JSON_URL = "./data/data.json";
     const AUTO_REFRESH_INTERVAL = 300000;
+    const PAGE_SIZE = 50;
 
     let state = {
       ops: [],
@@ -458,9 +469,9 @@
       pnr: [],
       activeModule: 'ops',
       pages: {
-        ops: { page: 1, pageSize: 50, filter: '' },
-        ems: { page: 1, pageSize: 50, filter: '' },
-        pnr: { page: 1, pageSize: 50, filter: '' }
+        ops: { page: 1, filter: '', month: 'all', store: 'all', trainer: 'all' },
+        ems: { page: 1, filter: '', month: 'all', store: 'all', trainer: 'all' },
+        pnr: { page: 1, filter: '', month: 'all', store: 'all', trainer: 'all' }
       }
     };
 
@@ -480,7 +491,6 @@
       }).replace('.', ':');
     }
 
-    // Pemetaan nama header panjang ke nama pendek yang relevan
     function cleanHeaderName(str) {
       if (!str) return '';
       let clean = String(str).replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim();
@@ -513,6 +523,41 @@
       return null;
     }
 
+    // Dynamic Filter Populate
+    function populateDropdowns(type) {
+      const data = state[type];
+      if (!data || data.length === 0) return;
+
+      const months = new Set();
+      const stores = new Set();
+      const trainers = new Set();
+
+      data.forEach(row => {
+        const m = getFlexibleValue(row, ['bulan', 'month']);
+        const s = getFlexibleValue(row, ['store', 'toko']);
+        const t = getFlexibleValue(row, ['presenter', 'trainer', 'nama']);
+
+        if (m) months.add(String(m).trim());
+        if (s) stores.add(String(s).trim());
+        if (t) trainers.add(String(t).trim());
+      });
+
+      updateSelectOptions(`${type}MonthFilter`, Array.from(months).sort(), 'Semua Bulan', state.pages[type].month);
+      updateSelectOptions(`${type}StoreFilter`, Array.from(stores).sort(), 'Semua Store', state.pages[type].store);
+      updateSelectOptions(`${type}TrainerFilter`, Array.from(trainers).sort(), 'Semua Trainer', state.pages[type].trainer);
+    }
+
+    function updateSelectOptions(elementId, items, defaultText, currentValue) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      let html = `<option value="all">${defaultText}</option>`;
+      items.forEach(item => {
+        const selected = item === currentValue ? 'selected' : '';
+        html += `<option value="${item}" ${selected}>${item}</option>`;
+      });
+      el.innerHTML = html;
+    }
+
     async function fetchLatestData() {
       const lastSync = localStorage.getItem('last_sync');
       const fallbackTime = lastSync ? formatDateTime(lastSync) : formatDateTime(new Date());
@@ -535,6 +580,10 @@
         localStorage.setItem('cached_state', JSON.stringify({ ops: state.ops, ems: state.ems, pnr: state.pnr }));
         localStorage.setItem('last_sync', syncTimestamp);
 
+        populateDropdowns('ops');
+        populateDropdowns('ems');
+        populateDropdowns('pnr');
+
         renderCurrentModule();
 
         const formattedTime = formatDateTime(syncTimestamp);
@@ -548,6 +597,11 @@
           state.ops = parsed.ops || [];
           state.ems = parsed.ems || [];
           state.pnr = parsed.pnr || [];
+          
+          populateDropdowns('ops');
+          populateDropdowns('ems');
+          populateDropdowns('pnr');
+          
           renderCurrentModule();
         }
 
@@ -561,15 +615,49 @@
       if (state.activeModule === 'pnr') renderPNR();
     }
 
+    function getFilteredData(type) {
+      const rawData = state[type];
+      const pState = state.pages[type];
+
+      return rawData.filter(row => {
+        // Filter Bulan
+        if (pState.month !== 'all') {
+          const rowMonth = getFlexibleValue(row, ['bulan', 'month']);
+          if (String(rowMonth || '').trim() !== pState.month) return false;
+        }
+
+        // Filter Store
+        if (pState.store !== 'all') {
+          const rowStore = getFlexibleValue(row, ['store', 'toko']);
+          if (String(rowStore || '').trim() !== pState.store) return false;
+        }
+
+        // Filter Trainer
+        if (pState.trainer !== 'all') {
+          const rowTrainer = getFlexibleValue(row, ['presenter', 'trainer', 'nama']);
+          if (String(rowTrainer || '').trim() !== pState.trainer) return false;
+        }
+
+        // Filter Teks
+        if (pState.filter) {
+          const q = pState.filter.toLowerCase();
+          const matchText = Object.values(row).some(val => String(val || '').toLowerCase().includes(q));
+          if (!matchText) return false;
+        }
+
+        return true;
+      });
+    }
+
     function renderOPS() {
-      const data = state.ops;
-      document.getElementById('ops-kpi-total').textContent = data.length.toLocaleString('id-ID');
+      const filteredData = getFilteredData('ops');
+      document.getElementById('ops-kpi-total').textContent = filteredData.length.toLocaleString('id-ID');
 
       let totalParticipants = 0;
       let totalUnits = 0;
       const topicCounts = {};
 
-      data.forEach(row => {
+      filteredData.forEach(row => {
         const partVal = getFlexibleValue(row, ['participant', 'peserta']);
         const unitVal = getFlexibleValue(row, ['unit yang terjual', 'unit terjual', 'terjual']);
         const topicVal = getFlexibleValue(row, ['topics', 'topik']) || 'Lainnya';
@@ -585,18 +673,20 @@
       document.getElementById('ops-kpi-participants').textContent = totalParticipants.toLocaleString('id-ID');
       document.getElementById('ops-kpi-units').textContent = totalUnits.toLocaleString('id-ID');
 
-      renderTableWithPagination('ops', data);
+      renderTableWithPagination('ops', filteredData);
       renderChart('opsChart', topicCounts);
     }
 
     function renderEMS() {
-      document.getElementById('ems-kpi-total').textContent = state.ems.length.toLocaleString('id-ID');
-      renderTableWithPagination('ems', state.ems);
+      const filteredData = getFilteredData('ems');
+      document.getElementById('ems-kpi-total').textContent = filteredData.length.toLocaleString('id-ID');
+      renderTableWithPagination('ems', filteredData);
     }
 
     function renderPNR() {
-      document.getElementById('pnr-kpi-total').textContent = state.pnr.length.toLocaleString('id-ID');
-      renderTableWithPagination('pnr', state.pnr);
+      const filteredData = getFilteredData('pnr');
+      document.getElementById('pnr-kpi-total').textContent = filteredData.length.toLocaleString('id-ID');
+      renderTableWithPagination('pnr', filteredData);
     }
 
     function getAllHeaders(data) {
@@ -607,24 +697,16 @@
       return Array.from(headersSet);
     }
 
-    function renderTableWithPagination(type, rawData) {
+    function renderTableWithPagination(type, filteredData) {
       const pState = state.pages[type];
-      const query = pState.filter.toLowerCase();
-
-      const filtered = rawData.filter(row => {
-        if (!query) return true;
-        return Object.values(row).some(val => String(val || '').toLowerCase().includes(query));
-      });
-
-      const totalItems = filtered.length;
-      const pageSize = pState.pageSize === 'all' ? totalItems : parseInt(pState.pageSize);
-      const totalPages = Math.ceil(totalItems / (pageSize || 1)) || 1;
+      const totalItems = filteredData.length;
+      const totalPages = Math.ceil(totalItems / PAGE_SIZE) || 1;
 
       if (pState.page > totalPages) pState.page = totalPages;
       if (pState.page < 1) pState.page = 1;
 
-      const startIndex = (pState.page - 1) * pageSize;
-      const paginatedData = pState.pageSize === 'all' ? filtered : filtered.slice(startIndex, startIndex + pageSize);
+      const startIndex = (pState.page - 1) * PAGE_SIZE;
+      const paginatedData = filteredData.slice(startIndex, startIndex + PAGE_SIZE);
 
       const thead = document.getElementById(`${type}Thead`);
       const tbody = document.getElementById(`${type}Tbody`);
@@ -636,7 +718,7 @@
         return;
       }
 
-      const headers = getAllHeaders(rawData);
+      const headers = getAllHeaders(state[type]);
       thead.innerHTML = headers.map(h => `<th title="${h}">${cleanHeaderName(h)}</th>`).join('');
 
       tbody.innerHTML = paginatedData.map(row => {
@@ -659,7 +741,7 @@
         return;
       }
 
-      const start = (currentPage - 1) * (state.pages[type].pageSize === 'all' ? totalItems : parseInt(state.pages[type].pageSize)) + 1;
+      const start = (currentPage - 1) * PAGE_SIZE + 1;
       const end = start + currentDisplayed - 1;
 
       let btnsHtml = `
@@ -669,7 +751,7 @@
       `;
 
       container.innerHTML = `
-        <div>Menampilkan <strong>${start} - ${end}</strong> dari <strong>${totalItems.toLocaleString('id-ID')}</strong> total data</div>
+        <div>Menampilkan <strong>${start} - ${end}</strong> dari <strong>${totalItems.toLocaleString('id-ID')}</strong> data terfilter</div>
         <div class="pagination-buttons">${btnsHtml}</div>
       `;
     }
@@ -685,8 +767,10 @@
       renderCurrentModule();
     }
 
-    function onPageSizeChange(type) {
-      state.pages[type].pageSize = document.getElementById(`${type}PageSize`).value;
+    function onFilterChange(type, key) {
+      const capitalizedKey = key.charAt(0).toUpperCase() + key.slice(1);
+      const val = document.getElementById(`${type}${capitalizedKey}Filter`).value;
+      state.pages[type][key] = val;
       state.pages[type].page = 1;
       renderCurrentModule();
     }
