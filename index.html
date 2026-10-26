@@ -229,7 +229,7 @@
 
     .select-box {
       flex: 1;
-      min-width: 140px;
+      min-width: 150px;
       padding: 10px 14px;
       background: var(--input-bg);
       border: 1px solid var(--glass-border);
@@ -462,6 +462,7 @@
     const DATA_JSON_URL = "./data/data.json";
     const AUTO_REFRESH_INTERVAL = 300000;
     const PAGE_SIZE = 50;
+    const MONTH_NAMES_ID = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
     let state = {
       ops: [],
@@ -496,14 +497,14 @@
       let clean = String(str).replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim();
       const lower = clean.toLowerCase();
 
-      if (lower.includes('presenter name') || lower.includes('fill in your full name')) return 'Presenter';
+      if (lower.includes('presenter name') || lower.includes('fill in your full name') || lower.includes('trainer name')) return 'Trainer Name';
       if (lower.includes('tanggal (') || lower.includes('tanggal ( hari')) return 'Tanggal Sesi';
       if (lower.includes('total participants') || lower.includes('berapa banyak pelanggan')) return 'Total Peserta';
       if (lower.includes('unit yang terjual')) return 'Unit Terjual';
       if (lower.includes('produk apa yang pelanggan minati') || lower.includes('pelanggan minati')) return 'Produk Minat';
       if (lower.includes('open studio topics')) return 'Topik Open Studio';
       if (lower.includes('report photo')) return 'Foto Laporan';
-      if (lower.includes('timestamp')) return 'Waktu Input';
+      if (lower.includes('timestamp') || lower.includes('waktu input')) return 'Waktu Input';
 
       if (clean.length > 22) {
         clean = clean.split('(')[0].split(':')[0].trim();
@@ -525,45 +526,74 @@
       return null;
     }
 
-    // Populate Dynamic Filter Dropdowns based on matching data
+    function getRowStore(row) {
+      return getFlexibleValue(row, ['store', 'toko', 'cabang', 'location', 'lokasi']);
+    }
+
+    function getRowTrainer(row) {
+      return getFlexibleValue(row, ['trainer', 'presenter', 'nama trainer', 'nama presenter', 'staff', 'nps']);
+    }
+
+    function getRowMonth(row) {
+      // 1. Coba ambil dari kolom 'bulan' atau 'month' langsung
+      const direct = getFlexibleValue(row, ['bulan', 'month']);
+      if (direct) return direct;
+
+      // 2. Fallback: Ekstrak Bulan & Tahun dari kolom Tanggal / Timestamp
+      const dateStr = getFlexibleValue(row, ['waktu', 'timestamp', 'tanggal', 'date']);
+      if (!dateStr) return null;
+
+      let d = new Date(dateStr);
+      if (isNaN(d.getTime())) {
+        const parts = dateStr.split(/[\/\-\s]/);
+        if (parts.length >= 3) {
+          if (parts[0].length <= 2 && parts[2].length === 4) {
+            d = new Date(parts[2], parseInt(parts[1]) - 1, parts[0]);
+          }
+        }
+      }
+
+      if (!isNaN(d.getTime())) {
+        const monthName = MONTH_NAMES_ID[d.getMonth()];
+        const year = d.getFullYear();
+        if (year > 1990 && monthName) {
+          return `${monthName} ${year}`;
+        }
+      }
+      return null;
+    }
+
+    // Mengisi Opsi Dropdown secara Dinamis & Otomatis
     function populateDropdowns(type) {
       const data = state[type];
       if (!data || data.length === 0) return;
 
       const pState = state.pages[type];
 
-      // Filter data yang match untuk opsi Bulan
       const monthsSet = new Set();
+      const storesSet = new Set();
+      const trainersSet = new Set();
+
       data.forEach(row => {
-        const s = getFlexibleValue(row, ['store', 'toko']);
-        const t = getFlexibleValue(row, ['presenter', 'trainer', 'nama']);
+        const m = getRowMonth(row);
+        const s = getRowStore(row);
+        const t = getRowTrainer(row);
+
+        // Opsi Bulan
         if ((pState.store === 'all' || s === pState.store) &&
             (pState.trainer === 'all' || t === pState.trainer)) {
-          const m = getFlexibleValue(row, ['bulan', 'month']);
           if (m) monthsSet.add(m);
         }
-      });
 
-      // Filter data yang match untuk opsi Store
-      const storesSet = new Set();
-      data.forEach(row => {
-        const m = getFlexibleValue(row, ['bulan', 'month']);
-        const t = getFlexibleValue(row, ['presenter', 'trainer', 'nama']);
+        // Opsi Store
         if ((pState.month === 'all' || m === pState.month) &&
             (pState.trainer === 'all' || t === pState.trainer)) {
-          const s = getFlexibleValue(row, ['store', 'toko']);
           if (s) storesSet.add(s);
         }
-      });
 
-      // Filter data yang match untuk opsi Trainer
-      const trainersSet = new Set();
-      data.forEach(row => {
-        const m = getFlexibleValue(row, ['bulan', 'month']);
-        const s = getFlexibleValue(row, ['store', 'toko']);
+        // Opsi Trainer
         if ((pState.month === 'all' || m === pState.month) &&
             (pState.store === 'all' || s === pState.store)) {
-          const t = getFlexibleValue(row, ['presenter', 'trainer', 'nama']);
           if (t) trainersSet.add(t);
         }
       });
@@ -577,17 +607,30 @@
       const el = document.getElementById(elementId);
       if (!el) return;
       
-      let html = `<option value="all">${defaultText}</option>`;
-      
-      // Sort items
       items.sort((a, b) => a.localeCompare(b, 'id', { numeric: true, sensitivity: 'base' }));
 
+      let html = `<option value="all" ${currentValue === 'all' ? 'selected' : ''}>${defaultText}</option>`;
+      
+      let foundCurrent = false;
       items.forEach(item => {
         const selected = item === currentValue ? 'selected' : '';
-        html += `<option value="${item}" ${selected}>${item}</option>`;
+        if (item === currentValue) foundCurrent = true;
+        html += `<option value="${escapeHtml(item)}" ${selected}>${escapeHtml(item)}</option>`;
       });
 
+      if (currentValue !== 'all' && !foundCurrent) {
+        html += `<option value="${escapeHtml(currentValue)}" selected>${escapeHtml(currentValue)}</option>`;
+      }
+
       el.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
     }
 
     async function fetchLatestData() {
@@ -654,23 +697,23 @@
       return rawData.filter(row => {
         // Filter Bulan
         if (pState.month !== 'all') {
-          const rowMonth = getFlexibleValue(row, ['bulan', 'month']);
-          if (String(rowMonth || '').trim() !== pState.month) return false;
+          const m = getRowMonth(row);
+          if (m !== pState.month) return false;
         }
 
         // Filter Store
         if (pState.store !== 'all') {
-          const rowStore = getFlexibleValue(row, ['store', 'toko']);
-          if (String(rowStore || '').trim() !== pState.store) return false;
+          const s = getRowStore(row);
+          if (s !== pState.store) return false;
         }
 
         // Filter Trainer
         if (pState.trainer !== 'all') {
-          const rowTrainer = getFlexibleValue(row, ['presenter', 'trainer', 'nama']);
-          if (String(rowTrainer || '').trim() !== pState.trainer) return false;
+          const t = getRowTrainer(row);
+          if (t !== pState.trainer) return false;
         }
 
-        // Filter Teks
+        // Filter Teks Search
         if (pState.filter) {
           const q = pState.filter.toLowerCase();
           const matchText = Object.values(row).some(val => String(val || '').toLowerCase().includes(q));
