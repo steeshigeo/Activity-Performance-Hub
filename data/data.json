@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-10-26T06:42:08.027Z",
+  "last_updated": "2026-10-26T06:50:39.774Z",
   "sheets": {
     "ops": [
       {
@@ -86985,6 +86985,36 @@
         "Report Photo": "",
         "Unit yang terjual setelah Open Studio": 0,
         "Produk apa yang pelanggan minati": "-",
+        "Bulan": "Oktober 2026",
+        "Date": "26 Oktober 2026"
+      },
+      {
+        "Timestamp": "2026-10-26T06:43:57.000Z",
+        "Email": "fidia.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Fidiartiningsih ",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-10-25T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 1,
+        "Store": "M126 Digimap Ciputra World Surabaya",
+        "Open Studio Topics": "Preview App",
+        "Sessions": "13:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "iPhone",
+        "Bulan": "Oktober 2026",
+        "Date": "26 Oktober 2026"
+      },
+      {
+        "Timestamp": "2026-10-26T06:45:27.000Z",
+        "Email": "dellasalsabrina.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Dela salsabrina p",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-10-25T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 0,
+        "Store": "M240 Digimap Pasific Mall Tegal",
+        "Open Studio Topics": "Find My on Apple Watch",
+        "Sessions": "13:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "iPhone",
         "Bulan": "Oktober 2026",
         "Date": "26 Oktober 2026"
       },
