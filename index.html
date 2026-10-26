@@ -480,14 +480,32 @@
       }).replace('.', ':');
     }
 
+    // Pemetaan nama header panjang ke nama pendek yang relevan
     function cleanHeaderName(str) {
-      return String(str || '').replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!str) return '';
+      let clean = String(str).replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim();
+      const lower = clean.toLowerCase();
+
+      if (lower.includes('presenter name') || lower.includes('fill in your full name')) return 'Presenter';
+      if (lower.includes('tanggal (') || lower.includes('tanggal ( hari')) return 'Tanggal Sesi';
+      if (lower.includes('total participants') || lower.includes('berapa banyak pelanggan')) return 'Total Peserta';
+      if (lower.includes('unit yang terjual')) return 'Unit Terjual';
+      if (lower.includes('produk apa yang pelanggan minati') || lower.includes('pelanggan minati')) return 'Produk Minat';
+      if (lower.includes('open studio topics')) return 'Topik Open Studio';
+      if (lower.includes('report photo')) return 'Foto Laporan';
+      if (lower.includes('timestamp')) return 'Waktu Input';
+
+      if (clean.length > 22) {
+        clean = clean.split('(')[0].split(':')[0].trim();
+      }
+
+      return clean;
     }
 
     function getFlexibleValue(row, keywords) {
       const keys = Object.keys(row);
       for (const kw of keywords) {
-        const matchKey = keys.find(k => cleanHeaderName(k).toLowerCase().includes(kw.toLowerCase()));
+        const matchKey = keys.find(k => String(k).toLowerCase().includes(kw.toLowerCase()));
         if (matchKey && row[matchKey] !== undefined && row[matchKey] !== null && row[matchKey] !== '') {
           return row[matchKey];
         }
