@@ -229,7 +229,7 @@
 
     .select-box {
       flex: 1;
-      min-width: 140px;
+      min-width: 150px;
       padding: 10px 14px;
       background: var(--input-bg);
       border: 1px solid var(--glass-border);
@@ -362,18 +362,18 @@
             <div class="panel-title">Data Detail OPS</div>
           </div>
           <div class="controls-row">
-            <input type="text" id="opsSearch" class="search-box" placeholder="Cari pencarian teks..." oninput="onSearchInput('ops')">
+            <input type="text" id="opsSearch" class="search-box" placeholder="Cari kata kunci..." oninput="onSearchInput('ops')">
             <select id="opsMonthFilter" class="select-box" onchange="onFilterChange('ops', 'month')">
-              <option value="all">Semua Bulan</option>
+              <option value="all">📅 Semua Bulan</option>
             </select>
             <select id="opsStoreFilter" class="select-box" onchange="onFilterChange('ops', 'store')">
-              <option value="all">Semua Store</option>
+              <option value="all">🏪 Semua Store</option>
             </select>
             <select id="opsTrainerHOFilter" class="select-box" onchange="onFilterChange('ops', 'trainerHO')">
-              <option value="all">Semua Trainer HO</option>
+              <option value="all">👔 Semua Trainer HO</option>
             </select>
             <select id="opsTrainerFilter" class="select-box" onchange="onFilterChange('ops', 'trainer')">
-              <option value="all">Semua Presenter / Staff</option>
+              <option value="all">👤 Semua Trainer / Presenter</option>
             </select>
           </div>
           <div class="table-container">
@@ -407,16 +407,16 @@
         <div class="controls-row">
           <input type="text" id="emsSearch" class="search-box" placeholder="Cari data EMS..." oninput="onSearchInput('ems')">
           <select id="emsMonthFilter" class="select-box" onchange="onFilterChange('ems', 'month')">
-            <option value="all">Semua Bulan</option>
+            <option value="all">📅 Semua Bulan</option>
           </select>
           <select id="emsStoreFilter" class="select-box" onchange="onFilterChange('ems', 'store')">
-            <option value="all">Semua Store</option>
+            <option value="all">🏪 Semua Store</option>
           </select>
           <select id="emsTrainerHOFilter" class="select-box" onchange="onFilterChange('ems', 'trainerHO')">
-            <option value="all">Semua Trainer HO</option>
+            <option value="all">👔 Semua Trainer HO</option>
           </select>
           <select id="emsTrainerFilter" class="select-box" onchange="onFilterChange('ems', 'trainer')">
-            <option value="all">Semua Presenter / Staff</option>
+            <option value="all">👤 Semua Trainer / Presenter</option>
           </select>
         </div>
         <div class="table-container">
@@ -444,16 +444,16 @@
         <div class="controls-row">
           <input type="text" id="pnrSearch" class="search-box" placeholder="Cari data PNR..." oninput="onSearchInput('pnr')">
           <select id="pnrMonthFilter" class="select-box" onchange="onFilterChange('pnr', 'month')">
-            <option value="all">Semua Bulan</option>
+            <option value="all">📅 Semua Bulan</option>
           </select>
           <select id="pnrStoreFilter" class="select-box" onchange="onFilterChange('pnr', 'store')">
-            <option value="all">Semua Store</option>
+            <option value="all">🏪 Semua Store</option>
           </select>
           <select id="pnrTrainerHOFilter" class="select-box" onchange="onFilterChange('pnr', 'trainerHO')">
-            <option value="all">Semua Trainer HO</option>
+            <option value="all">👔 Semua Trainer HO</option>
           </select>
           <select id="pnrTrainerFilter" class="select-box" onchange="onFilterChange('pnr', 'trainer')">
-            <option value="all">Semua Presenter / Staff</option>
+            <option value="all">👤 Semua Trainer / Presenter</option>
           </select>
         </div>
         <div class="table-container">
@@ -509,7 +509,7 @@
       let clean = String(str).replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim();
       const lower = clean.toLowerCase();
 
-      if (lower.includes('presenter name') || lower.includes('fill in your full name') || lower.includes('trainer name')) return 'Trainer Name';
+      if (lower.includes('presenter name') || lower.includes('fill in your full name') || lower.includes('trainer name')) return 'Trainer / Presenter';
       if (lower.includes('tanggal (') || lower.includes('tanggal ( hari')) return 'Tanggal Sesi';
       if (lower.includes('total participants') || lower.includes('berapa banyak pelanggan')) return 'Total Peserta';
       if (lower.includes('unit yang terjual')) return 'Unit Terjual';
@@ -597,82 +597,40 @@
       }
     }
 
-    // Populate Dynamic Interconnected Dropdowns
     function populateDropdowns(type) {
       const data = state[type];
       if (!data) return;
 
       const pState = state.pages[type];
 
-      function rowMatchesFilter(row, ignoreKey) {
-        if (ignoreKey !== 'month' && pState.month !== 'all') {
-          if (getRowMonth(row) !== pState.month) return false;
-        }
-        if (ignoreKey !== 'store' && pState.store !== 'all') {
-          if (getRowStore(row) !== pState.store) return false;
-        }
-        if (ignoreKey !== 'trainerHO' && pState.trainerHO !== 'all' && recapMasterData.length > 0) {
-          const s = getRowStore(row);
-          const matchedMaster = recapMasterData.find(item => item.store === s);
-          if (!matchedMaster || matchedMaster.trainerHO !== pState.trainerHO) return false;
-        }
-        if (ignoreKey !== 'trainer' && pState.trainer !== 'all') {
-          if (getRowTrainer(row) !== pState.trainer) return false;
-        }
-        return true;
+      const monthsSet = new Set();
+      const storesSet = new Set();
+      const trainerHOSet = new Set();
+      const trainersSet = new Set();
+
+      // Kumpulkan data unik dari aktivitas & master Google Sheet
+      data.forEach(row => {
+        const m = getRowMonth(row);
+        const s = getRowStore(row);
+        const t = getRowTrainer(row);
+
+        if (m) monthsSet.add(m);
+        if (s) storesSet.add(s);
+        if (t) trainersSet.add(t);
+      });
+
+      if (recapMasterData.length > 0) {
+        recapMasterData.forEach(item => {
+          if (item.store && item.store !== '0') storesSet.add(item.store);
+          if (item.trainerHO && item.trainerHO !== '0') trainerHOSet.add(item.trainerHO);
+          if (item.nama && item.nama !== '0') trainersSet.add(item.nama);
+        });
       }
 
-      // 1. Month Options
-      const monthsSet = new Set();
-      data.forEach(row => {
-        if (rowMatchesFilter(row, 'month')) {
-          const m = getRowMonth(row);
-          if (m) monthsSet.add(m);
-        }
-      });
-
-      // 2. Store Options
-      const storesSet = new Set();
-      data.forEach(row => {
-        if (rowMatchesFilter(row, 'store')) {
-          const s = getRowStore(row);
-          if (s) storesSet.add(s);
-        }
-      });
-
-      // 3. Trainer HO Options
-      const trainerHOSet = new Set();
-      data.forEach(row => {
-        if (rowMatchesFilter(row, 'trainerHO')) {
-          const s = getRowStore(row);
-          if (recapMasterData.length > 0) {
-            const matchedMaster = recapMasterData.find(item => item.store === s);
-            if (matchedMaster && matchedMaster.trainerHO && matchedMaster.trainerHO !== '0') {
-              trainerHOSet.add(matchedMaster.trainerHO);
-            }
-          }
-        }
-      });
-
-      // 4. Presenter / Staff Options
-      const trainersSet = new Set();
-      data.forEach(row => {
-        if (rowMatchesFilter(row, 'trainer')) {
-          const t = getRowTrainer(row);
-          if (t) trainersSet.add(t);
-        }
-      });
-
-      // Adjust selections if current selection is no longer available in filtered list
-      if (pState.month !== 'all' && !monthsSet.has(pState.month)) pState.month = 'all';
-      if (pState.store !== 'all' && !storesSet.has(pState.store)) pState.store = 'all';
-      if (pState.trainerHO !== 'all' && !trainerHOSet.has(pState.trainerHO)) pState.trainerHO = 'all';
-      if (pState.trainer !== 'all' && !trainersSet.has(pState.trainer)) pState.trainer = 'all';
-
-      updateSelectOptions(`${type}MonthFilter`, Array.from(monthsSet), 'Semua Bulan', pState.month);
-      updateSelectOptions(`${type}StoreFilter`, Array.from(storesSet), 'Semua Store', pState.store);
-      updateSelectOptions(`${type}TrainerHOFilter`, Array.from(trainerHOSet), 'Semua Trainer HO', pState.trainerHO);
-      updateSelectOptions(`${type}TrainerFilter`, Array.from(trainersSet), 'Semua Presenter / Staff', pState.trainer);
+      updateSelectOptions(`${type}MonthFilter`, Array.from(monthsSet), '📅 Semua Bulan', pState.month);
+      updateSelectOptions(`${type}StoreFilter`, Array.from(storesSet), '🏪 Semua Store', pState.store);
+      updateSelectOptions(`${type}TrainerHOFilter`, Array.from(trainerHOSet), '👔 Semua Trainer HO', pState.trainerHO);
+      updateSelectOptions(`${type}TrainerFilter`, Array.from(trainersSet), '👤 Semua Trainer / Presenter', pState.trainer);
     }
 
     function updateSelectOptions(elementId, items, defaultText, currentValue) {
@@ -770,7 +728,7 @@
       const pState = state.pages[type];
 
       return rawData.filter(row => {
-        // Filter Bulan
+        // Filter Bulan (misal: "Oktober 2026", "Agustus 2026")
         if (pState.month !== 'all') {
           const m = getRowMonth(row);
           if (m !== pState.month) return false;
@@ -789,7 +747,7 @@
           if (!matchedMaster || matchedMaster.trainerHO !== pState.trainerHO) return false;
         }
 
-        // Filter Presenter / Staff
+        // Filter Presenter / Staff (misal: "Jennifer", "Widya", dll)
         if (pState.trainer !== 'all') {
           const t = getRowTrainer(row);
           if (t !== pState.trainer) return false;
@@ -870,7 +828,7 @@
 
       if (totalItems === 0) {
         thead.innerHTML = '';
-        tbody.innerHTML = '<tr><td style="text-align:center; padding:24px;">Data tidak ditemukan.</td></tr>';
+        tbody.innerHTML = '<tr><td style="text-align:center; padding:24px;">Data tidak ditemukan untuk kombinasi filter ini.</td></tr>';
         renderPaginationControls(type, 0, 0, 0, 0);
         return;
       }
@@ -921,7 +879,6 @@
     function onSearchInput(type) {
       state.pages[type].filter = document.getElementById(`${type}Search`).value;
       state.pages[type].page = 1;
-      populateDropdowns(type);
       renderCurrentModule();
     }
 
@@ -931,7 +888,6 @@
       state.pages[type][key] = val;
       state.pages[type].page = 1;
 
-      populateDropdowns(type);
       renderCurrentModule();
     }
 
