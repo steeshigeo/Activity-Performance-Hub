@@ -701,4 +701,410 @@
 
     function switchModule(mod, btn) {
       state.activeModule = mod;
-      document.
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.module-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`panel-${mod}`).classList.add('active');
+      renderCurrentModule();
+    }
+
+    /* ---------- Prosess Fetch Data dengan Progress Bar ---------- */
+    let isLoading = false;
+    const refreshBtnHtml = label => `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg><span>${label}</span>`;
+    
+    async function fetchLatestData() {
+      if (isLoading) return;
+      isLoading = true;
+      const btn = document.getElementById('manualSyncBtn');
+      btn.disabled = true;
+      btn.innerHTML = refreshBtnHtml('Memuat…');
+
+      updateProgress(5, 'Memulai sinkronisasi…', 'loading');
+
+      try {
+        updateProgress(25, 'Memuat Master Data (Recap)…', 'loading');
+        await fetchRecapMasterData();
+        
+        updateProgress(55, 'Memuat Data Aktivitas…', 'loading');
+        const syncTime = await _fetchActivityData();
+
+        updateProgress(80, 'Memuat Store Trainer Roster…', 'loading');
+        await fetchRoster();
+
+        updateProgress(95, 'Memproses Tampilan…', 'loading');
+        refreshAll();
+
+        updateProgress(100, `Success · Diperbarui ${syncTime}`, 'success');
+      } catch (err) {
+        console.warn('Proses sinkronisasi error:', err);
+        updateProgress(100, 'Gagal memperbarui data', 'warn');
+      } finally {
+        isLoading = false;
+        btn.disabled = false;
+        btn.innerHTML = refreshBtnHtml('Refresh');
+      }
+    }
+
+    let topicMode = 'all';
+    function setTopicMode(m) {
+      topicMode = m;
+      document.querySelectorAll('#pnr-chips .chip').forEach(b => b.classList.toggle('active', b.dataset.m === m));
+      renderPNR();
+    }
+
+    function initSummaryHosts() {
+      try { const th = localStorage.getItem('theme'); if (th) document.documentElement.setAttribute('data-theme', th); } catch (e) {}
+      ['ops', 'ems', 'pnr'].forEach(t => {
+        state.pages[t].status = 'all';
+        const d = document.createElement('div');
+        d.id = `${t}-summary`; d.className = 'panel-card sum-wrap';
+        document.querySelector(`#panel-${t} .kpi-grid`).after(d);
+        if (t === 'ops') return;
+        const tp = document.querySelector(`#panel-${t} > .panel-card:not(.sum-wrap)`);
+        const grid = document.createElement('div'); grid.className = 'content-grid';
+        const cp = document.createElement('div'); cp.className = 'panel-card';
+        const chips = t === 'pnr' ? `<div class="chips" id="pnr-chips">${[['all', 'Semua'], ['mandatory', 'Mandatory'], ['other', 'Other']].map(c => `<button class="chip${c[0] === 'all' ? ' active' : ''}" data-m="${c[0]}" onclick="setTopicMode('${c[0]}')">${c[1]}</button>`).join('')}</div>` : '';
+        cp.innerHTML = `<div class="panel-header"><div class="panel-title">Topik Terpopuler</div>${chips}</div><div class="chart-wrap"><canvas id="${t}Chart"></canvas></div>`;
+        tp.before(grid); grid.append(tp, cp);
+      });
+      ['all', 'roster'].forEach(id => {
+        const p = document.createElement('div');
+        p.id = `panel-${id}`; p.className = 'module-panel';
+        document.querySelector('.app-shell').appendChild(p);
+      });
+    }
+
+    function countBy(items, fn) {
+      const m = new Map();
+      items.forEach(x => { const k = fn(x); if (k) m.set(k, (m.get(k) || 0) + 1); });
+      return Array.from(m.entries()).sort((a, b) => b[1] - a[1] || byName(a[0], b[0]));
+    }
+    function monthEntries(metas, asc) {
+      const m = new Map();
+      metas.forEach(x => {
+        if (!x.month) return;
+        const e = m.get(x.month) || { n: 0, k: x.monthKey };
+        e.n++; m.set(x.month, e);
+      });
+      return Array.from(m.entries()).sort((a, b) => asc ? a[1].k - b[1].k : b[1].k - a[1].k).map(([l, e]) => [l, e.n]);
+    }
+    function barList(title, entries, limit) {
+      const list = entries.slice(0, limit || 5);
+      const max = Math.max(1, ...list.map(e => e[1]));
+      const rows = list.map(([k, v]) => `<div class="bar-row"><span class="bar-label" title="${escapeHtml(k)}">${escapeHtml(k)}</span><div class="bar-track"><div class="bar-fill" style="width:${(v / max * 100).toFixed(1)}%"></div></div><span class="bar-val">${v.toLocaleString('id-ID')}</span></div>`).join('');
+      return `<div class="sum-block"><div class="sum-title">${title}</div>${rows || '<div class="muted">Belum ada data</div>'}</div>`;
+    }
+    const kpiCard = (t, v, s) => `<div class="kpi-card"><div class="kpi-title">${t}</div><div class="kpi-value">${typeof v === 'number' ? v.toLocaleString('id-ID') : v}</div>${s ? `<div class="muted" style="font-size:.75rem;margin-top:4px">${s}</div>` : ''}</div>`;
+
+    /* ---------- Topik ---------- */
+    function getTopics(type, row, mode) {
+      const split = v => String(v).split(/[,;\n]+/).map(x => x.trim()).filter(x => x && x !== '-' && x !== '0');
+      if (type === 'pnr') {
+        const out = [];
+        Object.keys(row).forEach(k => {
+          const kl = k.toLowerCase();
+          if (/photo|foto|email|date|tanggal|timestamp/.test(kl)) return;
+          const isM = kl.includes('mandatory'), isO = !isM && kl.includes('other');
+          if ((isM && mode !== 'other') || (isO && mode !== 'mandatory')) { if (row[k] != null) out.push(...split(row[k])); }
+        });
+        return out;
+      }
+      return [getFlexibleValue(row, ['topics', 'topik', 'topic', 'kategori', 'category']) || 'Lainnya'];
+    }
+    function countTopics(type, data, mode) {
+      const c = {};
+      data.forEach(r => getTopics(type, r, mode || topicMode).forEach(t => { c[t] = (c[t] || 0) + 1; }));
+      return c;
+    }
+
+    /* ---------- Store Trainer Roster ---------- */
+    const ROSTER_ID = '1d93koBxpwMDtK6tYrDkRyuu30pb8drm54-Xh5Gk1L6U';
+    const ROSTER_MONTHS = MONTH_NAMES_ID.map(n => n.toUpperCase());
+    let rosterMonth = ROSTER_MONTHS[new Date().getMonth()];
+    let roster = { loaded: false, error: '', title: '', legend: '', days: [], rows: [], search: '', shift: 'all', day: 0, at: null };
+
+    async function fetchRoster() {
+      try {
+        const url = `https://docs.google.com/spreadsheets/d/${ROSTER_ID}/gviz/tq?tqx=out:json&headers=0&sheet=${encodeURIComponent(rosterMonth)}&_=${Date.now()}`;
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const txt = await res.text();
+        const json = JSON.parse(txt.substring(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
+        if (json.status === 'error') throw new Error((json.errors && json.errors[0] && json.errors[0].detailed_message) || `Sheet "${rosterMonth}" tidak ditemukan`);
+        const grid = (json.table.rows || []).map(r => (r.c || []).map(c => (c && c.v != null) ? String(c.v).trim() : ''));
+        const labels = (json.table.cols || []).map(c => (c.label || '').trim());
+        if (labels.some(Boolean)) grid.unshift(labels);
+        const hi = grid.findIndex(r => r.some(c => /^nama\s*toko$/i.test(c)));
+        if (hi < 0) throw new Error('Header "Nama Toko" tidak ditemukan di sheet ' + rosterMonth);
+        const head = grid[hi], dayRow = grid[hi + 1] || [];
+        const iStore = head.findIndex(c => /nama\s*toko/i.test(c));
+        const iTr = head.findIndex(c => /nama\s*trainer/i.test(c));
+        const iWa = head.findIndex(c => /whatsapp|^wa$/i.test(c));
+        const first = Math.max(iStore, iTr, iWa) + 1;
+        const hasDays = dayRow.some((c, i) => i >= first && /^\d+$/.test(c));
+        const days = [];
+        for (let i = first; i < head.length; i++) {
+          const d = hasDays ? parseInt(dayRow[i]) : NaN;
+          if (head[i] || d) days.push({ i, wd: head[i] || '', day: d || days.length + 1 });
+        }
+        roster.title = (grid.find(r => /roster/i.test(r[0] || '')) || [''])[0];
+        roster.legend = (grid.find(r => /legend/i.test(r[0] || '')) || [''])[0];
+        roster.days = days;
+        roster.rows = grid.slice(hi + (hasDays ? 2 : 1)).filter(r => r[iStore])
+          .map(r => ({ store: r[iStore], trainer: iTr >= 0 ? r[iTr] || '' : '', wa: iWa >= 0 ? r[iWa] || '' : '', shifts: days.map(d => (r[d.i] || '').toUpperCase()) }));
+        const now = new Date();
+        const ti = rosterMonth === ROSTER_MONTHS[now.getMonth()] ? days.findIndex(d => d.day === now.getDate()) : -1;
+        if (roster.day >= days.length || !roster.loaded) roster.day = ti >= 0 ? ti : 0;
+        roster.loaded = true; roster.error = ''; roster.at = new Date();
+      } catch (err) {
+        console.warn('Roster gagal dimuat:', err);
+        roster.error = String(err.message || err);
+      }
+      if (state.activeModule === 'roster') renderRoster();
+    }
+
+    function renderRoster() {
+      const host = document.getElementById('panel-roster');
+      if (!host) return;
+      if (!host.dataset.ready) {
+        host.dataset.ready = '1';
+        host.innerHTML = `
+          <div class="panel-card sum-wrap">
+            <div class="panel-header">
+              <div><div class="panel-title" id="rosterTitle">Store Trainer Roster</div><div class="muted" id="rosterLegend" style="font-size:.8rem;margin-top:2px"></div></div>
+              <span class="live-badge">● Live dari Google Sheet</span>
+            </div>
+            <div class="kpi-grid" id="rosterKpi"></div>
+            <div class="controls-row">
+              <input id="rosterSearch" class="search-box" placeholder="Cari toko / trainer / WhatsApp..." oninput="roster.search=this.value;renderRosterBody()">
+              <select id="rosterMonthSel" class="select-box" onchange="rosterMonth=this.value;fetchRoster()">${ROSTER_MONTHS.map(n => `<option value="${n}">📅 ${n.charAt(0) + n.slice(1).toLowerCase()}</option>`).join('')}</select>
+              <select id="rosterDaySel" class="select-box" onchange="roster.day=+this.value;renderRosterBody()"></select>
+              <select id="rosterShiftSel" class="select-box" onchange="roster.shift=this.value;renderRosterBody()">
+                <option value="all">🕒 Semua Shift</option><option value="E">E · Early (Pagi)</option><option value="M">M · Middle</option><option value="L">L · Late (Siang)</option><option value="X">X · Off Day</option><option value="-">Belum diisi</option>
+              </select>
+            </div>
+            <div class="table-container" style="max-height:640px"><table class="roster" id="rosterTable"></table></div>
+            <div class="pagination-bar" id="rosterCount"></div>
+          </div>`;
+      }
+      renderRosterBody();
+    }
+
+    function renderRosterBody() {
+      const $ = id => document.getElementById(id);
+      if (!$('rosterTable')) return;
+      $('rosterTitle').textContent = roster.title || 'Store Trainer Roster';
+      $('rosterLegend').textContent = roster.legend || '';
+      $('rosterMonthSel').value = rosterMonth;
+      $('rosterDaySel').innerHTML = roster.days.map((d, i) => `<option value="${i}">📆 Shift hari ${escapeHtml(d.wd + ' ' + d.day)}</option>`).join('');
+      $('rosterDaySel').value = String(roster.day);
+      const now = new Date();
+      const todayDay = rosterMonth === ROSTER_MONTHS[now.getMonth()] ? now.getDate() : 0;
+      const di = roster.day, q = roster.search.toLowerCase();
+      const cnt = { E: 0, M: 0, L: 0, X: 0, '': 0 };
+      roster.rows.forEach(r => { const v = r.shifts[di] || ''; cnt[v in cnt ? v : '']++; });
+      const trainers = new Set(roster.rows.map(r => norm(r.trainer)).filter(Boolean));
+      const dayLbl = roster.days[di] ? `${roster.days[di].wd} ${roster.days[di].day}` : '-';
+      $('rosterKpi').innerHTML = [
+        kpiCard('Total Store', roster.rows.length), kpiCard('Trainer Unik', trainers.size),
+        kpiCard('Early (E)', cnt.E, dayLbl), kpiCard('Middle (M)', cnt.M, dayLbl), kpiCard('Late (L)', cnt.L, dayLbl),
+        kpiCard('Off (X)', cnt.X, dayLbl), kpiCard('Belum Diisi', cnt[''], dayLbl)
+      ].join('');
+      const shown = roster.rows.filter(r => {
+        if (roster.shift !== 'all' && (r.shifts[di] || '-') !== roster.shift) return false;
+        return !q || `${r.store} ${r.trainer} ${r.wa}`.toLowerCase().includes(q);
+      });
+      const wa = v => {
+        const d = String(v).replace(/\D/g, '');
+        if (!d) return '-';
+        const n = d.startsWith('0') ? '62' + d.slice(1) : d.startsWith('62') ? d : '62' + d;
+        return `<a href="https://wa.me/${n}" target="_blank" rel="noopener" style="color:var(--accent)">${escapeHtml(v)}</a>`;
+      };
+      const cls = { E: 'sh-e', M: 'sh-m', L: 'sh-l', X: 'sh-x' };
+      $('rosterTable').innerHTML = `<thead><tr><th>Nama Toko</th><th>Nama Trainer</th><th>WhatsApp</th>${roster.days.map(d => `<th class="dc${d.day === todayDay ? ' today' : ''}">${escapeHtml(d.wd)}<br>${d.day}</th>`).join('')}</tr></thead>` +
+        `<tbody>${shown.map(r => `<tr><td>${escapeHtml(r.store)}</td><td>${escapeHtml(r.trainer || '-')}</td><td>${wa(r.wa)}</td>${r.shifts.map((v, i) => `<td class="sh ${cls[v] || ''}${roster.days[i].day === todayDay ? ' today' : ''}">${escapeHtml(v)}</td>`).join('')}</tr>`).join('') || '<tr><td colspan="4" style="text-align:center;padding:24px">Data tidak ditemukan.</td></tr>'}</tbody>`;
+      $('rosterCount').innerHTML = `<div>Menampilkan <strong>${shown.length}</strong> dari <strong>${roster.rows.length}</strong> toko · Sheet <strong>${rosterMonth}</strong>${roster.at ? ' · sinkron ' + formatDateTime(roster.at) : ''}</div>` +
+        (roster.error ? `<div style="color:#f59e0b">⚠️ ${escapeHtml(roster.error)}</div>` : (roster.loaded ? '' : '<div>Memuat roster…</div>'));
+    }
+
+    /* ---------- Summary ---------- */
+    const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '0%';
+    const num1 = n => n.toFixed(1).replace('.', ',');
+    function miniTable(heads, rows, maxH) {
+      return `<div class="table-container" style="max-height:${maxH || 340}px"><table><thead><tr>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${heads.length}" style="text-align:center">Belum ada data</td></tr>`}</tbody></table></div>`;
+    }
+    function tally(items, keyFn) {
+      const m = new Map();
+      items.forEach(x => {
+        const k = keyFn(x);
+        if (!k) return;
+        let e = m.get(k);
+        if (!e) { e = { ops: 0, ems: 0, pnr: 0, total: 0, part: 0, units: 0 }; m.set(k, e); }
+        e[x.t]++; e.total++; e.part += x.part; e.units += x.units;
+      });
+      return m;
+    }
+    const fmt = n => n.toLocaleString('id-ID');
+
+    function renderModuleSummary(type, data, extras) {
+      const el = document.getElementById(`${type}-summary`);
+      if (!el) return;
+      const isPNR = type === 'pnr';
+      const metas = data.map(getRowMeta);
+      const stores = new Set(metas.map(m => m.store).filter(Boolean));
+      const staff = new Set(metas.map(m => norm(m.trainer)).filter(Boolean));
+      const months = monthEntries(metas);
+      const matched = metas.filter(m => m.store && storeIndex.has(norm(m.store))).length;
+      let trend = '';
+      if (months.length > 1 && months[1][1]) { const d = Math.round((months[0][1] - months[1][1]) / months[1][1] * 100); trend = `${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% vs ${months[1][0]}`; }
+      const topics = Object.entries(countTopics(type, data)).sort((a, b) => b[1] - a[1]);
+      const kp = [
+        kpiCard('Store Aktif', stores.size, storeIndex.size ? `${pct(stores.size, storeIndex.size)} dari ${storeIndex.size} store` : ''),
+        kpiCard(isPNR ? 'Trainer Aktif' : 'Staff Aktif', staff.size),
+        kpiCard('Bulan Terakhir', months.length ? months[0][1] : 0, months.length ? months[0][0] + (trend ? ' · ' + trend : '') : ''),
+        kpiCard('Rata-rata Entry / Store', stores.size ? num1(data.length / stores.size) : '0'),
+        kpiCard(isPNR ? 'Rata-rata Entry / Trainer' : 'Rata-rata Entry / Staff', staff.size ? num1(data.length / staff.size) : '0'),
+        kpiCard('Cocok dengan Recap', pct(matched, data.length), `${fmt(matched)} dari ${fmt(data.length)} entry`)
+      ];
+      if (isPNR) {
+        const dv = metas.filter(m => m.status === 'Delivered').length, pl = metas.filter(m => m.status === 'Planning').length;
+        kp.push(kpiCard('Delivered', dv, pct(dv, data.length) + ' dari entry'), kpiCard('Planning', pl, pct(pl, data.length) + ' dari entry'));
+      }
+      (extras || []).forEach(e => kp.push(kpiCard(e[0], e[1])));
+      const blocks = [
+        barList('Entry per Bulan', months, 6),
+        barList('Top 5 Store', countBy(metas, m => m.store)),
+        barList(isPNR ? 'Top 5 Trainer' : 'Top 5 Presenter', countBy(metas, m => m.trainer)),
+        isPNR ? barList('Entry per Status', countBy(metas, m => m.status)) : barList('Entry per Trainer HO', countBy(metas, m => m.ho)),
+        isPNR ? barList('Entry per Store Trainer', countBy(metas.flatMap(m => m.st), x => x)) : '',
+        barList(isPNR ? 'Top Topik (Mandatory & Other)' : 'Top Topik', topics)
+      ];
+      el.innerHTML = `<div class="panel-title" style="margin-bottom:14px">Summary ${type.toUpperCase()}</div><div class="kpi-grid">${kp.join('')}</div><div class="sum-cols">${blocks.join('')}</div>`;
+    }
+
+    let allMonth = 'all';
+    function renderAllSummary() {
+      const host = document.getElementById('panel-all');
+      if (!host) return;
+      if (chartInstances.allTrend) { chartInstances.allTrend.destroy(); delete chartInstances.allTrend; }
+      const mods = ['ops', 'ems', 'pnr'];
+      const per = mods.map(t => (state[t] || []).map(r => {
+        let part = 0, units = 0;
+        if (t === 'ops') {
+          part = parseInt(getFlexibleValue(r, ['participant', 'peserta'])) || 0;
+          units = parseInt(getFlexibleValue(r, ['unit yang terjual', 'unit terjual', 'terjual'])) || 0;
+        }
+        return { t, r, m: getRowMeta(r), part, units };
+      }));
+      const flat = [].concat(...per);
+      const monthLabels = monthEntries(flat.map(x => x.m)).map(e => e[0]);
+      if (allMonth !== 'all' && !monthLabels.includes(allMonth)) allMonth = 'all';
+      const sel = allMonth === 'all' ? flat : flat.filter(x => x.m.month === allMonth);
+      const stores = new Set(sel.map(x => x.m.store).filter(Boolean));
+      const staff = new Set(sel.map(x => norm(x.m.trainer)).filter(Boolean));
+      const part = sel.reduce((a, x) => a + x.part, 0), units = sel.reduce((a, x) => a + x.units, 0);
+      const cnt = t => sel.filter(x => x.t === t).length;
+      const pnrRows = sel.filter(x => x.t === 'pnr');
+      const dv = pnrRows.filter(x => x.m.status === 'Delivered').length, pl = pnrRows.filter(x => x.m.status === 'Planning').length;
+      const isMatched = x => x.m.store && storeIndex.has(norm(x.m.store));
+      const matched = sel.filter(isMatched).length;
+      const unmatched = countBy(sel.filter(x => x.m.store && !storeIndex.has(norm(x.m.store))), x => x.m.store);
+      const idle = Array.from(storeIndex.values()).filter(s => !stores.has(s.name)).map(s => s.name).sort(byName);
+      const listTxt = (arr, n) => arr.length ? escapeHtml(arr.slice(0, n).join(', ')) + (arr.length > n ? ` +${arr.length - n} lainnya` : '') : '-';
+      const topicOf = t => Object.entries(countTopics(t, sel.filter(x => x.t === t).map(x => x.r), 'all')).sort((a, b) => b[1] - a[1]);
+
+      const keyOf = new Map(flat.map(x => [x.m.month, x.m.monthKey]));
+      const mt = Array.from(tally(flat, x => x.m.month).entries()).sort((a, b) => keyOf.get(b[0]) - keyOf.get(a[0]));
+      const monthRows = mt.map(([l, e], i) => {
+        const o = mt[i + 1] ? mt[i + 1][1].total : 0;
+        const d = o ? Math.round((e.total - o) / o * 100) : null;
+        return [escapeHtml(l), fmt(e.ops), fmt(e.ems), fmt(e.pnr), `<strong>${fmt(e.total)}</strong>`, d === null ? '-' : `<span style="color:${d >= 0 ? '#10b981' : '#f43f5e'}">${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}%</span>`];
+      });
+      const hoRows = Array.from(tally(sel, x => x.m.ho || NO_HO).entries()).sort((a, b) => b[1].total - a[1].total)
+        .map(([k, e]) => [escapeHtml(k), fmt(e.ops), fmt(e.ems), fmt(e.pnr), `<strong>${fmt(e.total)}</strong>`]);
+      const storeRows = Array.from(tally(sel, x => x.m.store).entries()).sort((a, b) => b[1].total - a[1].total)
+        .map(([k, e]) => { const ix = storeIndex.get(norm(k)); return [escapeHtml(k), escapeHtml(ix && ix.ho || '-'), escapeHtml(ix && ix.trainers.size ? Array.from(ix.trainers).join(', ') : '-'), fmt(e.ops), fmt(e.ems), fmt(e.pnr), `<strong>${fmt(e.total)}</strong>`, fmt(e.part), fmt(e.units)]; });
+
+      host.innerHTML = `
+        <div class="panel-card sum-wrap">
+          <div class="panel-header">
+            <div class="panel-title">Summary Keseluruhan (OPS + EMS + PNR)</div>
+            <select class="select-box" style="flex:none;min-width:200px" onchange="allMonth=this.value;renderAllSummary()">
+              <option value="all">📅 Semua Bulan</option>
+              ${monthLabels.map(l => `<option value="${escapeHtml(l)}" ${l === allMonth ? 'selected' : ''}>${escapeHtml(l)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="kpi-grid" style="margin-bottom:0">
+            ${kpiCard('Total Entry', sel.length)}${kpiCard('Entry OPS', cnt('ops'))}${kpiCard('Entry EMS', cnt('ems'))}${kpiCard('Entry PNR', cnt('pnr'))}
+            ${kpiCard('Store Aktif', stores.size, storeIndex.size ? `${pct(stores.size, storeIndex.size)} dari ${storeIndex.size} store` : '')}
+            ${kpiCard('Staff Aktif', staff.size)}
+            ${kpiCard('Peserta Open Studio', part)}${kpiCard('Unit Terjual', units)}
+            ${kpiCard('Rata-rata Peserta / Sesi', cnt('ops') ? num1(part / cnt('ops')) : '0')}
+            ${kpiCard('Unit Terjual / Peserta', part ? (units / part).toFixed(2).replace('.', ',') : '0')}
+            ${kpiCard('PNR Delivered', dv, `${pct(dv, pnrRows.length)} · Planning ${pl}`)}
+            ${kpiCard('Cocok dengan Recap', pct(matched, sel.length), `${fmt(matched)} dari ${fmt(sel.length)} entry`)}
+          </div>
+        </div>
+        <div class="panel-card sum-wrap">
+          <div class="panel-title" style="margin-bottom:12px">Tren Entry per Bulan (12 bulan terakhir)</div>
+          <div class="chart-wrap" style="height:300px;flex:none;min-height:0"><canvas id="allTrendChart"></canvas></div>
+        </div>
+        <div class="content-grid" style="grid-template-columns:1fr 1fr">
+          <div class="panel-card"><div class="sum-title">Rekap per Bulan</div>${miniTable(['Bulan', 'OPS', 'EMS', 'PNR', 'Total', 'Δ Bulan lalu'], monthRows)}</div>
+          <div class="panel-card"><div class="sum-title">Rekap per Trainer HO</div>${miniTable(['Trainer HO', 'OPS', 'EMS', 'PNR', 'Total'], hoRows)}</div>
+        </div>
+        <div class="panel-card sum-wrap">
+          <div class="sum-title">Rekap per Store (${storeRows.length} store aktif)</div>
+          ${miniTable(['Store', 'Trainer HO', 'Store Trainer', 'OPS', 'EMS', 'PNR', 'Total', 'Peserta', 'Unit'], storeRows, 420)}
+        </div>
+        <div class="panel-card sum-wrap">
+          <div class="sum-cols">
+            ${barList('Top 5 Store', countBy(sel, x => x.m.store))}
+            ${barList('Top 5 Staff', countBy(sel, x => x.m.trainer))}
+            ${barList('Status PNR', countBy(pnrRows, x => x.m.status))}
+            ${barList('Top Topik OPS', topicOf('ops'))}
+            ${barList('Top Topik EMS', topicOf('ems'))}
+            ${barList('Top Topik PNR (Mandatory & Other)', topicOf('pnr'))}
+            <div class="sum-block"><div class="sum-title">Store Belum Ada Aktivitas (${idle.length})</div><div class="muted" style="font-size:.82rem;line-height:1.6">${storeIndex.size ? listTxt(idle, 14) : 'Data Recap belum terbaca.'}</div></div>
+            <div class="sum-block"><div class="sum-title">Nama Store Tidak Cocok dengan Recap (${unmatched.length})</div><div class="muted" style="font-size:.82rem;line-height:1.6">${listTxt(unmatched.map(e => `${e[0]} (${e[1]})`), 10)}</div></div>
+          </div>
+        </div>`;
+
+      const root = getComputedStyle(document.documentElement);
+      const tc = root.getPropertyValue('--text-main').trim(), mc = root.getPropertyValue('--text-muted').trim();
+      const ml = monthEntries(flat.map(x => x.m), true).map(e => e[0]).slice(-12);
+      const colors = ['#38bdf8', '#c084fc', '#34d399'];
+      chartInstances.allTrend = new Chart(document.getElementById('allTrendChart').getContext('2d'), {
+        type: 'bar',
+        data: { labels: ml, datasets: mods.map((t, i) => ({ label: t.toUpperCase(), data: ml.map(l => per[i].filter(x => x.m.month === l).length), backgroundColor: colors[i], borderRadius: 4 })) },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { stacked: true, ticks: { color: mc }, grid: { display: false } },
+            y: { stacked: true, beginAtZero: true, ticks: { color: mc, precision: 0 }, grid: { color: 'rgba(148,163,184,.15)' } }
+          },
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, color: tc } } }
+        }
+      });
+    }
+
+    document.getElementById('themeToggleBtn').addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme');
+      const nt = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', nt);
+      try { localStorage.setItem('theme', nt); } catch (e) {}
+      renderCurrentModule();
+    });
+    document.getElementById('manualSyncBtn').addEventListener('click', fetchLatestData);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initSummaryHosts();
+      fetchLatestData();
+      setInterval(fetchLatestData, AUTO_REFRESH_INTERVAL);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') fetchLatestData();
+      });
+    });
+  </script>
+</body>
+</html>
