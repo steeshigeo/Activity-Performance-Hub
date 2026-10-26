@@ -274,7 +274,6 @@
       background: var(--table-hover);
     }
 
-    /* Pagination Styles */
     .pagination-bar {
       display: flex;
       justify-content: space-between;
@@ -327,9 +326,9 @@
 
       <div class="header-actions">
         <div id="cloudStatusPill" class="status-pill syncing">
-          <span>☁️ Memuat data...</span>
+          <span>☁️ Memuat data JSON...</span>
         </div>
-        <button class="btn-icon" id="manualSyncBtn">↻ Sync Data</button>
+        <button class="btn-icon" id="manualSyncBtn">↻ Refresh</button>
         <button class="btn-icon" id="themeToggleBtn">🌓 Tema</button>
       </div>
     </header>
@@ -454,8 +453,8 @@
   </div>
 
   <script>
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxAAdUZ1LQfD6GOnGFf364ixUlyNT_FVwb2lZUcIi4sCSIBmmluz1KkyQlFIEPeWHipHA/exec";
-    const SYNC_INTERVAL = 60000;
+    const DATA_JSON_URL = "./data/data.json";
+    const AUTO_REFRESH_INTERVAL = 300000; // 5 Menit
 
     let state = {
       ops: [],
@@ -471,12 +470,10 @@
 
     let chartInstances = {};
 
-    // Helper Membersihkan Nama Key Header
     function cleanHeaderName(str) {
       return String(str || '').replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim();
     }
 
-    // Helper Mengambil Value dengan Pencarian Keyword
     function getFlexibleValue(row, keywords) {
       const keys = Object.keys(row);
       for (const kw of keywords) {
@@ -488,12 +485,12 @@
       return null;
     }
 
-    // 1. Core Fetch Engine
+    // Load Data dari File Static JSON di Repositori
     async function fetchLatestData() {
-      updateSyncStatus('syncing', '☁️ Synchronizing...');
+      updateSyncStatus('syncing', '☁️ Memuat data JSON...');
       try {
-        const res = await fetch(GAS_API_URL, { cache: 'no-cache' });
-        if (!res.ok) throw new Error('Network error');
+        const res = await fetch(DATA_JSON_URL, { cache: 'no-cache' });
+        if (!res.ok) throw new Error('File data.json tidak ditemukan');
         
         const data = await res.json();
         
@@ -506,12 +503,17 @@
         }
 
         localStorage.setItem('cached_state', JSON.stringify({ ops: state.ops, ems: state.ems, pnr: state.pnr }));
-        localStorage.setItem('last_sync', new Date().toISOString());
+        localStorage.setItem('last_sync', data.last_updated || new Date().toISOString());
 
         renderCurrentModule();
-        updateSyncStatus('online', `☁️ Data Sinkron (${new Date().toLocaleTimeString()})`);
+
+        const updateTime = data.last_updated 
+          ? new Date(data.last_updated).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) 
+          : new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+        updateSyncStatus('online', `☁️ Static JSON (${updateTime})`);
       } catch (err) {
-        console.warn('Sync failed, using cache:', err);
+        console.warn('Gagal membaca data.json lokal, memuat dari cache:', err);
         const cached = localStorage.getItem('cached_state');
         if (cached) {
           const parsed = JSON.parse(cached);
@@ -521,12 +523,11 @@
           renderCurrentModule();
           updateSyncStatus('offline', '⚠️ Cache Mode (Offline)');
         } else {
-          updateSyncStatus('offline', '⚠️ Gagal Terhubung');
+          updateSyncStatus('offline', '⚠️ Data JSON Belum Ada');
         }
       }
     }
 
-    // 2. Render Functions
     function renderCurrentModule() {
       if (state.activeModule === 'ops') renderOPS();
       if (state.activeModule === 'ems') renderEMS();
@@ -571,7 +572,6 @@
       renderTableWithPagination('pnr', state.pnr);
     }
 
-    // Konsolidasi Semua Header Unik
     function getAllHeaders(data) {
       const headersSet = new Set();
       data.forEach(row => {
@@ -580,12 +580,10 @@
       return Array.from(headersSet);
     }
 
-    // Render Table + Pagination Logic
     function renderTableWithPagination(type, rawData) {
       const pState = state.pages[type];
       const query = pState.filter.toLowerCase();
 
-      // Filter Data
       const filtered = rawData.filter(row => {
         if (!query) return true;
         return Object.values(row).some(val => String(val || '').toLowerCase().includes(query));
@@ -612,11 +610,8 @@
       }
 
       const headers = getAllHeaders(rawData);
-
-      // Header dengan nama bersih
       thead.innerHTML = headers.map(h => `<th title="${h}">${cleanHeaderName(h)}</th>`).join('');
 
-      // Body
       tbody.innerHTML = paginatedData.map(row => {
         return `<tr>${headers.map(h => {
           let val = row[h];
@@ -734,7 +729,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       fetchLatestData();
-      setInterval(fetchLatestData, SYNC_INTERVAL);
+      setInterval(fetchLatestData, AUTO_REFRESH_INTERVAL);
 
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') fetchLatestData();
