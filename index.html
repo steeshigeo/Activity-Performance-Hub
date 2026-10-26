@@ -106,7 +106,6 @@
 
     .status-pill.syncing { color: #f59e0b; }
     .status-pill.online { color: #10b981; }
-    .status-pill.offline { color: #ef4444; }
 
     .btn-icon {
       background: rgba(255, 255, 255, 0.05);
@@ -326,7 +325,7 @@
 
       <div class="header-actions">
         <div id="cloudStatusPill" class="status-pill syncing">
-          <span>☁️ Memuat data JSON...</span>
+          <span>☁️ Memuat data...</span>
         </div>
         <button class="btn-icon" id="manualSyncBtn">↻ Refresh</button>
         <button class="btn-icon" id="themeToggleBtn">🌓 Tema</button>
@@ -470,6 +469,20 @@
 
     let chartInstances = {};
 
+    function formatDateTime(dateInput) {
+      if (!dateInput) return '';
+      const date = new Date(dateInput);
+      if (isNaN(date.getTime())) return '';
+      
+      return date.toLocaleString('id-ID', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).replace('.', ':');
+    }
+
     function cleanHeaderName(str) {
       return String(str || '').replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim();
     }
@@ -485,9 +498,8 @@
       return null;
     }
 
-    // Load Data dari File Static JSON di Repositori
     async function fetchLatestData() {
-      updateSyncStatus('syncing', '☁️ Memuat data JSON...');
+      updateSyncStatus('syncing', '☁️ Memuat data...');
       try {
         const res = await fetch(DATA_JSON_URL, { cache: 'no-cache' });
         if (!res.ok) throw new Error('File data.json tidak ditemukan');
@@ -502,28 +514,30 @@
           state.ops = data;
         }
 
+        const syncTimestamp = data.last_updated || new Date().toISOString();
         localStorage.setItem('cached_state', JSON.stringify({ ops: state.ops, ems: state.ems, pnr: state.pnr }));
-        localStorage.setItem('last_sync', data.last_updated || new Date().toISOString());
+        localStorage.setItem('last_sync', syncTimestamp);
 
         renderCurrentModule();
 
-        const updateTime = data.last_updated 
-          ? new Date(data.last_updated).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) 
-          : new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
-        updateSyncStatus('online', `☁️ Static JSON (${updateTime})`);
+        const formattedTime = formatDateTime(syncTimestamp);
+        updateSyncStatus('online', `☁️ Updated: ${formattedTime}`);
       } catch (err) {
-        console.warn('Gagal membaca data.json lokal, memuat dari cache:', err);
+        console.warn('Membaca data dari cache lokal:', err);
         const cached = localStorage.getItem('cached_state');
+        const lastSync = localStorage.getItem('last_sync');
+
         if (cached) {
           const parsed = JSON.parse(cached);
           state.ops = parsed.ops || [];
           state.ems = parsed.ems || [];
           state.pnr = parsed.pnr || [];
           renderCurrentModule();
-          updateSyncStatus('offline', '⚠️ Cache Mode (Offline)');
+
+          const formattedTime = lastSync ? formatDateTime(lastSync) : formatDateTime(new Date());
+          updateSyncStatus('online', `☁️ Updated: ${formattedTime}`);
         } else {
-          updateSyncStatus('offline', '⚠️ Data JSON Belum Ada');
+          updateSyncStatus('syncing', '☁️ Memuat Data...');
         }
       }
     }
