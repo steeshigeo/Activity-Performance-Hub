@@ -543,7 +543,7 @@
     }
 
     function getRowTrainer(row) {
-      return getFlexibleValue(row, ['trainer', 'presenter', 'nama trainer', 'nama presenter', 'staff', 'nama', 'nps']);
+      return getFlexibleValue(row, ['trainer', 'presenter', 'nama trainer', 'nama presenter', 'staff', 'nama', 'nps', 'participants name']);
     }
 
     function getRowMonth(row) {
@@ -576,6 +576,7 @@
     async function fetchRecapMasterData() {
       try {
         const res = await fetch(RECAP_SHEET_URL);
+        if (!res.ok) return;
         const text = await res.text();
         const jsonText = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
         const data = JSON.parse(jsonText);
@@ -593,14 +594,12 @@
         }).filter(item => item.store !== '' && item.store !== '0');
 
       } catch (err) {
-        console.warn('Gagal memuat master data Recap dari Google Sheet:', err);
+        console.warn('Google Sheet master recap skip/fail:', err);
       }
     }
 
     function populateDropdowns(type) {
-      const data = state[type];
-      if (!data) return;
-
+      const data = state[type] || [];
       const pState = state.pages[type];
 
       const monthsSet = new Set();
@@ -608,7 +607,7 @@
       const trainerHOSet = new Set();
       const trainersSet = new Set();
 
-      // Kumpulkan data unik dari aktivitas & master Google Sheet
+      // Ekstrak data unik langsung dari data aktivitas
       data.forEach(row => {
         const m = getRowMonth(row);
         const s = getRowStore(row);
@@ -619,6 +618,7 @@
         if (t) trainersSet.add(t);
       });
 
+      // Tambahkan master data toko & trainer jika ada
       if (recapMasterData.length > 0) {
         recapMasterData.forEach(item => {
           if (item.store && item.store !== '0') storesSet.add(item.store);
@@ -637,6 +637,7 @@
       const el = document.getElementById(elementId);
       if (!el) return;
       
+      // Urutkan item secara alfabetis/kronologis
       items.sort((a, b) => a.localeCompare(b, 'id', { numeric: true, sensitivity: 'base' }));
 
       let html = `<option value="all" ${currentValue === 'all' ? 'selected' : ''}>${defaultText}</option>`;
@@ -668,7 +669,9 @@
       const lastSync = localStorage.getItem('last_sync');
       const fallbackTime = lastSync ? formatDateTime(lastSync) : formatDateTime(new Date());
 
-      await fetchRecapMasterData();
+      try {
+        await fetchRecapMasterData();
+      } catch (e) {}
 
       try {
         const res = await fetch(DATA_JSON_URL, { cache: 'no-cache' });
@@ -724,7 +727,7 @@
     }
 
     function getFilteredData(type) {
-      const rawData = state[type];
+      const rawData = state[type] || [];
       const pState = state.pages[type];
 
       return rawData.filter(row => {
