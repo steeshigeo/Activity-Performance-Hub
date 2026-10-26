@@ -47,6 +47,28 @@
     .page-btn{padding:6px 12px;background:rgba(255,255,255,.05);border:1px solid var(--glass-border);color:var(--text-main);border-radius:8px;cursor:pointer;font-size:.8rem}
     .page-btn:disabled{opacity:.4;cursor:not-allowed}
     .module-panel{display:none}.module-panel.active{display:block}
+  
+    .header-actions{flex-wrap:wrap}
+    .status-pill,.btn-icon{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:38px;padding:0 16px;line-height:1;white-space:nowrap}
+    .btn-icon:disabled{opacity:.65;cursor:wait}
+    .btn-icon.loading span{display:inline-block;animation:spin .9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .status-pill.loading{color:var(--accent)}
+    .status-pill.warn{color:#f59e0b}
+    .content-grid{align-items:stretch}
+    .content-grid>.panel-card:last-child{display:flex;flex-direction:column}
+    .chart-wrap{position:relative;flex:1;min-height:280px}
+    .chart-wrap canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+    .muted{color:var(--text-muted)}
+    .sum-wrap{margin-bottom:24px}
+    .sum-wrap .kpi-value{font-size:1.4rem}
+    .sum-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+    .sum-title{font-size:.8rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+    .bar-row{display:grid;grid-template-columns:minmax(80px,38%) 1fr auto;gap:10px;align-items:center;font-size:.82rem;margin-bottom:8px}
+    .bar-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .bar-track{height:8px;border-radius:99px;background:var(--input-bg);overflow:hidden}
+    .bar-fill{height:100%;border-radius:99px;background:var(--accent)}
+    .bar-val{font-weight:600}
   </style>
 </head>
 <body>
@@ -64,6 +86,7 @@
       <button class="tab-btn active" onclick="switchModule('ops',this)">Module OPS</button>
       <button class="tab-btn" onclick="switchModule('ems',this)">Module EMS</button>
       <button class="tab-btn" onclick="switchModule('pnr',this)">Module PNR</button>
+      <button class="tab-btn" onclick="switchModule('all',this)">Summary</button>
     </div>
 
     <div id="panel-ops" class="module-panel active">
@@ -87,7 +110,7 @@
         </div>
         <div class="panel-card">
           <div class="panel-title">Topik Terpopuler</div>
-          <canvas id="opsChart" height="260"></canvas>
+          <div class="chart-wrap"><canvas id="opsChart"></canvas></div>
         </div>
       </div>
     </div>
@@ -159,7 +182,7 @@
       if (!str) return '';
       let clean = String(str).replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim();
       const lower = clean.toLowerCase();
-      if (lower.includes('presenter name') || lower.includes('fill in your full name') || lower.includes('trainer name')) return 'Trainer / Presenter';
+      if (lower.includes('presenter name') || lower.includes('fill in your full name') || lower.includes('trainer name')) return 'Presenter';
       if (lower.includes('tanggal (') || lower.includes('tanggal ( hari')) return 'Tanggal Sesi';
       if (lower.includes('total participants') || lower.includes('berapa banyak pelanggan')) return 'Total Peserta';
       if (lower.includes('unit yang terjual')) return 'Unit Terjual';
@@ -190,9 +213,12 @@
       recapMasterData.forEach(r => {
         const k = norm(r.store);
         if (!k) return;
-        const cur = storeIndex.get(k);
-        if (!cur) storeIndex.set(k, { name: r.store, ho: r.trainerHO || '' });
+        let cur = storeIndex.get(k);
+        if (!cur) { cur = { name: r.store, ho: r.trainerHO || '', trainers: new Set() }; storeIndex.set(k, cur); }
         else if (!cur.ho && r.trainerHO) cur.ho = r.trainerHO;
+        // Store Trainer = kolom "Store Trainer" bila ada, atau staff di store itu yang posisinya Trainer
+        const st = r.storeTrainer || (/trainer/i.test(r.position) ? r.nama : '');
+        if (st && st !== '0') cur.trainers.add(st);
       });
     }
 
@@ -208,15 +234,16 @@
         const i = headers.findIndex((h, idx) => !exclude.includes(idx) && re.test(String(h).toLowerCase()));
         return i >= 0 ? i : fallback;
       };
-      const iHO = find(/trainer\s*ho|ho\s*trainer|\bho\b/, [], 9);
-      const iStore = find(/store|toko|cabang/, [iHO], 1);
-      const iNama = find(/nama|name|presenter|trainer/, [iHO, iStore], 2);
-      const iEmail = find(/email|e-mail/, [iHO, iStore, iNama], 4);
-      const iPos = find(/position|posisi|jabatan/, [iHO, iStore, iNama, iEmail], 5);
+      const iST = find(/store\s*trainer|trainer\s*store/, [], -1);
+      const iHO = find(/trainer\s*ho|ho\s*trainer|\bho\b/, [iST], 9);
+      const iStore = find(/store|toko|cabang/, [iHO, iST], 1);
+      const iNama = find(/nama|name|presenter|trainer/, [iHO, iStore, iST], 2);
+      const iEmail = find(/email|e-mail/, [iHO, iStore, iNama, iST], 4);
+      const iPos = find(/position|posisi|jabatan/, [iHO, iStore, iNama, iEmail, iST], 5);
 
       return rows.map(c => ({
         store: c[iStore] || '', nama: c[iNama] || '', email: c[iEmail] || '',
-        position: c[iPos] || '', trainerHO: c[iHO] || ''
+        position: c[iPos] || '', trainerHO: c[iHO] || '', storeTrainer: c[iST] || ''
       })).filter(r => r.store && r.store !== '0').map(r => {
         if (r.trainerHO === '0') r.trainerHO = '';
         if (r.nama === '0') r.nama = '';
@@ -226,7 +253,7 @@
 
     async function fetchRecapMasterData() {
       try {
-        const res = await fetch(RECAP_SHEET_URL, { cache: 'no-cache' });
+        const res = await fetch(RECAP_SHEET_URL + '&_=' + Date.now(), { cache: 'no-store' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         recapMasterData = parseRecap(await res.text());
         localStorage.setItem('recap_cache', JSON.stringify(recapMasterData));
@@ -255,23 +282,33 @@
       return mi >= 0 && y ? parseInt(y) * 100 + mi : 0;
     }
 
+    const MONTH_NAMES_EN = ["january","february","march","april","may","june","july","august","september","october","november","december"];
+    function monthFromText(low) {
+      for (let i = 0; i < 12; i++) {
+        if (new RegExp('\\b(' + MONTH_NAMES_ID[i].toLowerCase() + '|' + MONTH_NAMES_EN[i] + ')\\b').test(low)) return i;
+      }
+      return -1;
+    }
+    function parseAnyDate(v) {
+      const s = String(v).trim(), low = s.toLowerCase();
+      let m = s.match(/^Date\((\d{4}),\s*(\d{1,2}),\s*(\d{1,2})/);
+      if (m) return new Date(+m[1], +m[2], +m[3]);
+      const yr = low.match(/\b((?:19|20)\d{2})\b/), mi = monthFromText(low);
+      if (mi >= 0 && yr) return new Date(+yr[1], mi, 1);
+      m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);
+      if (m) return new Date(+m[3], +m[2] - 1, +m[1]); // dd/mm/yyyy
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? null : d;
+    }
     function getRowMonthInfo(row) {
       const direct = getFlexibleValue(row, ['bulan', 'month']);
-      if (direct) return { label: direct, key: monthKeyFromLabel(direct) };
-
-      const dateStr = getFlexibleValue(row, ['waktu', 'timestamp', 'tanggal', 'date']);
-      if (!dateStr) return null;
-      let d = new Date(dateStr);
-      if (isNaN(d.getTime())) {
-        const parts = dateStr.split(/[\/\-\s,]/).filter(Boolean);
-        if (parts.length >= 3 && parts[0].length <= 2 && parts[2].length === 4) {
-          d = new Date(parts[2], parseInt(parts[1]) - 1, parts[0]);
-        }
+      const cands = [direct, ...['tanggal', 'date', 'waktu', 'timestamp'].map(k => getFlexibleValue(row, [k]))];
+      for (const v of cands) {
+        if (!v) continue;
+        const d = parseAnyDate(v);
+        if (d && d.getFullYear() > 1990) return { label: `${MONTH_NAMES_ID[d.getMonth()]} ${d.getFullYear()}`, key: d.getFullYear() * 100 + d.getMonth() };
       }
-      if (!isNaN(d.getTime()) && d.getFullYear() > 1990) {
-        return { label: `${MONTH_NAMES_ID[d.getMonth()]} ${d.getFullYear()}`, key: d.getFullYear() * 100 + d.getMonth() };
-      }
-      return null;
+      return direct ? { label: direct, key: monthKeyFromLabel(direct) } : null;
     }
 
     function getRowMeta(row) {
@@ -283,7 +320,7 @@
         trainer: getRowTrainer(row) || '',
         month: mi ? mi.label : '',
         monthKey: mi ? mi.key : 0,
-        ho: idx ? idx.ho : ''
+        ho: idx ? idx.ho : '', st: idx ? Array.from(idx.trainers) : []
       };
     }
 
@@ -313,52 +350,57 @@
 
     function populateDropdowns(type) {
       const p = state.pages[type];
+      const isPNR = type === 'pnr'; // PNR: filter grup = Store Trainer, modul lain = Trainer HO
       const metas = (state[type] || []).map(getRowMeta);
+      const el = id => document.getElementById(`${type}${id}`);
 
-      // Bulan + tahun (urut terbaru -> lama)
+      // Bulan + tahun, terbaru dulu
       const months = new Map();
       metas.forEach(m => { if (m.month) months.set(m.month, m.monthKey); });
       const monthList = Array.from(months.entries()).sort((a, b) => b[1] - a[1] || byName(a[0], b[0])).map(e => e[0]);
-      const mg = new Map([['_', monthList]]);
-      renderSelect(`${type}MonthFilter`, '📅 Semua Bulan', mg, p.month);
-      p.month = document.getElementById(`${type}MonthFilter`).value;
+      renderSelect(`${type}MonthFilter`, '📅 Semua Bulan', new Map([['_', monthList]]), p.month);
+      p.month = el('MonthFilter').value;
 
-      // Trainer HO
-      const hoSet = new Set();
-      recapMasterData.forEach(r => { if (r.trainerHO) hoSet.add(r.trainerHO); });
-      renderSelect(`${type}TrainerHOFilter`, '👔 Semua Trainer HO', new Map([['_', Array.from(hoSet).sort(byName)]]), p.trainerHO);
-      p.trainerHO = document.getElementById(`${type}TrainerHOFilter`).value;
+      // Semua store (master Recap + store yang muncul di aktivitas)
+      const stores = new Map();
+      storeIndex.forEach((v, k) => stores.set(k, { name: v.name, ho: v.ho, trainers: v.trainers }));
+      metas.forEach(m => { if (m.store && !stores.has(norm(m.store))) stores.set(norm(m.store), { name: m.store, ho: '', trainers: new Set() }); });
+      const inGroup = (s, v) => v === 'all' || (isPNR ? s.trainers.has(v) : s.ho === v);
 
-      // Store (dikelompokkan per Trainer HO, mengikuti pilihan Trainer HO)
-      const stores = new Map(); // norm -> {name, ho}
-      storeIndex.forEach((v, k) => stores.set(k, { name: v.name, ho: v.ho }));
-      metas.forEach(m => { if (m.store && !stores.has(norm(m.store))) stores.set(norm(m.store), { name: m.store, ho: '' }); });
-      const storeList = Array.from(stores.values()).filter(s => p.trainerHO === 'all' || s.ho === p.trainerHO);
-      const sg = groupBy(storeList.sort((a, b) => byName(a.name, b.name)), s => s.ho || NO_HO);
+      // Trainer HO / Store Trainer
+      const groupSet = new Set();
+      stores.forEach(s => { if (isPNR) s.trainers.forEach(t => groupSet.add(t)); else if (s.ho) groupSet.add(s.ho); });
+      renderSelect(`${type}TrainerHOFilter`, isPNR ? '🏷️ Semua Store Trainer' : '👔 Semua Trainer HO',
+        new Map([['_', Array.from(groupSet).sort(byName)]]), p.trainerHO);
+      p.trainerHO = el('TrainerHOFilter').value;
+
+      // Store, dikelompokkan per Trainer HO (PNR: per Store Trainer)
+      const storeList = Array.from(stores.values()).filter(s => inGroup(s, p.trainerHO)).sort((a, b) => byName(a.name, b.name));
+      const sg = groupBy(storeList, s => isPNR ? (Array.from(s.trainers).sort(byName).join(', ') || 'Tanpa Store Trainer') : (s.ho || NO_HO));
       sg.forEach((arr, k) => sg.set(k, arr.map(s => s.name)));
       sg.__grouped = true;
       renderSelect(`${type}StoreFilter`, '🏪 Semua Store', sg, p.store);
-      p.store = document.getElementById(`${type}StoreFilter`).value;
+      p.store = el('StoreFilter').value;
 
-      // Trainer / Presenter (dikelompokkan per Store, mengikuti pilihan Trainer HO & Store)
-      const trainers = new Map(); // norm(store)|norm(name) -> {name, store}
-      const addTrainer = (name, store) => {
+      // Staff / Presenter, dikelompokkan per Store
+      const staff = new Map();
+      const addStaff = (name, store) => {
         if (!name || name === '0') return;
-        const s = storeIndex.get(norm(store));
-        const storeName = s ? s.name : store;
-        const ho = s ? s.ho : '';
-        if (p.trainerHO !== 'all' && ho !== p.trainerHO) return;
+        const idx = storeIndex.get(norm(store));
+        const storeName = idx ? idx.name : store;
+        const s = stores.get(norm(storeName)) || { ho: '', trainers: new Set() };
+        if (!inGroup(s, p.trainerHO)) return;
         if (p.store !== 'all' && norm(storeName) !== norm(p.store)) return;
         const k = norm(storeName) + '|' + norm(name);
-        if (!trainers.has(k)) trainers.set(k, { name, store: storeName || 'Tanpa Store' });
+        if (!staff.has(k)) staff.set(k, { name, store: storeName || 'Tanpa Store' });
       };
-      recapMasterData.forEach(r => addTrainer(r.nama, r.store));
-      metas.forEach(m => addTrainer(m.trainer, m.store));
-      const tg = groupBy(Array.from(trainers.values()).sort((a, b) => byName(a.name, b.name)), t => t.store);
+      recapMasterData.forEach(r => addStaff(r.nama, r.store));
+      metas.forEach(m => addStaff(m.trainer, m.store));
+      const tg = groupBy(Array.from(staff.values()).sort((a, b) => byName(a.name, b.name)), t => t.store);
       tg.forEach((arr, k) => tg.set(k, arr.map(t => t.name)));
       tg.__grouped = true;
-      renderSelect(`${type}TrainerFilter`, '👤 Semua Trainer / Presenter', tg, p.trainer);
-      p.trainer = document.getElementById(`${type}TrainerFilter`).value;
+      renderSelect(`${type}TrainerFilter`, '👤 Semua Staff', tg, p.trainer);
+      p.trainer = el('TrainerFilter').value;
     }
 
     function escapeHtml(str) {
@@ -366,14 +408,14 @@
     }
 
     /* ---------- Ambil data aktivitas (OPS / EMS / PNR) ---------- */
-    async function fetchLatestData() {
+    async function _fetchLatestData() {
       const lastSync = localStorage.getItem('last_sync');
       const fallbackTime = lastSync ? formatDateTime(lastSync) : formatDateTime(new Date());
 
       await fetchRecapMasterData();
 
       try {
-        const res = await fetch(DATA_JSON_URL, { cache: 'no-cache' });
+        const res = await fetch(DATA_JSON_URL + '?t=' + Date.now(), { cache: 'no-store' });
         if (!res.ok) throw new Error('File data.json tidak ditemukan');
         const data = await res.json();
 
@@ -401,7 +443,7 @@
           state.pnr = parsed.pnr || [];
           refreshAll();
         }
-        updateSyncStatus(`☁️ Updated: ${fallbackTime}`);
+        updateSyncStatus(`⚠️ Offline, pakai cache: ${fallbackTime}`, 'warn');
       }
     }
 
@@ -414,6 +456,7 @@
       if (state.activeModule === 'ops') renderOPS();
       if (state.activeModule === 'ems') renderEMS();
       if (state.activeModule === 'pnr') renderPNR();
+      if (state.activeModule === 'all') renderAllSummary();
     }
 
     function getFilteredData(type) {
@@ -424,7 +467,7 @@
       return rawData.filter(row => {
         const m = getRowMeta(row);
         if (p.month !== 'all' && m.month !== p.month) return false;
-        if (p.trainerHO !== 'all' && m.ho !== p.trainerHO) return false;
+        if (p.trainerHO !== 'all' && !(type === 'pnr' ? m.st.includes(p.trainerHO) : m.ho === p.trainerHO)) return false;
         if (p.store !== 'all' && norm(m.store) !== norm(p.store)) return false;
         if (p.trainer !== 'all') {
           const a = norm(m.trainer), b = norm(p.trainer);
@@ -449,6 +492,10 @@
       document.getElementById('ops-kpi-participants').textContent = totalParticipants.toLocaleString('id-ID');
       document.getElementById('ops-kpi-units').textContent = totalUnits.toLocaleString('id-ID');
       renderTableWithPagination('ops', filteredData);
+      renderModuleSummary('ops', filteredData, [
+        ['Rata-rata Peserta / Sesi', filteredData.length ? (totalParticipants / filteredData.length).toFixed(1).replace('.', ',') : '0'],
+        ['Unit Terjual / Peserta', totalParticipants ? (totalUnits / totalParticipants).toFixed(2).replace('.', ',') : '0']
+      ]);
       renderChart('opsChart', topicCounts);
     }
 
@@ -456,12 +503,14 @@
       const d = getFilteredData('ems');
       document.getElementById('ems-kpi-total').textContent = d.length.toLocaleString('id-ID');
       renderTableWithPagination('ems', d);
+      renderModuleSummary('ems', d);
     }
 
     function renderPNR() {
       const d = getFilteredData('pnr');
       document.getElementById('pnr-kpi-total').textContent = d.length.toLocaleString('id-ID');
       renderTableWithPagination('pnr', d);
+      renderModuleSummary('pnr', d);
     }
 
     function getAllHeaders(data) {
@@ -489,11 +538,11 @@
         return;
       }
 
-      const headers = getAllHeaders(state[type]);
-      thead.innerHTML = headers.map(h => `<th title="${escapeHtml(h)}">${escapeHtml(cleanHeaderName(h))}</th>`).join('');
+      const headers = ['__bulan', ...getAllHeaders(state[type])];
+      thead.innerHTML = headers.map(h => `<th title="${escapeHtml(h)}">${escapeHtml(h === '__bulan' ? 'Bulan' : cleanHeaderName(h))}</th>`).join('');
       tbody.innerHTML = paginatedData.map(row =>
         `<tr>${headers.map(h => {
-          let val = row[h];
+          let val = h === '__bulan' ? getRowMeta(row).month : row[h];
           if (val === undefined || val === null || val === '') val = '-';
           return `<td>${escapeHtml(val)}</td>`;
         }).join('')}</tr>`
@@ -558,8 +607,155 @@
       renderCurrentModule();
     }
 
-    function updateSyncStatus(msg) {
-      document.getElementById('cloudStatusPill').innerHTML = `<span>${msg}</span>`;
+    function updateSyncStatus(msg, cls = '') {
+      const pill = document.getElementById('cloudStatusPill');
+      pill.className = 'status-pill ' + cls;
+      pill.innerHTML = `<span>${msg}</span>`;
+    }
+
+    /* ---------- Summary ---------- */
+    let isLoading = false;
+    async function fetchLatestData() {
+      if (isLoading) return;
+      isLoading = true;
+      const btn = document.getElementById('manualSyncBtn');
+      btn.disabled = true; btn.classList.add('loading'); btn.innerHTML = '<span>↻</span> Memuat…';
+      updateSyncStatus('⏳ Memuat data…', 'loading');
+      try { await _fetchLatestData(); }
+      finally {
+        isLoading = false; btn.disabled = false; btn.classList.remove('loading'); btn.innerHTML = '<span>↻</span> Refresh';
+      }
+    }
+
+    function initSummaryHosts() {
+      ['ops', 'ems', 'pnr'].forEach(t => {
+        const d = document.createElement('div');
+        d.id = `${t}-summary`; d.className = 'panel-card sum-wrap';
+        document.querySelector(`#panel-${t} .kpi-grid`).after(d);
+      });
+      const p = document.createElement('div');
+      p.id = 'panel-all'; p.className = 'module-panel';
+      document.querySelector('.app-shell').appendChild(p);
+    }
+
+    function countBy(items, fn) {
+      const m = new Map();
+      items.forEach(x => { const k = fn(x); if (k) m.set(k, (m.get(k) || 0) + 1); });
+      return Array.from(m.entries()).sort((a, b) => b[1] - a[1] || byName(a[0], b[0]));
+    }
+    function monthEntries(metas, asc) {
+      const m = new Map();
+      metas.forEach(x => {
+        if (!x.month) return;
+        const e = m.get(x.month) || { n: 0, k: x.monthKey };
+        e.n++; m.set(x.month, e);
+      });
+      return Array.from(m.entries()).sort((a, b) => asc ? a[1].k - b[1].k : b[1].k - a[1].k).map(([l, e]) => [l, e.n]);
+    }
+    function barList(title, entries, limit) {
+      const list = entries.slice(0, limit || 5);
+      const max = Math.max(1, ...list.map(e => e[1]));
+      const rows = list.map(([k, v]) => `<div class="bar-row"><span class="bar-label" title="${escapeHtml(k)}">${escapeHtml(k)}</span><div class="bar-track"><div class="bar-fill" style="width:${(v / max * 100).toFixed(1)}%"></div></div><span class="bar-val">${v.toLocaleString('id-ID')}</span></div>`).join('');
+      return `<div class="sum-block"><div class="sum-title">${title}</div>${rows || '<div class="muted">Belum ada data</div>'}</div>`;
+    }
+    const kpiCard = (t, v, s) => `<div class="kpi-card"><div class="kpi-title">${t}</div><div class="kpi-value">${typeof v === 'number' ? v.toLocaleString('id-ID') : v}</div>${s ? `<div class="muted" style="font-size:.75rem;margin-top:4px">${s}</div>` : ''}</div>`;
+
+    function renderModuleSummary(type, data, extras) {
+      const el = document.getElementById(`${type}-summary`);
+      if (!el) return;
+      const metas = data.map(getRowMeta);
+      const stores = new Set(metas.map(m => m.store).filter(Boolean));
+      const staff = new Set(metas.map(m => norm(m.trainer)).filter(Boolean));
+      const months = monthEntries(metas);
+      const avg = stores.size ? (data.length / stores.size).toFixed(1).replace('.', ',') : '0';
+      el.innerHTML = `<div class="panel-title" style="margin-bottom:14px">Summary ${type.toUpperCase()}</div>
+        <div class="kpi-grid">
+          ${kpiCard('Store Aktif', stores.size, storeIndex.size ? `dari ${storeIndex.size} store terdaftar` : '')}
+          ${kpiCard('Staff Aktif', staff.size)}
+          ${kpiCard('Bulan Tercakup', months.length)}
+          ${kpiCard('Rata-rata Entry / Store', avg)}
+          ${(extras || []).map(e => kpiCard(e[0], e[1])).join('')}
+        </div>
+        <div class="sum-cols">
+          ${barList('Entry per Bulan', months, 6)}
+          ${barList('Top 5 Store', countBy(metas, m => m.store))}
+          ${barList('Top 5 Staff', countBy(metas, m => m.trainer))}
+        </div>`;
+    }
+
+    let allMonth = 'all';
+    function renderAllSummary() {
+      const host = document.getElementById('panel-all');
+      if (!host) return;
+      if (chartInstances.allTrend) { chartInstances.allTrend.destroy(); delete chartInstances.allTrend; }
+      const mods = ['ops', 'ems', 'pnr'];
+      const per = mods.map(t => (state[t] || []).map(r => ({ t, r, m: getRowMeta(r) })));
+      const flat = [].concat(...per);
+      const monthLabels = monthEntries(flat.map(x => x.m)).map(e => e[0]);
+      if (allMonth !== 'all' && !monthLabels.includes(allMonth)) allMonth = 'all';
+      const sel = allMonth === 'all' ? flat : flat.filter(x => x.m.month === allMonth);
+      const stores = new Set(sel.map(x => x.m.store).filter(Boolean));
+      const staff = new Set(sel.map(x => norm(x.m.trainer)).filter(Boolean));
+      let part = 0, units = 0;
+      sel.filter(x => x.t === 'ops').forEach(x => {
+        part += parseInt(getFlexibleValue(x.r, ['participant', 'peserta'])) || 0;
+        units += parseInt(getFlexibleValue(x.r, ['unit yang terjual', 'unit terjual', 'terjual'])) || 0;
+      });
+      const cnt = t => sel.filter(x => x.t === t).length;
+      const idle = Array.from(storeIndex.values()).filter(s => !stores.has(s.name)).map(s => s.name).sort(byName);
+      const idleHtml = !storeIndex.size ? 'Data Recap belum terbaca.' :
+        idle.length ? escapeHtml(idle.slice(0, 12).join(', ')) + (idle.length > 12 ? ` +${idle.length - 12} lainnya` : '') : 'Semua store sudah punya aktivitas 🎉';
+
+      host.innerHTML = `
+        <div class="panel-card sum-wrap">
+          <div class="panel-header">
+            <div class="panel-title">Summary Keseluruhan (OPS + EMS + PNR)</div>
+            <select class="select-box" style="flex:none;min-width:200px" onchange="allMonth=this.value;renderAllSummary()">
+              <option value="all">📅 Semua Bulan</option>
+              ${monthLabels.map(l => `<option value="${escapeHtml(l)}" ${l === allMonth ? 'selected' : ''}>${escapeHtml(l)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="kpi-grid" style="margin-bottom:0">
+            ${kpiCard('Total Entry', sel.length)}
+            ${kpiCard('Entry OPS', cnt('ops'))}
+            ${kpiCard('Entry EMS', cnt('ems'))}
+            ${kpiCard('Entry PNR', cnt('pnr'))}
+            ${kpiCard('Store Aktif', stores.size, storeIndex.size ? `dari ${storeIndex.size} store terdaftar` : '')}
+            ${kpiCard('Staff Aktif', staff.size)}
+            ${kpiCard('Peserta Open Studio', part)}
+            ${kpiCard('Unit Terjual', units)}
+          </div>
+        </div>
+        <div class="panel-card sum-wrap">
+          <div class="panel-title" style="margin-bottom:12px">Tren Entry per Bulan (12 bulan terakhir)</div>
+          <div class="chart-wrap" style="height:300px;flex:none;min-height:0"><canvas id="allTrendChart"></canvas></div>
+        </div>
+        <div class="panel-card sum-wrap">
+          <div class="sum-cols">
+            ${barList('Top 5 Store', countBy(sel, x => x.m.store))}
+            ${barList('Top 5 Staff', countBy(sel, x => x.m.trainer))}
+            ${barList('Entry per Trainer HO', countBy(sel, x => x.m.ho))}
+            ${barList('Entry per Bulan', monthEntries(sel.map(x => x.m)), 6)}
+            <div class="sum-block"><div class="sum-title">Store Belum Ada Aktivitas (${idle.length})</div><div class="muted" style="font-size:.82rem;line-height:1.6">${idleHtml}</div></div>
+          </div>
+        </div>`;
+
+      const root = getComputedStyle(document.documentElement);
+      const tc = root.getPropertyValue('--text-main').trim(), mc = root.getPropertyValue('--text-muted').trim();
+      const ml = monthEntries(flat.map(x => x.m), true).map(e => e[0]).slice(-12);
+      const colors = ['#38bdf8', '#c084fc', '#34d399'];
+      chartInstances.allTrend = new Chart(document.getElementById('allTrendChart').getContext('2d'), {
+        type: 'bar',
+        data: { labels: ml, datasets: mods.map((t, i) => ({ label: t.toUpperCase(), data: ml.map(l => per[i].filter(x => x.m.month === l).length), backgroundColor: colors[i] })) },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: {
+            x: { stacked: true, ticks: { color: mc }, grid: { display: false } },
+            y: { stacked: true, beginAtZero: true, ticks: { color: mc, precision: 0 }, grid: { color: 'rgba(148,163,184,.15)' } }
+          },
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, color: tc } } }
+        }
+      });
     }
 
     document.getElementById('themeToggleBtn').addEventListener('click', () => {
@@ -570,6 +766,7 @@
     document.getElementById('manualSyncBtn').addEventListener('click', fetchLatestData);
 
     document.addEventListener('DOMContentLoaded', () => {
+      initSummaryHosts();
       fetchLatestData();
       setInterval(fetchLatestData, AUTO_REFRESH_INTERVAL);
       document.addEventListener('visibilitychange', () => {
