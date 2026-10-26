@@ -513,48 +513,80 @@
     }
 
     function getFlexibleValue(row, keywords) {
+      if (!row) return null;
       const keys = Object.keys(row);
       for (const kw of keywords) {
         const matchKey = keys.find(k => String(k).toLowerCase().includes(kw.toLowerCase()));
-        if (matchKey && row[matchKey] !== undefined && row[matchKey] !== null && row[matchKey] !== '') {
-          return row[matchKey];
+        if (matchKey && row[matchKey] !== undefined && row[matchKey] !== null) {
+          const val = String(row[matchKey]).trim();
+          if (val !== '' && val !== '-') return val;
         }
       }
       return null;
     }
 
-    // Dynamic Filter Populate
+    // Populate Dynamic Filter Dropdowns based on matching data
     function populateDropdowns(type) {
       const data = state[type];
       if (!data || data.length === 0) return;
 
-      const months = new Set();
-      const stores = new Set();
-      const trainers = new Set();
+      const pState = state.pages[type];
 
+      // Filter data yang match untuk opsi Bulan
+      const monthsSet = new Set();
+      data.forEach(row => {
+        const s = getFlexibleValue(row, ['store', 'toko']);
+        const t = getFlexibleValue(row, ['presenter', 'trainer', 'nama']);
+        if ((pState.store === 'all' || s === pState.store) &&
+            (pState.trainer === 'all' || t === pState.trainer)) {
+          const m = getFlexibleValue(row, ['bulan', 'month']);
+          if (m) monthsSet.add(m);
+        }
+      });
+
+      // Filter data yang match untuk opsi Store
+      const storesSet = new Set();
+      data.forEach(row => {
+        const m = getFlexibleValue(row, ['bulan', 'month']);
+        const t = getFlexibleValue(row, ['presenter', 'trainer', 'nama']);
+        if ((pState.month === 'all' || m === pState.month) &&
+            (pState.trainer === 'all' || t === pState.trainer)) {
+          const s = getFlexibleValue(row, ['store', 'toko']);
+          if (s) storesSet.add(s);
+        }
+      });
+
+      // Filter data yang match untuk opsi Trainer
+      const trainersSet = new Set();
       data.forEach(row => {
         const m = getFlexibleValue(row, ['bulan', 'month']);
         const s = getFlexibleValue(row, ['store', 'toko']);
-        const t = getFlexibleValue(row, ['presenter', 'trainer', 'nama']);
-
-        if (m) months.add(String(m).trim());
-        if (s) stores.add(String(s).trim());
-        if (t) trainers.add(String(t).trim());
+        if ((pState.month === 'all' || m === pState.month) &&
+            (pState.store === 'all' || s === pState.store)) {
+          const t = getFlexibleValue(row, ['presenter', 'trainer', 'nama']);
+          if (t) trainersSet.add(t);
+        }
       });
 
-      updateSelectOptions(`${type}MonthFilter`, Array.from(months).sort(), 'Semua Bulan', state.pages[type].month);
-      updateSelectOptions(`${type}StoreFilter`, Array.from(stores).sort(), 'Semua Store', state.pages[type].store);
-      updateSelectOptions(`${type}TrainerFilter`, Array.from(trainers).sort(), 'Semua Trainer', state.pages[type].trainer);
+      updateSelectOptions(`${type}MonthFilter`, Array.from(monthsSet), 'Semua Bulan', pState.month);
+      updateSelectOptions(`${type}StoreFilter`, Array.from(storesSet), 'Semua Store', pState.store);
+      updateSelectOptions(`${type}TrainerFilter`, Array.from(trainersSet), 'Semua Trainer', pState.trainer);
     }
 
     function updateSelectOptions(elementId, items, defaultText, currentValue) {
       const el = document.getElementById(elementId);
       if (!el) return;
+      
       let html = `<option value="all">${defaultText}</option>`;
+      
+      // Sort items
+      items.sort((a, b) => a.localeCompare(b, 'id', { numeric: true, sensitivity: 'base' }));
+
       items.forEach(item => {
         const selected = item === currentValue ? 'selected' : '';
         html += `<option value="${item}" ${selected}>${item}</option>`;
       });
+
       el.innerHTML = html;
     }
 
@@ -764,6 +796,7 @@
     function onSearchInput(type) {
       state.pages[type].filter = document.getElementById(`${type}Search`).value;
       state.pages[type].page = 1;
+      populateDropdowns(type);
       renderCurrentModule();
     }
 
@@ -772,6 +805,8 @@
       const val = document.getElementById(`${type}${capitalizedKey}Filter`).value;
       state.pages[type][key] = val;
       state.pages[type].page = 1;
+
+      populateDropdowns(type);
       renderCurrentModule();
     }
 
