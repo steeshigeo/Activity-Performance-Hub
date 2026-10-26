@@ -97,15 +97,12 @@
       border-radius: 99px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--glass-border);
-      color: var(--text-muted);
+      color: #10b981;
       display: flex;
       align-items: center;
       gap: 6px;
       font-weight: 500;
     }
-
-    .status-pill.syncing { color: #f59e0b; }
-    .status-pill.online { color: #10b981; }
 
     .btn-icon {
       background: rgba(255, 255, 255, 0.05);
@@ -324,8 +321,8 @@
       </div>
 
       <div class="header-actions">
-        <div id="cloudStatusPill" class="status-pill syncing">
-          <span>☁️ Memuat data...</span>
+        <div id="cloudStatusPill" class="status-pill">
+          <span>☁️ Updated</span>
         </div>
         <button class="btn-icon" id="manualSyncBtn">↻ Refresh</button>
         <button class="btn-icon" id="themeToggleBtn">🌓 Tema</button>
@@ -453,7 +450,7 @@
 
   <script>
     const DATA_JSON_URL = "./data/data.json";
-    const AUTO_REFRESH_INTERVAL = 300000; // 5 Menit
+    const AUTO_REFRESH_INTERVAL = 300000;
 
     let state = {
       ops: [],
@@ -499,7 +496,9 @@
     }
 
     async function fetchLatestData() {
-      updateSyncStatus('syncing', '☁️ Memuat data...');
+      const lastSync = localStorage.getItem('last_sync');
+      const fallbackTime = lastSync ? formatDateTime(lastSync) : formatDateTime(new Date());
+
       try {
         const res = await fetch(DATA_JSON_URL, { cache: 'no-cache' });
         if (!res.ok) throw new Error('File data.json tidak ditemukan');
@@ -521,11 +520,10 @@
         renderCurrentModule();
 
         const formattedTime = formatDateTime(syncTimestamp);
-        updateSyncStatus('online', `☁️ Updated: ${formattedTime}`);
+        updateSyncStatus(`☁️ Updated: ${formattedTime}`);
       } catch (err) {
         console.warn('Membaca data dari cache lokal:', err);
         const cached = localStorage.getItem('cached_state');
-        const lastSync = localStorage.getItem('last_sync');
 
         if (cached) {
           const parsed = JSON.parse(cached);
@@ -533,12 +531,9 @@
           state.ems = parsed.ems || [];
           state.pnr = parsed.pnr || [];
           renderCurrentModule();
-
-          const formattedTime = lastSync ? formatDateTime(lastSync) : formatDateTime(new Date());
-          updateSyncStatus('online', `☁️ Updated: ${formattedTime}`);
-        } else {
-          updateSyncStatus('syncing', '☁️ Memuat Data...');
         }
+
+        updateSyncStatus(`☁️ Updated: ${fallbackTime}`);
       }
     }
 
@@ -726,9 +721,8 @@
       renderCurrentModule();
     }
 
-    function updateSyncStatus(type, msg) {
+    function updateSyncStatus(msg) {
       const el = document.getElementById('cloudStatusPill');
-      el.className = `status-pill ${type}`;
       el.innerHTML = `<span>${msg}</span>`;
     }
 
