@@ -474,7 +474,7 @@
     const PAGE_SIZE = 50;
     const MONTH_NAMES_ID = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-    let recapMasterData = []; // Data master unik dari Google Sheet Sheet 'Recap'
+    let recapMasterData = [];
 
     let state = {
       ops: [],
@@ -573,7 +573,6 @@
       return null;
     }
 
-    // 1. Live Fetch Master Data dari Sheet 'Recap' Google Sheets
     async function fetchRecapMasterData() {
       try {
         const res = await fetch(RECAP_SHEET_URL);
@@ -598,37 +597,77 @@
       }
     }
 
-    // Populate Dynamic Filter Dropdowns
+    // Populate Dynamic Interconnected Dropdowns
     function populateDropdowns(type) {
       const data = state[type];
       if (!data) return;
 
       const pState = state.pages[type];
 
-      const monthsSet = new Set();
-      const storesSet = new Set();
-      const trainerHOSet = new Set();
-      const trainersSet = new Set();
-
-      // Isi Opsi Store & Trainer HO dari Master Recap Sheet jika ada
-      if (recapMasterData.length > 0) {
-        recapMasterData.forEach(item => {
-          if (item.store && item.store !== '0') storesSet.add(item.store);
-          if (item.trainerHO && item.trainerHO !== '0') trainerHOSet.add(item.trainerHO);
-          if (item.nama && item.nama !== '0') trainersSet.add(item.nama);
-        });
+      function rowMatchesFilter(row, ignoreKey) {
+        if (ignoreKey !== 'month' && pState.month !== 'all') {
+          if (getRowMonth(row) !== pState.month) return false;
+        }
+        if (ignoreKey !== 'store' && pState.store !== 'all') {
+          if (getRowStore(row) !== pState.store) return false;
+        }
+        if (ignoreKey !== 'trainerHO' && pState.trainerHO !== 'all' && recapMasterData.length > 0) {
+          const s = getRowStore(row);
+          const matchedMaster = recapMasterData.find(item => item.store === s);
+          if (!matchedMaster || matchedMaster.trainerHO !== pState.trainerHO) return false;
+        }
+        if (ignoreKey !== 'trainer' && pState.trainer !== 'all') {
+          if (getRowTrainer(row) !== pState.trainer) return false;
+        }
+        return true;
       }
 
-      // Isi Opsi Bulan & gabungkan Store/Trainer dari Data Aktivitas Live
+      // 1. Month Options
+      const monthsSet = new Set();
       data.forEach(row => {
-        const m = getRowMonth(row);
-        const s = getRowStore(row);
-        const t = getRowTrainer(row);
-
-        if (m) monthsSet.add(m);
-        if (s) storesSet.add(s);
-        if (t) trainersSet.add(t);
+        if (rowMatchesFilter(row, 'month')) {
+          const m = getRowMonth(row);
+          if (m) monthsSet.add(m);
+        }
       });
+
+      // 2. Store Options
+      const storesSet = new Set();
+      data.forEach(row => {
+        if (rowMatchesFilter(row, 'store')) {
+          const s = getRowStore(row);
+          if (s) storesSet.add(s);
+        }
+      });
+
+      // 3. Trainer HO Options
+      const trainerHOSet = new Set();
+      data.forEach(row => {
+        if (rowMatchesFilter(row, 'trainerHO')) {
+          const s = getRowStore(row);
+          if (recapMasterData.length > 0) {
+            const matchedMaster = recapMasterData.find(item => item.store === s);
+            if (matchedMaster && matchedMaster.trainerHO && matchedMaster.trainerHO !== '0') {
+              trainerHOSet.add(matchedMaster.trainerHO);
+            }
+          }
+        }
+      });
+
+      // 4. Presenter / Staff Options
+      const trainersSet = new Set();
+      data.forEach(row => {
+        if (rowMatchesFilter(row, 'trainer')) {
+          const t = getRowTrainer(row);
+          if (t) trainersSet.add(t);
+        }
+      });
+
+      // Adjust selections if current selection is no longer available in filtered list
+      if (pState.month !== 'all' && !monthsSet.has(pState.month)) pState.month = 'all';
+      if (pState.store !== 'all' && !storesSet.has(pState.store)) pState.store = 'all';
+      if (pState.trainerHO !== 'all' && !trainerHOSet.has(pState.trainerHO)) pState.trainerHO = 'all';
+      if (pState.trainer !== 'all' && !trainersSet.has(pState.trainer)) pState.trainer = 'all';
 
       updateSelectOptions(`${type}MonthFilter`, Array.from(monthsSet), 'Semua Bulan', pState.month);
       updateSelectOptions(`${type}StoreFilter`, Array.from(storesSet), 'Semua Store', pState.store);
@@ -671,7 +710,6 @@
       const lastSync = localStorage.getItem('last_sync');
       const fallbackTime = lastSync ? formatDateTime(lastSync) : formatDateTime(new Date());
 
-      // Fetch master Google Sheet recap terlebih dahulu
       await fetchRecapMasterData();
 
       try {
@@ -883,6 +921,7 @@
     function onSearchInput(type) {
       state.pages[type].filter = document.getElementById(`${type}Search`).value;
       state.pages[type].page = 1;
+      populateDropdowns(type);
       renderCurrentModule();
     }
 
@@ -892,6 +931,7 @@
       state.pages[type][key] = val;
       state.pages[type].page = 1;
 
+      populateDropdowns(type);
       renderCurrentModule();
     }
 
