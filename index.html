@@ -129,8 +129,8 @@
     .pbar i{display:block;height:100%;background:var(--accent)}
     .matrix th,.matrix td{white-space:nowrap}
     .matrix th:nth-child(1),.matrix td:nth-child(1){position:sticky;left:0;min-width:200px;background:var(--opt-bg);z-index:1}
-    .matrix th:nth-child(2),.matrix td:nth-child(2){position:sticky;left:200px;min-width:170px;background:var(--opt-bg);z-index:1}
-    .matrix th:nth-child(-n+2){z-index:3}
+    
+    .matrix th:nth-child(1){z-index:3}
     .matrix th.dc{text-align:center;padding:6px 4px;min-width:34px;line-height:1.2;font-size:.72rem}
     .matrix th.wk{color:#f43f5e}.matrix .today{box-shadow:inset 0 0 0 1px var(--accent)}
     .matrix td.mx{text-align:center;padding:6px 4px}
@@ -243,8 +243,8 @@
       .roster .av{display:none}
       .roster th:nth-child(3),.roster td:nth-child(3){left:225px;min-width:54px}
       .roster .wa-btn{padding:7px 9px;font-size:0;gap:0}.roster .wa-btn svg{width:16px;height:16px}
-      .matrix th:nth-child(1),.matrix td:nth-child(1){min-width:120px;white-space:normal}
-      .matrix th:nth-child(2),.matrix td:nth-child(2){left:120px;min-width:110px}
+      
+      
     }
   
     .btn-run{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;border:0;border-radius:99px;cursor:pointer;font-weight:600;font-size:.82rem;color:var(--text-main);background:var(--input-bg);transition:transform .15s,background .2s}
@@ -274,6 +274,21 @@
       #raporSel,.panel-header .select-box{flex:1 1 100%!important;min-width:0!important;width:100%!important}
       .panel-header{flex-wrap:wrap}
       .panel-header>div{min-width:0;max-width:100%}
+    }
+  
+    .matrix th:nth-child(1),.matrix td:nth-child(1){min-width:230px;max-width:230px;box-shadow:8px 0 12px -8px rgba(0,0,0,.35)}
+    .mcap{display:flex;flex-direction:column;gap:1px;padding:5px 12px;border-radius:14px;background:var(--input-bg);max-width:100%;line-height:1.2;overflow:hidden;transition:background .15s,color .15s}
+    .mcap b{font-size:.68rem;font-weight:600;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mcap span{font-size:.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mcap:hover{background:var(--accent);color:#fff}.mcap:hover b{color:rgba(255,255,255,.85)}
+    .sum-cols>*,.sum-block{min-width:0}
+    .cmp{max-width:100%}
+    .cmp table{white-space:normal}
+    @media(max-width:720px){
+      .matrix th:nth-child(1),.matrix td:nth-child(1){min-width:104px;max-width:104px;padding:6px}
+      .mcap{padding:4px 8px;border-radius:12px}.mcap b{font-size:.58rem}.mcap span{font-size:.68rem}
+      .matrix th.dc{min-width:30px}
+      .cmp th,.cmp td{padding:8px 6px;font-size:.74rem}
     }
   </style>
 </head>
@@ -1266,14 +1281,36 @@
         return { s, n };
       });
     }
-    function bottomStaffBlock(title, pool, names, detailFn) {
+    const shortStore = n => String(n || '').replace(/^M\d+\s+Digimap\s+/i, '');
+    function staffSplit(pool, names) {
       if (!pool.length) { const seen = new Set(); names.forEach(t => { const k = norm(t); if (k && !seen.has(k)) { seen.add(k); pool.push({ nama: t, store: '', ho: '', pos: '' }); } }); }
-      const list = staffCounts(pool, names).sort((a, b) => a.n - b.n || byName(a.s.nama, b.s.nama));
+      const all = staffCounts(pool, names);
+      return { active: all.filter(x => x.n > 0).sort((a, b) => a.n - b.n || byName(a.s.nama, b.s.nama)), zero: all.filter(x => x.n === 0).sort((a, b) => byName(a.s.nama, b.s.nama)) };
+    }
+    // Paling sedikit aktivitas = jumlah entry terkecil dari data OPS / EMS / PNR (minimal 1 entry)
+    function bottomStaffBlock(title, pool, names, detailFn) {
+      const { active } = staffSplit(pool, names);
       const keyMap = new Map();
-      const entries = list.slice(0, 5).map(x => { const k = x.s.store ? `${x.s.nama} · ${x.s.store.replace(/^M\d+\s+Digimap\s+/i, '')}` : x.s.nama; keyMap.set(k, x.s); return [k, x.n]; });
-      const zero = list.filter(x => x.n === 0).length;
-      const all = () => ({ title, sub: `${list.length} orang · ${zero} belum ada aktivitas`, heads: ['Nama', 'Store', 'Trainer HO', 'Posisi', 'Entry'], rows: list.map(x => [escapeHtml(x.s.nama), escapeHtml(x.s.store || '-'), escapeHtml(x.s.ho || '-'), escapeHtml(x.s.pos || '-'), fmt(x.n)]) });
-      return barList(title, entries, 5, k => detailFn(keyMap.get(k)), { label: `Lihat semua ${list.length} (${zero} belum aktif)`, fn: all });
+      const entries = active.slice(0, 5).map(x => { const k = x.s.store ? `${x.s.nama} · ${shortStore(x.s.store)}` : x.s.nama; keyMap.set(k, x.s); return [k, x.n]; });
+      const all = () => ({ title, sub: `${active.length} orang yang beraktivitas, dari entry paling sedikit`, heads: ['Nama', 'Store', 'Trainer HO', 'Posisi', 'Entry'], rows: active.map(x => [escapeHtml(x.s.nama), escapeHtml(x.s.store || '-'), escapeHtml(x.s.ho || '-'), escapeHtml(x.s.pos || '-'), fmt(x.n)]) });
+      return barList(title, entries, 5, k => detailFn(keyMap.get(k)), { label: `Lihat semua ${active.length} yang aktif`, fn: all });
+    }
+    // Kelompok yang tidak punya aktivitas sama sekali (0 entry), ditampilkan sebagai capsule
+    function zeroBlock(title, items, heads, rowFn) {
+      const rows = items.map(rowFn);
+      const detail = () => ({ title, sub: `${items.length} tanpa aktivitas sama sekali (0 entry)`, heads, rows: rows.map(r => r.cells.map(escapeHtml)) });
+      const caps = rows.slice(0, 24).map(r => `<span class="capsule clickable" onclick="openDrill(${reg(() => ({ title: r.label, sub: 'Tidak ada aktivitas (0 entry)', heads, rows: [r.cells.map(escapeHtml)] }))})">${escapeHtml(r.label)}</span>`).join('');
+      return `<div class="sum-block"><div class="sum-title">${title} (${items.length})</div><div class="capsules">${caps || '<span class="muted">Semua sudah punya aktivitas</span>'}${rows.length > 24 ? `<span class="capsule clickable" onclick="openDrill(${reg(detail)})">+${rows.length - 24} lainnya ›</span>` : ''}</div></div>`;
+    }
+    const zStoreRow = s => ({ label: s.name, cells: [s.name, s.ho || '-', Array.from(s.trainers).join(', ') || '-', String(s.employees)] });
+    const zStaffRow = x => ({ label: x.s.store ? `${x.s.nama} · ${shortStore(x.s.store)}` : x.s.nama, cells: [x.s.nama, x.s.store || '-', x.s.ho || '-', x.s.pos || '-'] });
+    const Z_STORE_HEADS = ['Store', 'Trainer HO', 'Store Trainer', 'Total Employee'], Z_STAFF_HEADS = ['Nama', 'Store', 'Trainer HO', 'Posisi'];
+    function zeroBlocks(type, data) {
+      const p = state.pages[type], isPNR = type === 'pnr';
+      const act = new Set(data.map(r => getRowMeta(r).store).filter(Boolean));
+      const stores = Array.from(storeIndex.values()).filter(s => !act.has(s.name) && (p.store === 'all' || norm(s.name) === norm(p.store)) && (p.trainerHO === 'all' || (isPNR ? s.trainers.has(p.trainerHO) : s.ho === p.trainerHO)));
+      const { zero } = staffSplit(staffPool(type, p), data.map(r => getRowMeta(r).trainer));
+      return `<div class="sum-cols" style="margin-top:18px">${zeroBlock('Store Tanpa Aktivitas', stores, Z_STORE_HEADS, zStoreRow)}${zeroBlock(isPNR ? 'Store Trainer Tanpa Aktivitas' : 'Staff Tanpa Aktivitas', zero, Z_STAFF_HEADS, zStaffRow)}</div>`;
     }
     function staffBlock(type, data) {
       const title = (type === 'pnr' ? 'Trainer' : 'Staff') + ' Paling Sedikit Aktivitas';
@@ -1283,10 +1320,12 @@
       });
     }
     function overallBottomStaff(sel) {
-      return bottomStaffBlock('Staff Paling Sedikit Aktivitas', staffPool('ops', { store: 'all', trainerHO: 'all' }), sel.map(x => x.m.trainer), s => {
-        const rows = sel.filter(x => tokSame(tokensOf(x.m.trainer), tokensOf(s.nama)));
-        return mixedDetail(s.nama, rows);
-      });
+      return bottomStaffBlock('Staff Paling Sedikit Aktivitas', staffPool('ops', { store: 'all', trainerHO: 'all' }), sel.map(x => x.m.trainer), s => mixedDetail(s.nama, sel.filter(x => tokSame(tokensOf(x.m.trainer), tokensOf(s.nama)))));
+    }
+    function overallZero(sel) {
+      const names = sel.map(x => x.m.trainer), any = { store: 'all', trainerHO: 'all' };
+      const staffZero = staffSplit(staffPool('ops', any), names).zero, trZero = staffSplit(staffPool('pnr', any), names).zero;
+      return `<div class="panel-card sum-wrap"><div class="sum-cols">${zeroBlock('Staff Tanpa Aktivitas', staffZero, Z_STAFF_HEADS, zStaffRow)}${zeroBlock('Store Trainer Tanpa Aktivitas', trZero, Z_STAFF_HEADS, zStaffRow)}</div></div>`;
     }
     function renderModuleSummary(type, data, extras) {
       const el = document.getElementById(`${type}-summary`);
@@ -1299,7 +1338,7 @@
       const storeCnt = countBy(mm, m => m.store), staffCnt = countBy(mm, m => m.trainer), cntMap = new Map(storeCnt);
       const poolStores = storeIndex.size ? Array.from(storeIndex.values()).map(s => s.name) : storeCnt.map(e => e[0]);
       const allStores = poolStores.map(n => [n, cntMap.get(n) || 0]).sort((a, b) => b[1] - a[1] || byName(a[0], b[0]));
-      const bottomStores = allStores.slice().reverse(), bottomStaff = staffCnt.slice().reverse();
+      const bottomStores = storeCnt.slice().reverse();
       const matched = mm.filter(m => m.store && storeIndex.has(norm(m.store))).length;
       const unm = countBy(mm.filter(m => m.store && !storeIndex.has(norm(m.store))), m => m.store);
       let trend = '';
@@ -1334,7 +1373,7 @@
         isPNR ? barList('Entry per Store Trainer', countBy(mm.flatMap(m => m.st), x => x), 5, k => D(`Store Trainer ${k}`, by(m => m.st.includes(k)))()) : '',
         barList(isPNR ? 'Top Topik (Mandatory & Other)' : 'Top Topik', topics, 5, k => D(`Topik ${k}`, data.filter(r => getTopics(type, r, 'all').includes(k)))())
       ];
-      el.innerHTML = `<div class="panel-title" style="margin-bottom:14px">Summary ${type.toUpperCase()}</div><div class="kpi-grid">${kp.join('')}</div><div class="sum-cols">${blocks.join('')}</div><div class="muted" style="font-size:.75rem;margin-top:10px">Klik kartu atau baris untuk melihat detailnya.</div>`;
+      el.innerHTML = `<div class="panel-title" style="margin-bottom:14px">Summary ${type.toUpperCase()}</div><div class="kpi-grid">${kp.join('')}</div><div class="sum-cols">${blocks.join('')}</div>${zeroBlocks(type, data)}<div class="muted" style="font-size:.75rem;margin-top:10px">Klik kartu atau baris untuk melihat detailnya.</div>`;
     }
 
     /* ---------- Comparison like for like (minggu & bulan sebelumnya) ---------- */
@@ -1374,9 +1413,9 @@
           const dr = reg(() => ({ title: `${name} · ${k}`, sub: `${lbl(cur)} · ${cl.length} entry`, ...detailRows(type, cl.map(x => x.r)) }));
           return `<tr class="clickable" onclick="openDrill(${dr})"><td>${k}</td><td><strong>${fmt(c[k])}</strong></td><td>${fmt(pv[k])}</td><td style="color:${col}">${d > 0 ? '▲ +' : d < 0 ? '▼ ' : ''}${fmt(d)}</td><td style="color:${col}">${pc === null ? (c[k] ? 'baru' : '0%') : (pc >= 0 ? '+' : '') + pc + '%'}</td></tr>`;
         }).join('');
-        return `<div class="sum-block"><div class="sum-title">${name}</div><div class="muted" style="font-size:.78rem;margin-bottom:8px">${lbl(cur)} vs ${lbl(prev)}</div><div class="table-container" style="max-height:none"><table><thead><tr><th>Metrik</th><th>Saat ini</th><th>Sebelumnya</th><th>Selisih</th><th>%</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+        return `<div class="sum-block"><div class="sum-title">${name}</div><div class="muted" style="font-size:.78rem;margin-bottom:8px">${lbl(cur)} vs ${lbl(prev)}</div><div class="table-container cmp" style="max-height:none"><table><thead><tr><th>Metrik</th><th>Saat ini</th><th>Sebelumnya</th><th>Selisih</th><th>%</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
       };
-      el.innerHTML = `${title}<div class="muted" style="font-size:.8rem;margin-bottom:14px">Acuan tanggal ${fmtDate(anchor)} (data terbaru) · dibandingkan dengan jumlah hari yang sama · klik baris untuk detail</div><div class="sum-cols" style="grid-template-columns:repeat(auto-fit,minmax(340px,1fr))">${block('Minggu ini vs Minggu lalu', wCur, wPrev)}${block('Bulan ini vs Bulan lalu', mCur, mPrev)}</div>`;
+      el.innerHTML = `${title}<div class="muted" style="font-size:.8rem;margin-bottom:14px">Acuan tanggal ${fmtDate(anchor)} (data terbaru) · dibandingkan dengan jumlah hari yang sama · klik baris untuk detail</div><div class="sum-cols" style="grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr))">${block('Minggu ini vs Minggu lalu', wCur, wPrev)}${block('Bulan ini vs Bulan lalu', mCur, mPrev)}</div>`;
     }
 
     /* ---------- Matriks Partisipasi Staff Bulanan (monitoring harian OPS / EMS) ---------- */
@@ -1403,13 +1442,13 @@
       const dayTot = days.map(d => list.reduce((a, e) => a + e.d[d].length, 0)), grand = dayTot.reduce((a, b) => a + b, 0);
       const now = new Date(), todayD = (now.getFullYear() === Y && now.getMonth() === M) ? now.getDate() : 0;
       const th = days.map(d => { const w = new Date(Y, M, d).getDay(); return `<th class="dc${w === 0 ? ' wk' : ''}${d === todayD ? ' today' : ''}">${wd[w]}<br>${d}</th>`; }).join('');
-      const body = list.map(e => `<tr><td>${escapeHtml(e.store)}</td><td>${escapeHtml(e.staff)}</td>${days.map(d => {
+      const body = list.map(e => `<tr><td><span class="mcap clickable" title="${escapeHtml(e.store + ' · ' + e.staff)}" onclick="openDrill(${reg(() => ({ title: e.staff, sub: `${e.store} · ${e.total} entry · ${label}`, ...detailRows(type, [].concat(...e.d)) }))})"><b>${escapeHtml(shortStore(e.store))}</b><span>${escapeHtml(e.staff)}</span></span></td>${days.map(d => {
         const n = e.d[d].length;
         return n ? `<td class="mx on" onclick="openDrill(${reg(() => ({ title: `${e.staff} · ${d} ${label}`, sub: `${e.store} · ${n} entry`, ...detailRows(type, e.d[d]) }))})">${n}</td>` : '<td class="mx"></td>';
       }).join('')}<td class="mxt">${e.total}</td></tr>`).join('');
       el.innerHTML = head + `<div class="kpi-grid" style="margin-bottom:14px">${kpiCard(`Total Qty ${NAME}`, grand)}${kpiCard(`${WHO} Terlibat`, new Set(list.map(e => norm(e.staff))).size)}${kpiCard('Hari Aktif', dayTot.filter(n => n).length, `dari ${dim} hari`)}</div>
-        <div class="table-container" style="max-height:560px"><table class="matrix"><thead><tr><th>Store</th><th>Nama ${WHO}</th>${th}<th class="dc">Total</th></tr></thead><tbody>${body}</tbody>
-        <tfoot><tr><td>Total per hari</td><td></td>${dayTot.map(n => `<td>${n || ''}</td>`).join('')}<td>${grand}</td></tr></tfoot></table></div>`;
+        <div class="table-container" style="max-height:560px"><table class="matrix"><thead><tr><th>${WHO} · Store</th>${th}<th class="dc">Total</th></tr></thead><tbody>${body}</tbody>
+        <tfoot><tr><td>Total per hari</td>${dayTot.map(n => `<td>${n || ''}</td>`).join('')}<td>${grand}</td></tr></tfoot></table></div>`;
     }
 
     /* ---------- Rekapitulasi PNR per Toko ---------- */
@@ -1702,6 +1741,7 @@
         <div class="donut-grid">${[['allDonMod', 'Komposisi per Modul'], ['allDonStatus', 'Status PNR'], ['allDonStore', 'Top Store'], ['allDonHO', 'Entry per Trainer HO']].map(([id, t]) => `<div class="panel-card"><div class="panel-title" style="font-size:1.05rem">${t}</div><div class="muted" style="font-size:.74rem;margin:2px 0 8px">klik irisan untuk detail</div><div class="chart-wrap" style="height:250px;flex:none;min-height:0"><canvas id="${id}"></canvas></div></div>`).join('')}</div>`);
       const idleDetail = n => { const ix = storeIndex.get(norm(n)); return { title: n, sub: 'Belum ada aktivitas pada periode ini', heads: ['Trainer HO', 'Store Trainer', 'Total Employee'], rows: [[escapeHtml(ix && ix.ho || '-'), escapeHtml(ix && ix.trainers.size ? Array.from(ix.trainers).join(', ') : '-'), ix ? ix.employees : '-']] }; };
       host.insertAdjacentHTML('beforeend', `<div class="panel-card sum-wrap"><div class="panel-header"><div><div class="panel-title">Store Belum Ada Aktivitas</div><div class="muted" style="font-size:.8rem;margin-top:2px">${allMonth === 'all' ? 'Semua periode' : escapeHtml(allMonth)} · klik store untuk detail</div></div><span class="cap-count">${idle.length}</span></div><div class="capsules">${idle.map(n => `<span class="capsule clickable" onclick="openDrill(${reg(() => idleDetail(n))})">${escapeHtml(n)}</span>`).join('') || '<span class="muted">Semua store sudah punya aktivitas</span>'}</div></div>`);
+      host.insertAdjacentHTML('beforeend', overallZero(sel));
       const ml12 = monthEntries(flat.map(x => x.m), true).map(e => e[0]).slice(-12);
       const lineOpts = fn => ({
         responsive: true, maintainAspectRatio: false, interaction: { mode: 'nearest', intersect: true },
