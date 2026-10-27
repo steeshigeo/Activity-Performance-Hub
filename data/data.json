@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-10-27T01:44:40.219Z",
+  "last_updated": "2026-10-27T02:12:36.408Z",
   "sheets": {
     "ops": [
       {
@@ -203587,6 +203587,54 @@
         "Date": 26,
         "Score": 70,
         "Any Comment": "Next lebih aktif jangan pasif dalam melayani customer "
+      },
+      {
+        "Timestamp": "2026-10-27T01:57:33.000Z",
+        "Store": "M253 Digimap Plaza Surabaya",
+        "Trainer Name": "Hilda Ainur Rosyidah",
+        "Participants name": "Putri Arumsari",
+        "Participants Sales Coach": "putriarum.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "Oktober",
+        "Date": 8,
+        "Score": 80,
+        "Any Comment": "staff menjelasakan watch face dengan baik, dimana akan bermanfaat untuk customer mengganti tampilan jam mereka sesuai dengan kebutuhan dan terlihat menarik"
+      },
+      {
+        "Timestamp": "2026-10-27T01:59:25.000Z",
+        "Store": "M253 Digimap Plaza Surabaya",
+        "Trainer Name": "Hilda Ainur Rosyidah",
+        "Participants name": "Anandio Januar Putra",
+        "Participants Sales Coach": "anandio.digimap@gmail.com",
+        "Topic": "Demo Aksesoris",
+        "Month": "Oktober",
+        "Date": 8,
+        "Score": 100,
+        "Any Comment": "all good"
+      },
+      {
+        "Timestamp": "2026-10-27T02:06:07.000Z",
+        "Store": "M253 Digimap Plaza Surabaya",
+        "Trainer Name": "Hilda Ainur Rosyidah",
+        "Participants name": "Imro’atul Mufidah",
+        "Participants Sales Coach": "fida.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "Oktober",
+        "Date": 9,
+        "Score": 90,
+        "Any Comment": "staff menjelaskan fungsi touch id di MacBook, manfaat untuk customer selain membuka kunci perangkat staff juga menjelaskan manfaat lain yaitu untuk otorisasi pembayaran serta dapat mengunci dokumen rahasia"
+      },
+      {
+        "Timestamp": "2026-10-27T02:09:28.000Z",
+        "Store": "M253 Digimap Plaza Surabaya",
+        "Trainer Name": "Hilda Ainur Rosyidah",
+        "Participants name": "Anandio Januar Putra",
+        "Participants Sales Coach": "anandio.digimap@gmail.com",
+        "Topic": "Demo Aksesoris",
+        "Month": "Oktober",
+        "Date": 9,
+        "Score": 90,
+        "Any Comment": "staff menjelaskan aksesoris airtag versi 2 dimana jika customer akan melakukan pembelian mendapatkan ugrade precision finding dan volume speaker lebih besar dari airtag 1"
       }
     ],
     "pnr": [
