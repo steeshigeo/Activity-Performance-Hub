@@ -254,6 +254,19 @@
     .btn-run.done{background:#30d158;color:#fff}.btn-run.err{background:#ff453a;color:#fff}
     .btn-run:disabled{cursor:wait}
     @media(max-width:720px){.btn-run{padding:0 12px}}
+  
+    .btn-theme{position:relative;overflow:hidden}
+    .btn-theme svg{position:relative}
+    #settingsBtn .fill{position:absolute;left:0;right:0;bottom:0;height:var(--p,0%);background:rgba(10,132,255,.4);transition:height .35s ease;pointer-events:none}
+    .settings-wrap{position:relative}
+    .menu{position:absolute;right:0;top:46px;min-width:250px;max-width:calc(100vw - 24px);padding:10px;border-radius:18px;background:var(--opt-bg);border:1px solid var(--glass-border);box-shadow:0 24px 60px rgba(0,0,0,.4);display:none;flex-direction:column;gap:8px;z-index:60}
+    .menu.open{display:flex}
+    .menu-title{font-size:.68rem;font-weight:600;color:var(--text-muted);padding:2px 6px}
+    .menu .btn-primary,.menu .btn-run{width:100%;height:44px;justify-content:flex-start;padding:0 16px;border-radius:12px;min-width:0}
+    .menu .btn-run{background:var(--input-bg)}
+    .filter-bar{padding:14px 16px;margin-bottom:20px}
+    .filter-bar .controls-row{margin:0}
+    .bar-more{margin-top:8px;font-size:.78rem;color:var(--accent);font-weight:600;padding:4px 0}
   </style>
 </head>
 <body>
@@ -262,8 +275,14 @@
       <div class="brand"><h1>Activity Performance Hub</h1><p>OPS EMS PNR</p></div>
       <div class="header-actions">
         <div id="cloudStatusPill" class="status-pill loading"><span>Memuat data…</span></div>
-        <button class="btn-primary" id="manualSyncBtn"><i class="fill"></i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg><span class="lbl">Refresh</span></button>
-        <button class="btn-run" id="ghRunBtn" onclick="runGithubAction()" title="Jalankan GitHub Action sync-data.yml"><i class="fill"></i><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Run Sync</span></button>
+        <div class="settings-wrap">
+          <button class="btn-theme" id="settingsBtn" aria-label="Pengaturan" title="Pengaturan" onclick="toggleSettings(event)"><i class="fill"></i><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+          <div class="menu" id="settingsMenu">
+            <div class="menu-title">Pengaturan</div>
+            <button class="btn-primary" id="manualSyncBtn"><i class="fill"></i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg><span class="lbl">Refresh</span></button>
+            <button class="btn-run" id="ghRunBtn" onclick="runGithubAction()" title="Jalankan GitHub Action sync-data.yml"><i class="fill"></i><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Run Sync</span></button>
+          </div>
+        </div>
         <button class="btn-theme" id="themeToggleBtn" aria-label="Ganti tema" title="Ganti tema">
           <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
           <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
@@ -796,7 +815,7 @@
     const STORE_TARGET = 85;
     function renderOPS() {
       const filteredData = getFilteredData('ops');
-      document.getElementById('ops-kpi-total').textContent = filteredData.length.toLocaleString('id-ID');
+      
       let totalParticipants = 0, totalUnits = 0;
       const topicCounts = {};
       filteredData.forEach(row => {
@@ -804,8 +823,8 @@
         const t = getFlexibleValue(row, ['topics', 'topik']) || 'Lainnya';
         topicCounts[t] = (topicCounts[t] || 0) + 1;
       });
-      document.getElementById('ops-kpi-participants').textContent = totalParticipants.toLocaleString('id-ID');
-      document.getElementById('ops-kpi-units').textContent = totalUnits.toLocaleString('id-ID');
+      
+      
       renderOpsStoreTable(filteredData);
       renderModuleSummary('ops', filteredData, [
         ['Rata-rata Peserta / Sesi', filteredData.length ? (totalParticipants / filteredData.length).toFixed(1).replace('.', ',') : '0'],
@@ -847,7 +866,7 @@
 
     function renderEMS() {
       const d = getFilteredData('ems');
-      document.getElementById('ems-kpi-total').textContent = d.length.toLocaleString('id-ID');
+      
       renderTableWithPagination('ems', d);
       renderModuleSummary('ems', d);
       renderChart('emsChart', countTopics('ems', d), k => openModal({ title: `Topik ${k}`, sub: 'EMS', ...detailRows('ems', d.filter(r => getTopics('ems', r, 'all').includes(k))) }));
@@ -856,7 +875,7 @@
 
     function renderPNR() {
       const d = getFilteredData('pnr');
-      document.getElementById('pnr-kpi-total').textContent = d.length.toLocaleString('id-ID');
+      
       renderTableWithPagination('pnr', d);
       renderModuleSummary('pnr', d);
       renderChart('pnrChart', countTopics('pnr', d), k => openModal({ title: `Topik ${k}`, sub: 'PNR', ...detailRows('pnr', d.filter(r => getTopics('pnr', r, topicMode).includes(k))) }));
@@ -1021,9 +1040,12 @@
 
     /* ---------- Summary ---------- */
     let isLoading = false;
+    function toggleSettings(e) { e.stopPropagation(); document.getElementById('settingsMenu').classList.toggle('open'); }
+    document.addEventListener('click', e => { if (!e.target.closest('.settings-wrap')) document.getElementById('settingsMenu').classList.remove('open'); });
     function setProg(pc, label) {
       const b = document.getElementById('manualSyncBtn');
       b.style.setProperty('--p', pc + '%');
+      document.getElementById('settingsBtn').style.setProperty('--p', (pc >= 100 ? 0 : pc) + '%');
       b.querySelector('.lbl').textContent = label;
     }
     async function fetchLatestData() {
@@ -1059,7 +1081,7 @@
       ['ops', 'ems', 'pnr'].forEach(t => {
         state.pages[t].status = 'all';
         const sum = mk(`${t}-summary`, 'panel-card sum-wrap'), cmp = mk(`${t}-compare`, 'panel-card sum-wrap');
-        document.querySelector(`#panel-${t} .kpi-grid`).after(sum);
+        const kg0 = document.querySelector(`#panel-${t} .kpi-grid`); kg0.after(sum); kg0.remove();
         sum.after(cmp);
         if (t !== 'ops') { // tabel + diagram Topik Terpopuler berdampingan
           const tp = document.querySelector(`#panel-${t} > .panel-card:not(.sum-wrap)`);
@@ -1071,6 +1093,9 @@
         }
         if (t === 'pnr') document.getElementById('panel-pnr').appendChild(mk('pnr-rekap', 'panel-card sum-wrap'));
         document.getElementById(`panel-${t}`).appendChild(mk(`${t}-matrix`, 'panel-card sum-wrap'));
+        const fb = mk(`${t}-filterbar`, 'panel-card filter-bar'); // semua sort by di paling atas tab
+        fb.appendChild(document.querySelector(`#panel-${t} .controls-row`));
+        document.getElementById(`panel-${t}`).prepend(fb);
       });
       // urutan sort PNR: bulan, store, status, store trainer, staff
       const row = document.querySelector('#panel-pnr .controls-row');
@@ -1123,11 +1148,11 @@
     const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '0%';
     const num1 = n => n.toFixed(1).replace('.', ',');
     const r1 = n => Math.round(n * 10) / 10;
-    function barList(title, entries, limit, drill) {
+    function barList(title, entries, limit, drill, more) {
       const list = entries.slice(0, limit || 5);
       const max = Math.max(1, ...list.map(e => e[1]));
       const rows = list.map(([k, v]) => `<div class="bar-row${drill ? ' clickable' : ''}"${drill ? ` onclick="openDrill(${reg(() => drill(k))})"` : ''}><span class="bar-label" title="${escapeHtml(k)}">${escapeHtml(k)}</span><div class="bar-track"><div class="bar-fill" style="width:${(v / max * 100).toFixed(1)}%"></div></div><span class="bar-val">${fmt(v)}</span></div>`).join('');
-      return `<div class="sum-block"><div class="sum-title">${title}</div>${rows || '<div class="muted">Belum ada data</div>'}</div>`;
+      return `<div class="sum-block"><div class="sum-title">${title}</div>${rows || '<div class="muted">Belum ada data</div>'}${more ? `<div class="bar-more clickable" onclick="openDrill(${reg(more.fn)})">${more.label} ›</div>` : ''}</div>`;
     }
     const kpiCard = (t, v, s, dr) => `<div class="kpi-card${dr ? ' clickable' : ''}"${dr ? ` onclick="openDrill(${reg(dr)})"` : ''}><div class="kpi-title">${t}</div><div class="kpi-value">${typeof v === 'number' ? fmt(v) : v}</div>${s ? `<div class="muted" style="font-size:.75rem;margin-top:4px">${s}</div>` : ''}</div>`;
     function listDetail(title, entries, target) {
@@ -1201,6 +1226,60 @@
     }
 
     /* ---------- Summary per modul ---------- */
+    const tokSame = (x, y) => {
+      if (!x.length || !y.length) return false;
+      const [sm, lg] = x.length <= y.length ? [x, y] : [y, x];
+      return sm.every(t => lg.includes(t)) && (sm.length >= 2 || sm[0].length >= 4);
+    };
+    // Daftar staff (sheet Recap) sesuai filter aktif; PNR = store trainer saja. Staff tanpa aktivitas ikut dihitung (0).
+    function staffPool(type, p) {
+      const seen = new Set(), out = [];
+      recapMasterData.forEach(r => {
+        if (!r.nama || r.nama === '0' || !r.store) return;
+        if (type === 'pnr' && !/trainer/i.test(r.position)) return;
+        const st = resolveStore(r.store), ix = storeIndex.get(norm(st));
+        if (!ix) return;
+        if (p.store !== 'all' && norm(st) !== norm(p.store)) return;
+        if (type === 'pnr') { if (p.trainerHO !== 'all' && !sameName(r.nama, p.trainerHO)) return; }
+        else if (p.trainerHO !== 'all' && ix.ho !== p.trainerHO) return;
+        const k = norm(r.nama) + '|' + norm(st);
+        if (seen.has(k)) return;
+        seen.add(k); out.push({ nama: r.nama, store: st, ho: ix.ho, pos: r.position });
+      });
+      return out;
+    }
+    function staffCounts(pool, names) {
+      const cnt = new Map();
+      names.forEach(t => { const k = norm(t); if (k) cnt.set(k, (cnt.get(k) || 0) + 1); });
+      const acts = Array.from(cnt.entries()).map(([k, n]) => ({ tk: tokensOf(k), n }));
+      return pool.map(s => {
+        let n = cnt.get(norm(s.nama));
+        if (n == null) { n = 0; const tk = tokensOf(s.nama); acts.forEach(a => { if (tokSame(tk, a.tk)) n += a.n; }); }
+        return { s, n };
+      });
+    }
+    function bottomStaffBlock(title, pool, names, detailFn) {
+      if (!pool.length) { const seen = new Set(); names.forEach(t => { const k = norm(t); if (k && !seen.has(k)) { seen.add(k); pool.push({ nama: t, store: '', ho: '', pos: '' }); } }); }
+      const list = staffCounts(pool, names).sort((a, b) => a.n - b.n || byName(a.s.nama, b.s.nama));
+      const keyMap = new Map();
+      const entries = list.slice(0, 5).map(x => { const k = x.s.store ? `${x.s.nama} · ${x.s.store.replace(/^M\d+\s+Digimap\s+/i, '')}` : x.s.nama; keyMap.set(k, x.s); return [k, x.n]; });
+      const zero = list.filter(x => x.n === 0).length;
+      const all = () => ({ title, sub: `${list.length} orang · ${zero} belum ada aktivitas`, heads: ['Nama', 'Store', 'Trainer HO', 'Posisi', 'Entry'], rows: list.map(x => [escapeHtml(x.s.nama), escapeHtml(x.s.store || '-'), escapeHtml(x.s.ho || '-'), escapeHtml(x.s.pos || '-'), fmt(x.n)]) });
+      return barList(title, entries, 5, k => detailFn(keyMap.get(k)), { label: `Lihat semua ${list.length} (${zero} belum aktif)`, fn: all });
+    }
+    function staffBlock(type, data) {
+      const title = (type === 'pnr' ? 'Trainer' : 'Staff') + ' Paling Sedikit Aktivitas';
+      return bottomStaffBlock(title, staffPool(type, state.pages[type]), data.map(r => getRowMeta(r).trainer), s => {
+        const rows = data.filter(r => tokSame(tokensOf(getRowMeta(r).trainer), tokensOf(s.nama)));
+        return { title: s.nama, sub: `${s.store || '-'} · ${fmt(rows.length)} entry`, ...detailRows(type, rows) };
+      });
+    }
+    function overallBottomStaff(sel) {
+      return bottomStaffBlock('Staff Paling Sedikit Aktivitas', staffPool('ops', { store: 'all', trainerHO: 'all' }), sel.map(x => x.m.trainer), s => {
+        const rows = sel.filter(x => tokSame(tokensOf(x.m.trainer), tokensOf(s.nama)));
+        return mixedDetail(s.nama, rows);
+      });
+    }
     function renderModuleSummary(type, data, extras) {
       const el = document.getElementById(`${type}-summary`);
       if (!el) return;
@@ -1241,7 +1320,7 @@
         barList('Top 5 Store', storeCnt, 5, k => D(k, by(m => m.store === k))()),
         barList('Bottom 5 Store', bottomStores, 5, k => D(k, by(m => m.store === k))()),
         barList(`Top 5 ${who}`, staffCnt, 5, k => D(k, by(m => m.trainer === k))()),
-        barList(`Bottom 5 ${who}`, bottomStaff, 5, k => D(k, by(m => m.trainer === k))()),
+        staffBlock(type, data),
         isPNR ? barList('Entry per Status', countBy(mm, m => m.status), 5, k => D(`Status ${k}`, by(m => m.status === k))())
               : barList('Entry per Trainer HO', countBy(mm, m => m.ho), 5, k => D(`Trainer HO ${k}`, by(m => m.ho === k))()),
         isPNR ? barList('Entry per Store Trainer', countBy(mm.flatMap(m => m.st), x => x), 5, k => D(`Store Trainer ${k}`, by(m => m.st.includes(k)))()) : '',
@@ -1421,8 +1500,6 @@
         host.dataset.ready = '1';
         host.innerHTML = `
           <div class="panel-card sum-wrap">
-            <div class="panel-header"><div><div class="panel-title" id="rosterTitle">Store Trainer Roster</div><div class="muted" id="rosterLegend" style="font-size:.8rem;margin-top:2px"></div></div></div>
-            <div class="cap-grid" id="rosterKpi"></div>
             <div class="controls-row">
               <input id="rosterSearch" class="search-box" placeholder="Cari toko / trainer / WhatsApp..." oninput="roster.search=this.value;renderRosterBody()">
               <select id="rosterMonthSel" class="select-box" onchange="rosterMonth=this.value;fetchRoster()">${ROSTER_MONTHS.map(n => `<option value="${n}">📅 ${n.charAt(0) + n.slice(1).toLowerCase()}</option>`).join('')}</select>
@@ -1431,6 +1508,8 @@
                 <option value="all">🕒 Semua Shift</option><option value="E">E · Early (Pagi)</option><option value="M">M · Middle</option><option value="L">L · Late (Siang)</option><option value="X">X · Off Day</option><option value="-">Belum diisi</option>
               </select>
             </div>
+            <div class="panel-header"><div><div class="panel-title" id="rosterTitle">Store Trainer Roster</div><div class="muted" id="rosterLegend" style="font-size:.8rem;margin-top:2px"></div></div></div>
+            <div class="cap-grid" id="rosterKpi"></div>
             <div class="table-container" style="max-height:640px"><table class="roster" id="rosterTable"></table></div>
             <div class="pagination-bar" id="rosterCount"></div>
           </div>
@@ -1596,6 +1675,7 @@
           <div class="sum-cols">
             ${barList('Top 5 Store', countBy(sel, x => x.m.store), 5, k => mixedDetail(k, sel.filter(x => x.m.store === k)))}
             ${barList('Top 5 Staff', countBy(sel, x => x.m.trainer), 5, k => mixedDetail(k, sel.filter(x => x.m.trainer === k)))}
+            ${overallBottomStaff(sel)}
             ${barList('Status PNR', countBy(pnrRows, x => x.m.status), 5, k => mixedDetail(`Status ${k}`, pnrRows.filter(x => x.m.status === k)))}
             ${barList('Top Topik OPS', topicOf('ops'), 5, topicD('ops'))}
             ${barList('Top Topik EMS', topicOf('ems'), 5, topicD('ems'))}
@@ -1679,7 +1759,7 @@
       if (!confirm(`Jalankan GitHub Action "${GH.wf}" di ${GH.owner}/${GH.repo} sekarang?`)) return;
       ghRunning = true;
       const btn = document.getElementById('ghRunBtn');
-      const setB = (pc, label, st) => { btn.style.setProperty('--p', pc + '%'); btn.querySelector('.lbl').textContent = label; btn.classList.toggle('done', st === 'done'); btn.classList.toggle('err', st === 'err'); };
+      const setB = (pc, label, st) => { btn.style.setProperty('--p', pc + '%'); document.getElementById('settingsBtn').style.setProperty('--p', (pc >= 100 ? 0 : pc) + '%'); btn.querySelector('.lbl').textContent = label; btn.classList.toggle('done', st === 'done'); btn.classList.toggle('err', st === 'err'); };
       const sleep = ms => new Promise(r => setTimeout(r, ms));
       btn.disabled = true; setB(8, 'Mengambil token…');
       try {
