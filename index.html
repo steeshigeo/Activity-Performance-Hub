@@ -7,7 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{--bg-gradient:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);--glass-bg:rgba(30,41,59,.75);--glass-border:rgba(255,255,255,.1);--text-main:#f8fafc;--text-muted:#94a3b8;--accent:#38bdf8;--card-bg:rgba(15,23,42,.65);--table-hover:rgba(56,189,248,.08);--input-bg:rgba(0,0,0,.25);--opt-bg:#1e293b}
     [data-theme="light"]{--bg-gradient:linear-gradient(135deg,#f1f5f9 0%,#e2e8f0 100%);--glass-bg:rgba(255,255,255,.88);--glass-border:rgba(0,0,0,.08);--text-main:#0f172a;--text-muted:#64748b;--accent:#0284c7;--card-bg:rgba(255,255,255,.75);--table-hover:rgba(2,132,199,.06);--input-bg:rgba(255,255,255,.9);--opt-bg:#fff}
@@ -153,59 +153,99 @@
     .mod-card .v{font-size:1.7rem;font-weight:800}
     .mod-card .ln{font-size:.78rem;color:var(--text-muted);margin-top:4px}
   
-    /* ===== LUXURY THEME ===== */
-    :root{--bg-gradient:linear-gradient(160deg,#08080a 0%,#121215 55%,#0b0b0d 100%);--glass-bg:rgba(18,18,21,.86);--glass-border:rgba(201,169,110,.2);--text-main:#f4efe6;--text-muted:#a29b8d;--accent:#c9a96e;--card-bg:rgba(255,255,255,.028);--table-hover:rgba(201,169,110,.08);--input-bg:rgba(255,255,255,.045);--opt-bg:#17171a}
-    [data-theme="light"]{--bg-gradient:linear-gradient(160deg,#f8f4ec 0%,#ece4d4 100%);--glass-bg:rgba(255,253,248,.92);--glass-border:rgba(120,90,40,.22);--text-main:#1c1812;--text-muted:#7a7263;--accent:#8a6d2f;--card-bg:rgba(255,255,255,.72);--table-hover:rgba(138,109,47,.08);--input-bg:rgba(255,255,255,.9);--opt-bg:#fffdf8}
-    body{padding:28px 20px}
-    body::before{background:radial-gradient(700px 360px at 6% -6%,rgba(201,169,110,.16),transparent),radial-gradient(560px 340px at 98% 0,rgba(201,169,110,.09),transparent)}
-    .app-shell{border-radius:22px;padding:30px;border:1px solid var(--glass-border);box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.04)}
-    .brand h1,.panel-title,.kpi-value,.cap .v,.mod-card .v,.modal-t{font-family:'Cormorant Garamond','Playfair Display',Georgia,serif!important;letter-spacing:.2px}
-    .brand h1{font-size:2.3rem;font-weight:600;background:linear-gradient(90deg,#f1e2bd,var(--accent) 55%,#a8843f);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.05}
-    [data-theme="light"] .brand h1{background:linear-gradient(90deg,#5c4519,#8a6d2f 60%,#b08a3e);-webkit-background-clip:text;background-clip:text}
-    .brand p{font-size:.68rem;letter-spacing:.42em;text-transform:uppercase;color:var(--text-muted);margin-top:6px}
-    header{padding-bottom:22px;margin-bottom:26px;border-bottom:1px solid var(--glass-border)}
-    .status-pill{border-radius:99px;background:transparent;border:1px solid var(--glass-border);text-transform:uppercase;letter-spacing:.12em;font-size:.66rem;color:var(--accent)}
-    .status-pill.loading{color:var(--accent)}.status-pill.warn{color:#d9a441}
-    .status-pill::before{animation:pulseG 2.2s infinite}
-    @keyframes pulseG{0%{box-shadow:0 0 0 0 rgba(201,169,110,.55)}70%{box-shadow:0 0 0 7px rgba(201,169,110,0)}100%{box-shadow:0 0 0 0 rgba(201,169,110,0)}}
-    .btn-primary{border-radius:99px;color:#1b1407;letter-spacing:.14em;text-transform:uppercase;font-size:.7rem;font-weight:700;background:linear-gradient(135deg,#ecd9a8 0%,#c9a96e 50%,#a8843f 100%);box-shadow:0 8px 24px rgba(201,169,110,.28)}
-    .btn-primary:hover{box-shadow:0 10px 30px rgba(201,169,110,.45)}
-    .btn-primary .fill{background:rgba(255,255,255,.4)}
-    .btn-primary.done{background:linear-gradient(135deg,#3fae86,#2a7d5f);color:#fff;box-shadow:0 8px 24px rgba(42,125,95,.35)}
-    .btn-theme{background:transparent;border:1px solid var(--glass-border);color:var(--accent)}
-    .btn-theme:hover{background:var(--accent);color:#1b1407}
-    .nav-tabs{background:rgba(10,10,12,.55);border:1px solid var(--glass-border);border-radius:14px;padding:6px;gap:4px}
-    [data-theme="light"] .nav-tabs{background:rgba(255,253,248,.8)}
-    .tab-btn{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;border-radius:10px;padding:12px 18px;color:var(--text-muted)}
+    /* ===== APPLE-STYLE THEME ===== */
+    :root{--font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,"Helvetica Neue",Arial,sans-serif;--bg-gradient:#000;--glass-bg:rgba(28,28,30,.72);--glass-border:rgba(255,255,255,.09);--text-main:#f5f5f7;--text-muted:#98989f;--accent:#0a84ff;--card-bg:rgba(28,28,30,.72);--table-hover:rgba(10,132,255,.12);--input-bg:rgba(118,118,128,.24);--opt-bg:#1c1c1e;--shadow:0 1px 0 rgba(255,255,255,.04) inset,0 10px 40px rgba(0,0,0,.45);--seg:#3a3a3c}
+    [data-theme="light"]{--bg-gradient:#f5f5f7;--glass-bg:rgba(255,255,255,.78);--glass-border:rgba(0,0,0,.07);--text-main:#1d1d1f;--text-muted:#6e6e73;--accent:#0071e3;--card-bg:rgba(255,255,255,.86);--table-hover:rgba(0,113,227,.07);--input-bg:rgba(118,118,128,.12);--opt-bg:#ffffff;--shadow:0 1px 2px rgba(0,0,0,.04),0 8px 30px rgba(0,0,0,.07);--seg:#ffffff}
+    *{font-family:var(--font);-webkit-font-smoothing:antialiased}
+    html{-webkit-text-size-adjust:100%}
+    body{background:var(--bg-gradient) fixed;padding:clamp(12px,3vw,32px);letter-spacing:-.011em}
+    body::before{background:radial-gradient(900px 420px at 12% -10%,rgba(10,132,255,.14),transparent),radial-gradient(700px 380px at 100% 0,rgba(94,92,230,.12),transparent)}
+    [data-theme="light"] body::before{background:radial-gradient(900px 420px at 12% -10%,rgba(0,113,227,.07),transparent),radial-gradient(700px 380px at 100% 0,rgba(175,82,222,.06),transparent)}
+    .app-shell{max-width:1360px;background:transparent;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:0;border-radius:0}
+    header{border:0;padding:0;margin-bottom:22px}
+    .brand h1{font-size:clamp(1.7rem,3.6vw,2.4rem);font-weight:700;letter-spacing:-.035em;line-height:1.1;background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--text-main);-webkit-text-fill-color:var(--text-main)}
+    .brand p{font-size:.85rem;letter-spacing:0;text-transform:none;color:var(--text-muted);margin-top:4px;font-weight:500}
+    .status-pill{background:var(--card-bg);border:1px solid var(--glass-border);color:#30d158;text-transform:none;letter-spacing:0;font-size:.78rem;font-weight:600;backdrop-filter:blur(20px)}
+    .status-pill.loading{color:var(--accent)}.status-pill.warn{color:#ff9f0a}
+    .status-pill::before{animation:pulseA 2s infinite}
+    @keyframes pulseA{0%{box-shadow:0 0 0 0 rgba(48,209,88,.5)}70%{box-shadow:0 0 0 7px rgba(48,209,88,0)}100%{box-shadow:0 0 0 0 rgba(48,209,88,0)}}
+    .btn-primary{background:var(--accent);color:#fff;letter-spacing:0;text-transform:none;font-size:.82rem;font-weight:600;box-shadow:0 4px 14px rgba(10,132,255,.35)}
+    .btn-primary:hover{box-shadow:0 6px 20px rgba(10,132,255,.5)}
+    .btn-primary .fill{background:rgba(255,255,255,.28)}
+    .btn-primary.done{background:#30d158;box-shadow:0 4px 14px rgba(48,209,88,.4)}
+    .btn-theme{background:var(--card-bg);border:1px solid var(--glass-border);color:var(--text-main)}
+    .btn-theme:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .nav-tabs{background:var(--input-bg);border:0;border-radius:14px;padding:3px;gap:2px;backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);overflow-x:auto;scrollbar-width:none;top:8px}
+    .nav-tabs::-webkit-scrollbar{display:none}
+    .tab-btn{font-size:.82rem;letter-spacing:0;text-transform:none;font-weight:600;padding:9px 18px;border-radius:11px;color:var(--text-muted);flex:1 0 auto;background:transparent;box-shadow:none}
     .tab-btn:hover{color:var(--text-main)}
-    .tab-btn.active{background:linear-gradient(135deg,rgba(201,169,110,.22),rgba(201,169,110,.08));color:var(--accent);box-shadow:inset 0 -2px 0 var(--accent)}
-    .kpi-card,.panel-card,.cap,.mod-card{border-radius:14px;border:1px solid var(--glass-border);background:var(--card-bg)}
+    .tab-btn.active{background:var(--seg);color:var(--text-main);box-shadow:0 1px 3px rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.12)}
+    .kpi-card,.panel-card,.cap,.mod-card{border-radius:20px;border:1px solid var(--glass-border);background:var(--card-bg);box-shadow:var(--shadow);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%)}
     .panel-card{padding:24px}
-    .kpi-card{padding:20px}
-    .kpi-card:hover,.cap:hover,.mod-card:hover{border-color:var(--accent);box-shadow:0 10px 30px rgba(201,169,110,.12)}
-    .kpi-title,.cap .l,.sum-title{font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);font-weight:600}
-    .kpi-value{font-size:2.1rem;font-weight:600;color:var(--text-main)}
-    .cap .v,.mod-card .v{font-weight:600;font-size:2rem}
-    .panel-title{font-size:1.45rem;font-weight:600}
-    .panel-header{padding-bottom:12px;border-bottom:1px solid var(--glass-border);margin-bottom:18px}
-    .search-box,.select-box{border-radius:10px;border:1px solid var(--glass-border);background:var(--input-bg);font-size:.82rem}
-    .search-box:focus,.select-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,169,110,.15)}
-    .table-container{border-radius:12px;border:1px solid var(--glass-border)}
-    th{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);background:var(--opt-bg);font-weight:700;border-bottom:1px solid var(--glass-border)}
-    td{border-bottom:1px solid rgba(201,169,110,.1);font-size:.82rem}
-    .page-btn{border-radius:8px;border:1px solid var(--glass-border);background:transparent}
-    .page-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
-    .bar-fill,.pbar i{background:linear-gradient(90deg,#a8843f,#e6d3a3)}
-    .bar-track,.pbar{background:rgba(201,169,110,.12)}
-    .chip{border-color:var(--glass-border);letter-spacing:.08em;text-transform:uppercase;font-size:.64rem}
-    .chip.active{background:var(--accent);color:#1b1407;border-color:var(--accent)}
-    .av{background:linear-gradient(135deg,#e6d3a3,#a8843f);color:#1b1407}
-    .wa-btn{background:linear-gradient(135deg,#2fbf6b,#168a52);letter-spacing:.06em}
-    .modal{border-radius:18px;border:1px solid var(--glass-border);box-shadow:0 40px 90px rgba(0,0,0,.6)}
-    .modal-t{font-size:1.6rem;font-weight:600}
-    .matrix td.on{background:rgba(201,169,110,.2);color:var(--accent)}
-    .roster .today,.matrix .today{box-shadow:inset 0 0 0 1px var(--accent)}
-    ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(201,169,110,.35);border-radius:8px}::-webkit-scrollbar-track{background:transparent}
+    .kpi-card{padding:18px 20px}
+    .kpi-card:hover,.cap:hover,.mod-card:hover{transform:translateY(-2px);border-color:var(--glass-border);box-shadow:0 14px 40px rgba(0,0,0,.18)}
+    .brand h1,.panel-title,.kpi-value,.cap .v,.mod-card .v,.modal-t{font-family:var(--font)!important}
+    .panel-title{font-size:1.2rem;font-weight:700;letter-spacing:-.02em}
+    .panel-header{border:0;padding-bottom:0;margin-bottom:16px}
+    .kpi-title,.cap .l,.sum-title{font-size:.72rem;letter-spacing:.01em;text-transform:none;font-weight:600;color:var(--text-muted)}
+    .kpi-value{font-size:2rem;font-weight:700;letter-spacing:-.03em;color:var(--text-main)}
+    .cap .v,.mod-card .v{font-size:1.9rem;font-weight:700;letter-spacing:-.03em}
+    .search-box,.select-box{border:0;border-radius:12px;background:var(--input-bg);color:var(--text-main);font-size:.85rem;padding:11px 14px}
+    .search-box:focus,.select-box:focus{box-shadow:0 0 0 3px rgba(10,132,255,.35)}
+    .table-container{border-radius:16px;border:1px solid var(--glass-border)}
+    th{font-size:.7rem;letter-spacing:.02em;text-transform:none;color:var(--text-muted);background:var(--opt-bg);font-weight:600;border-bottom:1px solid var(--glass-border)}
+    td{border-bottom:1px solid var(--glass-border);font-size:.85rem}
+    .page-btn{border-radius:10px;border:0;background:var(--input-bg)}
+    .page-btn:hover:not(:disabled){background:var(--accent);color:#fff}
+    .bar-fill,.pbar i{background:linear-gradient(90deg,#0a84ff,#64d2ff)}
+    .bar-track,.pbar{background:var(--input-bg)}
+    .chip{border:0;background:var(--input-bg);color:var(--text-muted);letter-spacing:0;text-transform:none;font-size:.76rem}
+    .chip.active{background:var(--accent);color:#fff}
+    .av{background:linear-gradient(135deg,#64d2ff,#0a84ff);color:#fff}
+    .wa-btn{background:#30d158;letter-spacing:0;box-shadow:0 4px 12px rgba(48,209,88,.3)}
+    .modal-ov{background:rgba(0,0,0,.45);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%)}
+    .modal{border-radius:24px;border:1px solid var(--glass-border);box-shadow:0 40px 100px rgba(0,0,0,.5);background:var(--opt-bg)}
+    .modal-t{font-size:1.4rem;font-weight:700;letter-spacing:-.02em}
+    .matrix td.on{background:rgba(10,132,255,.2);color:var(--accent)}
+    .roster .today,.matrix .today{box-shadow:inset 0 0 0 1.5px var(--accent)}
+    .capsules{display:flex;flex-wrap:wrap;gap:8px}
+    .capsule{padding:7px 14px;border-radius:99px;background:var(--input-bg);font-size:.78rem;font-weight:500;transition:background .15s,color .15s}
+    .capsule:hover{background:var(--accent);color:#fff}
+    .cap-count{font-size:1.5rem;font-weight:700;color:var(--accent)}
+    .donut-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:24px}
+    /* roster: kolom toko, trainer, WhatsApp dibekukan (freeze) */
+    .roster th:nth-child(1),.roster td:nth-child(1){min-width:210px;max-width:210px;left:0;overflow:hidden;text-overflow:ellipsis}
+    .roster th:nth-child(2),.roster td:nth-child(2){left:210px;min-width:190px}
+    .roster th:nth-child(3),.roster td:nth-child(3){position:sticky;left:400px;min-width:130px;background:var(--opt-bg);z-index:1;box-shadow:8px 0 12px -8px rgba(0,0,0,.4)}
+    .roster th:nth-child(-n+3){z-index:3}
+    @keyframes sheet{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+    @media(max-width:1100px){.donut-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:720px){
+      body{padding:10px}
+      header{flex-direction:column;align-items:flex-start;gap:12px}
+      .header-actions{width:100%}.status-pill{flex:1;justify-content:center;min-width:0}
+      .btn-primary{min-width:0;padding:0 14px}
+      .tab-btn{padding:9px 14px;font-size:.78rem}
+      .panel-card{padding:16px;border-radius:18px}
+      .kpi-grid,.cap-grid,.rapor-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+      .kpi-card{padding:14px}.kpi-value{font-size:1.45rem}.kpi-title{font-size:.66rem}
+      .controls-row{gap:8px}.search-box,.select-box{flex:1 1 100%;min-width:0}
+      .content-grid,.donut-grid,.sum-cols{grid-template-columns:1fr!important}
+      .panel-title{font-size:1.05rem}
+      .table-container{max-height:420px}
+      th,td{padding:10px;font-size:.78rem}
+      .modal-ov{align-items:flex-end}
+      .modal{width:100%;max-height:92vh;border-radius:24px 24px 0 0;padding:16px;animation:sheet .25s ease}
+      .pagination-bar{flex-direction:column;align-items:flex-start}
+      .chart-wrap{min-height:240px}
+      .roster th:nth-child(1),.roster td:nth-child(1){min-width:120px;max-width:120px;white-space:normal;font-size:.72rem}
+      .roster th:nth-child(2),.roster td:nth-child(2){left:120px;min-width:105px;font-size:.74rem}
+      .roster .av{display:none}
+      .roster th:nth-child(3),.roster td:nth-child(3){left:225px;min-width:54px}
+      .roster .wa-btn{padding:7px 9px;font-size:0;gap:0}.roster .wa-btn svg{width:16px;height:16px}
+      .matrix th:nth-child(1),.matrix td:nth-child(1){min-width:120px;white-space:normal}
+      .matrix th:nth-child(2),.matrix td:nth-child(2){left:120px;min-width:110px}
+    }
   </style>
 </head>
 <body>
@@ -236,7 +276,7 @@
       <div class="kpi-grid">
         <div class="kpi-card"><div class="kpi-title">Total Entry OPS</div><div class="kpi-value" id="ops-kpi-total">0</div></div>
         <div class="kpi-card"><div class="kpi-title">Total Peserta Open Studio</div><div class="kpi-value" id="ops-kpi-participants">0</div></div>
-        <div class="kpi-card"><div class="kpi-title">Total Unit Terjual</div><div class="kpi-value" id="ops-kpi-units">0</div></div>
+        <div class="kpi-card"><div class="kpi-title">Total Unit Terjual Setelah OPS</div><div class="kpi-value" id="ops-kpi-units">0</div></div>
       </div>
       <div class="content-grid">
         <div class="panel-card">
@@ -301,7 +341,7 @@
     const MONTH_NAMES_ID = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 
     let recapMasterData = [];
-    let metaCache = new WeakMap(), recapByEmail = new Map(), recapByName = new Map(), resolveCache = new Map(), storeCores = [], storeByCode = new Map(), trainerRecs = [], pnrTargets = new Map();   // [{store, nama, email, position, trainerHO}]
+    let metaCache = new WeakMap(), recapByEmail = new Map(), recapByName = new Map(), resolveCache = new Map(), storeCores = [], storeByCode = new Map(), trainerRecs = [], pnrTargets = new Map(), trLabelCache = new Map();   // [{store, nama, email, position, trainerHO}]
     let storeIndex = new Map(); // norm(store) -> {name, ho}
     let state = {
       ops: [], ems: [], pnr: [], activeModule: 'ops',
@@ -354,7 +394,7 @@
 
     /* ---------- Data master (sheet Recap) ---------- */
     function buildStoreIndex() {
-      metaCache = new WeakMap(); recapByEmail = new Map(); recapByName = new Map(); resolveCache = new Map();
+      metaCache = new WeakMap(); recapByEmail = new Map(); recapByName = new Map(); resolveCache = new Map(); trLabelCache = new Map();
       storeIndex = new Map(); storeCores = []; storeByCode = new Map(); trainerRecs = [];
       recapMasterData.forEach(r => {
         const k = norm(r.store);
@@ -406,7 +446,7 @@
       return rows.map(c => ({
         store: c[iStore] || '', nama: c[iNama] || '', email: c[iEmail] || '',
         position: c[iPos] || '', trainerHO: c[iHO] || '', storeTrainer: c[iST] || '', nik: c[iNik] || '', exp: c[iExp] || '', type: c[iType] || ''
-      })).filter(r => r.store && r.store !== '0' && !/^\s*q\d+/i.test(r.store)).map(r => {
+      })).filter(r => r.store && r.store !== '0' && !/^\s*q\S*\d\S*(\s|$)/i.test(r.store)).map(r => {
         if (r.trainerHO === '0') r.trainerHO = '';
         if (r.nama === '0') r.nama = '';
         if (r.nik === '0') r.nik = '';
@@ -468,12 +508,12 @@
     function rawStoreOf(row) {
       let raw = null; // abaikan kolom seperti "Type of Training (... In-Store Coaching ...)"
       for (const kw of ['location', 'lokasi', 'store', 'toko', 'cabang', 'outlet']) {
-        const k = Object.keys(row).find(k => k.toLowerCase().includes(kw) && !/trainer|training|coaching|type|total/i.test(k) && row[k] != null && !['', '-', '0'].includes(String(row[k]).trim()));
+        const k = Object.keys(row).find(k => k.toLowerCase().includes(kw) && !(kw === 'store' ? /trainer|training|coaching|type|total/i : /coaching|type of|total/i).test(k) && row[k] != null && !['', '-', '0'].includes(String(row[k]).trim()));
         if (k) { raw = String(row[k]).trim(); break; }
       }
       return raw;
     }
-    const isQStore = s => /^\s*q\d+/i.test(String(s || ''));
+    const isQStore = s => /^\s*q\S*\d\S*(\s|$)/i.test(String(s || ''));
     const isQRow = r => isQStore(rawStoreOf(r));
     function getRowStore(row) {
       const raw = rawStoreOf(row);
@@ -610,16 +650,26 @@
     }
     const rowOk = (type, m, p, skip) => DIMS.every(d => d === skip || dimMatch(type, m, d, p[d]));
 
+    function trLabel(t) {
+      let v = trLabelCache.get(t);
+      if (v == null) {
+        const a = [];
+        storeIndex.forEach(s => { if (s.trainers.has(t)) a.push(s.name.replace(/\bdigimap\s+/i, '')); });
+        v = a.length ? `${t} · ${a.join(', ')}` : t;
+        trLabelCache.set(t, v);
+      }
+      return v;
+    }
     function facet(type, dim, rows, tname) {
       const out = new Map();
-      const add = (value, group, ord) => {
+      const add = (value, group, ord, label) => {
         if (!value) return;
-        const e = out.get(value) || { value, count: 0, group, ord };
+        const e = out.get(value) || { value, count: 0, group, ord, label };
         e.count++; out.set(value, e);
       };
       rows.forEach(r => {
         if (dim === 'month') add(r.month, '', -r.monthKey);
-        else if (dim === 'trainerHO') { if (type === 'pnr') r.st.forEach(t => add(t)); else add(r.ho); }
+        else if (dim === 'trainerHO') { if (type === 'pnr') r.st.forEach(t => add(t, '', 0, trLabel(t))); else add(r.ho); }
         else if (dim === 'store') add(r.store, type === 'pnr' ? (r.st.join(', ') || 'Tanpa Store Trainer') : (r.ho || NO_HO));
         else if (dim === 'trainer') add(tname.get(norm(r.trainer)), r.store || 'Tanpa Store');
         else if (dim === 'status') add(r.status);
@@ -630,7 +680,7 @@
     function fillSelect(id, defText, entries, current, grouped) {
       const el = document.getElementById(id);
       if (!el) return;
-      const opt = e => `<option value="${escapeHtml(e.value)}">${escapeHtml(e.value)} (${e.count})</option>`;
+      const opt = e => `<option value="${escapeHtml(e.value)}">${escapeHtml(e.label || e.value)} (${e.count})</option>`;
       let html = `<option value="all">${defText}</option>`;
       if (grouped) {
         const g = groupBy(entries, e => e.group);
@@ -650,7 +700,7 @@
       const metas = (state[type] || []).map(getRowMeta);
       const tname = new Map();
       metas.forEach(m => { const k = norm(m.trainer); if (k && !tname.has(k)) tname.set(k, m.trainer); });
-      const dims = isPNR ? DIMS : DIMS.filter(d => d !== 'status');
+      const dims = isPNR ? DIMS.filter(d => d !== 'trainer') : DIMS.filter(d => d !== 'status');
       const res = {};
       for (let pass = 0; pass < 4; pass++) {
         let changed = false;
@@ -722,12 +772,16 @@
       if (state.activeModule === 'roster') renderRoster();
     }
 
+    function sortNewest(rows) {
+      const dk = r => { const d = getRowMeta(r).date; return d ? d.getTime() : 0; };
+      return rows.map((r, i) => [r, i, dk(r)]).sort((a, b) => b[2] - a[2] || b[1] - a[1]).map(x => x[0]);
+    }
     function getFilteredData(type) {
       const p = state.pages[type], q = (p.filter || '').toLowerCase();
-      return (state[type] || []).filter(row => {
+      return sortNewest((state[type] || []).filter(row => {
         if (!rowOk(type, getRowMeta(row), p)) return false;
         return !q || Object.values(row).some(v => String(v || '').toLowerCase().includes(q));
-      });
+      }));
     }
 
     const STORE_TARGET = 85;
@@ -746,9 +800,9 @@
       renderOpsStoreTable(filteredData);
       renderModuleSummary('ops', filteredData, [
         ['Rata-rata Peserta / Sesi', filteredData.length ? (totalParticipants / filteredData.length).toFixed(1).replace('.', ',') : '0'],
-        ['Unit Terjual / Peserta', totalParticipants ? (totalUnits / totalParticipants).toFixed(2).replace('.', ',') : '0']
+        ['Unit Terjual Setelah OPS / Peserta', totalParticipants ? (totalUnits / totalParticipants).toFixed(2).replace('.', ',') : '0']
       ]);
-      renderChart('opsChart', topicCounts);
+      renderChart('opsChart', topicCounts, k => openModal({ title: `Topik ${k}`, sub: 'OPS', ...detailRows('ops', filteredData.filter(r => getTopics('ops', r, 'all').includes(k))) }));
       renderCompare('ops'); renderMatrix('ops');
     }
 
@@ -787,7 +841,7 @@
       document.getElementById('ems-kpi-total').textContent = d.length.toLocaleString('id-ID');
       renderTableWithPagination('ems', d);
       renderModuleSummary('ems', d);
-      renderChart('emsChart', countTopics('ems', d));
+      renderChart('emsChart', countTopics('ems', d), k => openModal({ title: `Topik ${k}`, sub: 'EMS', ...detailRows('ems', d.filter(r => getTopics('ems', r, 'all').includes(k))) }));
       renderCompare('ems'); renderMatrix('ems');
     }
 
@@ -796,8 +850,8 @@
       document.getElementById('pnr-kpi-total').textContent = d.length.toLocaleString('id-ID');
       renderTableWithPagination('pnr', d);
       renderModuleSummary('pnr', d);
-      renderChart('pnrChart', countTopics('pnr', d));
-      renderCompare('pnr'); renderRekapPNR();
+      renderChart('pnrChart', countTopics('pnr', d), k => openModal({ title: `Topik ${k}`, sub: 'PNR', ...detailRows('pnr', d.filter(r => getTopics('pnr', r, topicMode).includes(k))) }));
+      renderCompare('pnr'); renderRekapPNR(); renderMatrix('pnr');
     }
 
     function getAllHeaders(data) {
@@ -834,7 +888,7 @@
     }
     function detailRows(type, rows) {
       const spec = tableSpec(type);
-      return { heads: spec.map(c => c.h), rows: rows.map(r => spec.map(c => { let v = c.f(r); if (v == null || v === '') v = '-'; return c.html ? v : escapeHtml(v); })) };
+      return { heads: spec.map(c => c.h), rows: sortNewest(rows).map(r => spec.map(c => { let v = c.f(r); if (v == null || v === '') v = '-'; return c.html ? v : escapeHtml(v); })) };
     }
     function renderTableWithPagination(type, filteredData) {
       const p = state.pages[type];
@@ -892,7 +946,8 @@
       renderCurrentModule();
     }
 
-    const PALETTE = ['#c9a96e', '#a8843f', '#7d6330', '#d8b97a', '#8c7a5a', '#5e5646'];
+    const PALETTE = ['#0a84ff', '#5e5ce6', '#bf5af2', '#ff375f', '#ff9f0a', '#30d158'];
+    const MOD_COL = ['#0a84ff', '#bf5af2', '#30d158'];
     const numPlugin = {
       id: 'numLabels',
       afterDatasetsDraw(chart) {
@@ -919,7 +974,7 @@
         ctx.restore();
       }
     };
-    function renderChart(canvasId, topicCounts) {
+    function renderChart(canvasId, topicCounts, onClick) {
       if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
       const canvas = document.getElementById(canvasId);
       if (!canvas) return;
@@ -928,11 +983,13 @@
         type: 'doughnut',
         data: {
           labels: sorted.map(i => `${i[0]} (${i[1]})`),
-          datasets: [{ data: sorted.map(i => i[1]), backgroundColor: PALETTE, borderColor: 'rgba(15,23,42,.35)', borderWidth: 2 }]
+          datasets: [{ data: sorted.map(i => i[1]), backgroundColor: PALETTE, borderColor: 'rgba(0,0,0,.25)', borderWidth: 2, hoverOffset: 6 }]
         },
         plugins: [numPlugin],
         options: {
-          responsive: true, maintainAspectRatio: false, cutout: '58%',
+          responsive: true, maintainAspectRatio: false, cutout: '60%',
+          onClick: onClick ? (e, els) => { if (els.length) onClick(sorted[els[0].index][0]); } : undefined,
+          onHover: (e, els) => { if (e.native && e.native.target) e.native.target.style.cursor = onClick && els.length ? 'pointer' : 'default'; },
           plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, color: getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim() } } }
         }
       });
@@ -1003,11 +1060,13 @@
           cp.innerHTML = `<div class="panel-header"><div class="panel-title">Topik Terpopuler</div>${chips}</div><div class="chart-wrap"><canvas id="${t}Chart"></canvas></div>`;
           tp.before(grid); grid.append(tp, cp);
         }
-        document.getElementById(`panel-${t}`).appendChild(mk(t === 'pnr' ? 'pnr-rekap' : `${t}-matrix`, 'panel-card sum-wrap'));
+        if (t === 'pnr') document.getElementById('panel-pnr').appendChild(mk('pnr-rekap', 'panel-card sum-wrap'));
+        document.getElementById(`panel-${t}`).appendChild(mk(`${t}-matrix`, 'panel-card sum-wrap'));
       });
       // urutan sort PNR: bulan, store, status, store trainer, staff
       const row = document.querySelector('#panel-pnr .controls-row');
-      ['MonthFilter', 'StoreFilter', 'StatusFilter', 'TrainerHOFilter', 'TrainerFilter'].forEach(id => row.appendChild(document.getElementById('pnr' + id)));
+      ['MonthFilter', 'StoreFilter', 'StatusFilter', 'TrainerHOFilter'].forEach(id => row.appendChild(document.getElementById('pnr' + id)));
+      document.getElementById('pnrTrainerFilter').style.display = 'none';
       ['all', 'roster'].forEach(id => document.querySelector('.app-shell').appendChild(mk(`panel-${id}`, 'module-panel')));
     }
 
@@ -1068,7 +1127,7 @@
     }
     function mixedDetail(title, list) {
       return { title, sub: `${fmt(list.length)} entry`, heads: ['Modul', 'Bulan', 'Store', 'Staff', 'Topik / Status'],
-        rows: list.map(x => [x.t.toUpperCase(), escapeHtml(x.m.month || '-'), escapeHtml(x.m.store || '-'), escapeHtml(x.m.trainer || '-'),
+        rows: list.slice().sort((a, b) => (b.m.date ? b.m.date.getTime() : 0) - (a.m.date ? a.m.date.getTime() : 0)).map(x => [x.t.toUpperCase(), escapeHtml(x.m.month || '-'), escapeHtml(x.m.store || '-'), escapeHtml(x.m.trainer || '-'),
           escapeHtml(x.t === 'pnr' ? [x.m.status].concat(getTopics('pnr', x.r, 'all')).filter(Boolean).join(' · ') : getTopics(x.t, x.r).join(', '))]) };
     }
     function miniTable(heads, rows, maxH, drills) {
@@ -1157,7 +1216,7 @@
         kpiCard('Bulan Terakhir', months.length ? months[0][1] : 0, months.length ? months[0][0] + (trend ? ' · ' + trend : '') : '', D(months.length ? months[0][0] : '-', by(m => months.length && m.month === months[0][0]))),
         kpiCard('Rata-rata Entry / Store', stores.size ? num1(data.length / stores.size) : '0', '', () => listDetail('Entry per store', storeCnt)),
         kpiCard(`Rata-rata Entry / ${who}`, staff.size ? num1(data.length / staff.size) : '0', '', () => listDetail(`Entry per ${who.toLowerCase()}`, staffCnt)),
-        kpiCard('Cocok dengan Recap', pct(matched, data.length), `${fmt(matched)} dari ${fmt(data.length)} entry`, () => listDetail('Nama store belum cocok dengan Recap', unm))
+        
       ];
       if (!isPNR) {
         const scope = storeIndex.size || stores.size, hit = allStores.filter(e => e[1] >= STORE_TARGET).length;
@@ -1188,7 +1247,7 @@
       if (!el) return;
       const p = state.pages[type];
       const items = (state[type] || []).map(r => ({ r, m: getRowMeta(r) })).filter(x => x.m.date && rowOk(type, x.m, p, 'month'));
-      const title = '<div class="panel-title" style="margin-bottom:4px">Comparison Like for Like</div>';
+      const title = '<div class="panel-title" style="margin-bottom:4px">Comparison LFL</div>';
       if (!items.length) { el.innerHTML = title + '<div class="muted">Belum ada data bertanggal.</div>'; return; }
       const sod = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
       const addD = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
@@ -1206,7 +1265,7 @@
       const stat = list => {
         const o = { 'Entry': list.length, 'Store Aktif': new Set(list.map(x => x.m.store).filter(Boolean)).size };
         o[who] = new Set(list.map(x => norm(x.m.trainer)).filter(Boolean)).size;
-        if (type === 'ops') { o['Peserta'] = list.reduce((a, x) => a + partOf(x.r), 0); o['Unit Terjual'] = list.reduce((a, x) => a + unitsOf(x.r), 0); }
+        if (type === 'ops') { o['Peserta'] = list.reduce((a, x) => a + partOf(x.r), 0); o['Unit Terjual Setelah OPS'] = list.reduce((a, x) => a + unitsOf(x.r), 0); }
         if (type === 'pnr') { const dv = list.filter(x => x.m.status === 'Delivered'); o['Delivered'] = dv.length; o['Hours Delivered'] = r1(dv.reduce((a, x) => a + x.m.hours, 0)); }
         return o;
       };
@@ -1228,11 +1287,11 @@
     function renderMatrix(type) {
       const el = document.getElementById(`${type}-matrix`);
       if (!el) return;
-      const p = state.pages[type], NAME = type.toUpperCase();
+      const p = state.pages[type], NAME = type.toUpperCase(), WHO = type === 'pnr' ? 'Trainer' : 'Staff';
       const items = (state[type] || []).map(r => ({ r, m: getRowMeta(r) })).filter(x => x.m.date && rowOk(type, x.m, p, 'month'));
       let label = p.month !== 'all' ? p.month : '', bk = -1;
       if (!label) items.forEach(x => { if (x.m.monthKey > bk) { bk = x.m.monthKey; label = x.m.month; } });
-      const head = `<div class="panel-title" style="margin-bottom:4px">Matriks Partisipasi Staff Bulanan · ${NAME}</div><div class="muted" style="font-size:.8rem;margin-bottom:14px">Monitoring track daily ${NAME}${label ? ' · ' + escapeHtml(label) : ''} · angka = qty ${NAME} per tanggal, klik angka untuk detail</div>`;
+      const head = `<div class="panel-title" style="margin-bottom:4px">Matriks Partisipasi ${WHO} Bulanan · ${NAME}</div><div class="muted" style="font-size:.8rem;margin-bottom:14px">Monitoring track daily ${NAME}${type === 'pnr' ? ' (store trainer)' : ''}${label ? ' · ' + escapeHtml(label) : ''} · angka = qty ${NAME} per tanggal, klik angka untuk detail</div>`;
       const sel = items.filter(x => x.m.month === label);
       if (!sel.length) { el.innerHTML = head + '<div class="muted">Belum ada data bertanggal untuk periode ini.</div>'; return; }
       const key = sel[0].m.monthKey, Y = Math.floor(key / 100), M = key % 100, dim = new Date(Y, M + 1, 0).getDate();
@@ -1252,8 +1311,8 @@
         const n = e.d[d].length;
         return n ? `<td class="mx on" onclick="openDrill(${reg(() => ({ title: `${e.staff} · ${d} ${label}`, sub: `${e.store} · ${n} entry`, ...detailRows(type, e.d[d]) }))})">${n}</td>` : '<td class="mx"></td>';
       }).join('')}<td class="mxt">${e.total}</td></tr>`).join('');
-      el.innerHTML = head + `<div class="kpi-grid" style="margin-bottom:14px">${kpiCard(`Total Qty ${NAME}`, grand)}${kpiCard('Staff Terlibat', new Set(list.map(e => norm(e.staff))).size)}${kpiCard('Hari Aktif', dayTot.filter(n => n).length, `dari ${dim} hari`)}</div>
-        <div class="table-container" style="max-height:560px"><table class="matrix"><thead><tr><th>Store</th><th>Nama Staff</th>${th}<th class="dc">Total</th></tr></thead><tbody>${body}</tbody>
+      el.innerHTML = head + `<div class="kpi-grid" style="margin-bottom:14px">${kpiCard(`Total Qty ${NAME}`, grand)}${kpiCard(`${WHO} Terlibat`, new Set(list.map(e => norm(e.staff))).size)}${kpiCard('Hari Aktif', dayTot.filter(n => n).length, `dari ${dim} hari`)}</div>
+        <div class="table-container" style="max-height:560px"><table class="matrix"><thead><tr><th>Store</th><th>Nama ${WHO}</th>${th}<th class="dc">Total</th></tr></thead><tbody>${body}</tbody>
         <tfoot><tr><td>Total per hari</td><td></td>${dayTot.map(n => `<td>${n || ''}</td>`).join('')}<td>${grand}</td></tr></tfoot></table></div>`;
     }
 
@@ -1325,7 +1384,7 @@
         roster.title = (grid.find(r => /roster/i.test(r[0] || '')) || [''])[0];
         roster.legend = (grid.find(r => /legend/i.test(r[0] || '')) || [''])[0];
         roster.days = days;
-        roster.rows = grid.slice(hi + (hasDays ? 2 : 1)).filter(r => r[iStore] && !/^\s*q\d+/i.test(r[iStore]))
+        roster.rows = grid.slice(hi + (hasDays ? 2 : 1)).filter(r => r[iStore] && !/^\s*q\S*\d\S*(\s|$)/i.test(r[iStore]))
           .map(r => ({ store: r[iStore], trainer: iTr >= 0 ? r[iTr] || '' : '', wa: iWa >= 0 ? r[iWa] || '' : '', shifts: days.map(d => (r[d.i] || '').toUpperCase()) }));
         const now = new Date();
         const ti = rosterMonth === ROSTER_MONTHS[now.getMonth()] ? days.findIndex(d => d.day === now.getDate()) : -1;
@@ -1395,7 +1454,7 @@
       const cap = (cls, label, val, sub, fn) => `<div class="cap ${cls}" onclick="openDrill(${reg(fn)})"><div class="l">${label}</div><div class="v">${val}</div><div class="muted" style="font-size:.72rem">${sub}</div></div>`;
       $('rosterKpi').innerHTML = [
         cap('', 'Total Store', roster.rows.length, 'semua toko', listD('Semua Toko', roster.rows)),
-        cap('', 'Trainer Unik', uniq.size, 'nama berbeda', uniqD),
+        
         cap('e', 'Early (E)', onShift('E').length, dayLbl, listD('Shift Early (Pagi)', onShift('E'))),
         cap('m', 'Middle (M)', onShift('M').length, dayLbl, listD('Shift Middle', onShift('M'))),
         cap('l2', 'Late (L)', onShift('L').length, dayLbl, listD('Shift Late (Siang)', onShift('L'))),
@@ -1458,7 +1517,7 @@
     function renderAllSummary() {
       const host = document.getElementById('panel-all');
       if (!host) return;
-      if (chartInstances.allTrend) { chartInstances.allTrend.destroy(); delete chartInstances.allTrend; }
+      ['allTrend', 'allLine', 'allDay'].forEach(k => { if (chartInstances[k]) { chartInstances[k].destroy(); delete chartInstances[k]; } });
       const mods = ['ops', 'ems', 'pnr'];
       const per = mods.map(t => (state[t] || []).map(r => ({ t, r, m: getRowMeta(r), part: t === 'ops' ? partOf(r) : 0, units: t === 'ops' ? unitsOf(r) : 0 })));
       const flat = [].concat(...per);
@@ -1505,9 +1564,9 @@
             ${kpiCard('Total Entry', sel.length, '', mix('Semua entry', sel))}${kpiCard('Entry OPS', of('ops').length, '', mix('Entry OPS', of('ops')))}${kpiCard('Entry EMS', of('ems').length, '', mix('Entry EMS', of('ems')))}${kpiCard('Entry PNR', pnrRows.length, '', mix('Entry PNR', pnrRows))}
             ${kpiCard('Store Aktif', stores.size, storeIndex.size ? `${pct(stores.size, storeIndex.size)} dari ${storeIndex.size} store` : '', () => listDetail('Store aktif', countBy(sel, x => x.m.store)))}
             ${kpiCard('Staff Aktif', staff.size, '', () => listDetail('Staff aktif', countBy(sel, x => x.m.trainer)))}
-            ${kpiCard('Peserta Open Studio', part, '', mix('Entry OPS', of('ops')))}${kpiCard('Unit Terjual', units, '', mix('Entry OPS', of('ops')))}
+            ${kpiCard('Peserta Open Studio', part, '', mix('Entry OPS', of('ops')))}${kpiCard('Unit Terjual Setelah OPS', units, '', mix('Entry OPS', of('ops')))}
             ${kpiCard('Rata-rata Peserta / Sesi', of('ops').length ? num1(part / of('ops').length) : '0', '', mix('Entry OPS', of('ops')))}
-            ${kpiCard('Unit Terjual / Peserta', part ? (units / part).toFixed(2).replace('.', ',') : '0', '', mix('Entry OPS', of('ops')))}
+            ${kpiCard('Unit Terjual Setelah OPS / Peserta', part ? (units / part).toFixed(2).replace('.', ',') : '0', '', mix('Entry OPS', of('ops')))}
             ${kpiCard('PNR Delivered', dvRows.length, `${pct(dvRows.length, pnrRows.length)} · Planning ${plN}`, mix('PNR Delivered', dvRows))}
             ${kpiCard('Cocok dengan Recap', pct(matched, sel.length), `${fmt(matched)} dari ${fmt(sel.length)} entry`, () => listDetail('Nama store belum cocok dengan Recap', unmatched))}
           </div>
@@ -1522,7 +1581,7 @@
         </div>
         <div class="panel-card sum-wrap">
           <div class="sum-title">Rekap per Store (${storeRows.length} store aktif)</div>
-          ${miniTable(['Store', 'Trainer HO', 'Store Trainer', 'OPS', 'EMS', 'PNR', 'Total', 'Peserta', 'Unit'], storeRows, 420, storeDr)}
+          ${miniTable(['Store', 'Trainer HO', 'Store Trainer', 'OPS', 'EMS', 'PNR', 'Total', 'Peserta', 'Unit Setelah OPS'], storeRows, 420, storeDr)}
         </div>
         <div class="panel-card sum-wrap">
           <div class="sum-cols">
@@ -1532,16 +1591,51 @@
             ${barList('Top Topik OPS', topicOf('ops'), 5, topicD('ops'))}
             ${barList('Top Topik EMS', topicOf('ems'), 5, topicD('ems'))}
             ${barList('Top Topik PNR (Mandatory & Other)', topicOf('pnr'), 5, topicD('pnr'))}
-            <div class="sum-block clickable" onclick="openDrill(${reg(() => listDetail('Store belum ada aktivitas', idle.map(n => [n, 0])))})"><div class="sum-title">Store Belum Ada Aktivitas (${idle.length})</div><div class="muted" style="font-size:.82rem;line-height:1.6">${storeIndex.size ? listTxt(idle, 14) : 'Data Recap belum terbaca.'}</div></div>
-            <div class="sum-block clickable" onclick="openDrill(${reg(() => listDetail('Nama store belum cocok dengan Recap', unmatched))})"><div class="sum-title">Nama Store Tidak Cocok dengan Recap (${unmatched.length})</div><div class="muted" style="font-size:.82rem;line-height:1.6">${listTxt(unmatched.map(e => `${e[0]} (${e[1]})`), 10)}</div></div>
-            <div class="sum-block clickable" onclick="openDrill(${reg(() => mixedDetail('Entry tanpa Trainer HO', noHO))})"><div class="sum-title">Entry Tanpa Trainer HO (${noHO.length})</div><div class="muted" style="font-size:.82rem;line-height:1.6">${listTxt(countBy(noHO, x => x.m.store).map(e => `${e[0]} (${e[1]})`), 8)}</div></div>
           </div>
         </div>`;
 
       const root = getComputedStyle(document.documentElement);
       const tc = root.getPropertyValue('--text-main').trim(), mc = root.getPropertyValue('--text-muted').trim();
+      const modName = ['OPS', 'EMS', 'PNR'];
+      host.querySelector('.content-grid').insertAdjacentHTML('beforebegin', `
+        <div class="content-grid" style="grid-template-columns:1fr 1fr">
+          <div class="panel-card"><div class="panel-title">Grafik Line · Tren per Modul</div><div class="muted" style="font-size:.78rem;margin:2px 0 12px">12 bulan terakhir · klik titik untuk detail</div><div class="chart-wrap" style="height:280px;flex:none;min-height:0"><canvas id="allLineChart"></canvas></div></div>
+          <div class="panel-card"><div class="panel-title">Grafik Line · Aktivitas Harian</div><div class="muted" style="font-size:.78rem;margin:2px 0 12px" id="allDayLbl"></div><div class="chart-wrap" style="height:280px;flex:none;min-height:0"><canvas id="allDayChart"></canvas></div></div>
+        </div>
+        <div class="donut-grid">${[['allDonMod', 'Komposisi per Modul'], ['allDonStatus', 'Status PNR'], ['allDonStore', 'Top Store'], ['allDonHO', 'Entry per Trainer HO']].map(([id, t]) => `<div class="panel-card"><div class="panel-title" style="font-size:1.05rem">${t}</div><div class="muted" style="font-size:.74rem;margin:2px 0 8px">klik irisan untuk detail</div><div class="chart-wrap" style="height:250px;flex:none;min-height:0"><canvas id="${id}"></canvas></div></div>`).join('')}</div>`);
+      const idleDetail = n => { const ix = storeIndex.get(norm(n)); return { title: n, sub: 'Belum ada aktivitas pada periode ini', heads: ['Trainer HO', 'Store Trainer', 'Total Employee'], rows: [[escapeHtml(ix && ix.ho || '-'), escapeHtml(ix && ix.trainers.size ? Array.from(ix.trainers).join(', ') : '-'), ix ? ix.employees : '-']] }; };
+      host.insertAdjacentHTML('beforeend', `<div class="panel-card sum-wrap"><div class="panel-header"><div><div class="panel-title">Store Belum Ada Aktivitas</div><div class="muted" style="font-size:.8rem;margin-top:2px">${allMonth === 'all' ? 'Semua periode' : escapeHtml(allMonth)} · klik store untuk detail</div></div><span class="cap-count">${idle.length}</span></div><div class="capsules">${idle.map(n => `<span class="capsule clickable" onclick="openDrill(${reg(() => idleDetail(n))})">${escapeHtml(n)}</span>`).join('') || '<span class="muted">Semua store sudah punya aktivitas</span>'}</div></div>`);
+      const ml12 = monthEntries(flat.map(x => x.m), true).map(e => e[0]).slice(-12);
+      const lineOpts = fn => ({
+        responsive: true, maintainAspectRatio: false, interaction: { mode: 'nearest', intersect: true },
+        onClick: (e, els) => { if (els.length) fn(els[0].datasetIndex, els[0].index); },
+        scales: { x: { ticks: { color: mc }, grid: { display: false } }, y: { beginAtZero: true, ticks: { color: mc, precision: 0 }, grid: { color: 'rgba(152,152,159,.15)' } } },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, color: tc } } }
+      });
+      chartInstances.allLine = new Chart(document.getElementById('allLineChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: ml12, datasets: mods.map((t, i) => ({ label: modName[i], data: ml12.map(l => per[i].filter(x => x.m.month === l).length), borderColor: MOD_COL[i], backgroundColor: MOD_COL[i] + '33', tension: .35, pointRadius: 4, pointHoverRadius: 7, borderWidth: 2.5 }))
+          .concat([{ label: 'Total', data: ml12.map(l => flat.filter(x => x.m.month === l).length), borderColor: tc, borderDash: [6, 5], tension: .35, pointRadius: 3, pointHoverRadius: 6, borderWidth: 2 }]) },
+        options: lineOpts((di, ix) => { const l = ml12[ix]; openModal(mixedDetail(`${di >= 3 ? 'Total' : modName[di]} · ${l}`, flat.filter(x => x.m.month === l && (di >= 3 || x.t === mods[di])))); })
+      });
+      let dayLabel = allMonth !== 'all' ? allMonth : '', bk = -1;
+      if (!dayLabel) flat.forEach(x => { if (x.m.month && x.m.monthKey > bk) { bk = x.m.monthKey; dayLabel = x.m.month; } });
+      const inMo = flat.filter(x => x.m.date && x.m.month === dayLabel);
+      const dkey = inMo.length ? inMo[0].m.monthKey : 0, dim = dkey ? new Date(Math.floor(dkey / 100), dkey % 100 + 1, 0).getDate() : 0;
+      const dayArr = Array.from({ length: dim }, (_, i) => i + 1);
+      document.getElementById('allDayLbl').textContent = `${dayLabel || '-'} · klik titik untuk detail`;
+      chartInstances.allDay = new Chart(document.getElementById('allDayChart').getContext('2d'), {
+        type: 'line',
+        data: { labels: dayArr, datasets: mods.map((t, i) => ({ label: modName[i], data: dayArr.map(d => inMo.filter(x => x.t === t && x.m.date.getDate() === d).length), borderColor: MOD_COL[i], backgroundColor: MOD_COL[i] + '26', fill: true, tension: .3, pointRadius: 2.5, pointHoverRadius: 6, borderWidth: 2 })) },
+        options: lineOpts((di, ix) => openModal(mixedDetail(`${modName[di]} · ${ix + 1} ${dayLabel}`, inMo.filter(x => x.t === mods[di] && x.m.date.getDate() === ix + 1))))
+      });
+      const obj = ent => Object.fromEntries(ent);
+      renderChart('allDonMod', { OPS: of('ops').length, EMS: of('ems').length, PNR: pnrRows.length }, k => openModal(mixedDetail(`Entry ${k}`, of(k.toLowerCase()))));
+      renderChart('allDonStatus', obj(countBy(pnrRows, x => x.m.status)), k => openModal(mixedDetail(`PNR ${k}`, pnrRows.filter(x => x.m.status === k))));
+      renderChart('allDonStore', obj(countBy(sel, x => x.m.store).slice(0, 6)), k => openModal(mixedDetail(k, sel.filter(x => x.m.store === k))));
+      renderChart('allDonHO', obj(countBy(sel, x => x.m.ho)), k => openModal(mixedDetail(`Trainer HO ${k}`, sel.filter(x => x.m.ho === k))));
       const ml = monthEntries(flat.map(x => x.m), true).map(e => e[0]).slice(-12);
-      const colors = ['#c9a96e', '#8c7a5a', '#e6d3a3'];
+      const colors = MOD_COL;
       chartInstances.allTrend = new Chart(document.getElementById('allTrendChart').getContext('2d'), {
         type: 'bar',
         data: { labels: ml, datasets: mods.map((t, i) => ({ label: t.toUpperCase(), data: ml.map(l => per[i].filter(x => x.m.month === l).length), backgroundColor: colors[i], borderRadius: 4 })) },
