@@ -267,6 +267,14 @@
     .filter-bar{padding:14px 16px;margin-bottom:20px}
     .filter-bar .controls-row{margin:0}
     .bar-more{margin-top:8px;font-size:.78rem;color:var(--accent);font-weight:600;padding:4px 0}
+  
+    .select-box{max-width:100%;text-overflow:ellipsis}
+    #raporSel{max-width:100%}
+    @media(max-width:720px){
+      #raporSel,.panel-header .select-box{flex:1 1 100%!important;min-width:0!important;width:100%!important}
+      .panel-header{flex-wrap:wrap}
+      .panel-header>div{min-width:0;max-width:100%}
+    }
   </style>
 </head>
 <body>
