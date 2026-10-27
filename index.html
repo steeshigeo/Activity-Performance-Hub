@@ -7,7 +7,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{--bg-gradient:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);--glass-bg:rgba(30,41,59,.75);--glass-border:rgba(255,255,255,.1);--text-main:#f8fafc;--text-muted:#94a3b8;--accent:#38bdf8;--card-bg:rgba(15,23,42,.65);--table-hover:rgba(56,189,248,.08);--input-bg:rgba(0,0,0,.25);--opt-bg:#1e293b}
     [data-theme="light"]{--bg-gradient:linear-gradient(135deg,#f1f5f9 0%,#e2e8f0 100%);--glass-bg:rgba(255,255,255,.88);--glass-border:rgba(0,0,0,.08);--text-main:#0f172a;--text-muted:#64748b;--accent:#0284c7;--card-bg:rgba(255,255,255,.75);--table-hover:rgba(2,132,199,.06);--input-bg:rgba(255,255,255,.9);--opt-bg:#fff}
@@ -152,6 +152,60 @@
     .mod-card:hover{transform:translateY(-2px);border-color:var(--accent)}
     .mod-card .v{font-size:1.7rem;font-weight:800}
     .mod-card .ln{font-size:.78rem;color:var(--text-muted);margin-top:4px}
+  
+    /* ===== LUXURY THEME ===== */
+    :root{--bg-gradient:linear-gradient(160deg,#08080a 0%,#121215 55%,#0b0b0d 100%);--glass-bg:rgba(18,18,21,.86);--glass-border:rgba(201,169,110,.2);--text-main:#f4efe6;--text-muted:#a29b8d;--accent:#c9a96e;--card-bg:rgba(255,255,255,.028);--table-hover:rgba(201,169,110,.08);--input-bg:rgba(255,255,255,.045);--opt-bg:#17171a}
+    [data-theme="light"]{--bg-gradient:linear-gradient(160deg,#f8f4ec 0%,#ece4d4 100%);--glass-bg:rgba(255,253,248,.92);--glass-border:rgba(120,90,40,.22);--text-main:#1c1812;--text-muted:#7a7263;--accent:#8a6d2f;--card-bg:rgba(255,255,255,.72);--table-hover:rgba(138,109,47,.08);--input-bg:rgba(255,255,255,.9);--opt-bg:#fffdf8}
+    body{padding:28px 20px}
+    body::before{background:radial-gradient(700px 360px at 6% -6%,rgba(201,169,110,.16),transparent),radial-gradient(560px 340px at 98% 0,rgba(201,169,110,.09),transparent)}
+    .app-shell{border-radius:22px;padding:30px;border:1px solid var(--glass-border);box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.04)}
+    .brand h1,.panel-title,.kpi-value,.cap .v,.mod-card .v,.modal-t{font-family:'Cormorant Garamond','Playfair Display',Georgia,serif!important;letter-spacing:.2px}
+    .brand h1{font-size:2.3rem;font-weight:600;background:linear-gradient(90deg,#f1e2bd,var(--accent) 55%,#a8843f);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.05}
+    [data-theme="light"] .brand h1{background:linear-gradient(90deg,#5c4519,#8a6d2f 60%,#b08a3e);-webkit-background-clip:text;background-clip:text}
+    .brand p{font-size:.68rem;letter-spacing:.42em;text-transform:uppercase;color:var(--text-muted);margin-top:6px}
+    header{padding-bottom:22px;margin-bottom:26px;border-bottom:1px solid var(--glass-border)}
+    .status-pill{border-radius:99px;background:transparent;border:1px solid var(--glass-border);text-transform:uppercase;letter-spacing:.12em;font-size:.66rem;color:var(--accent)}
+    .status-pill.loading{color:var(--accent)}.status-pill.warn{color:#d9a441}
+    .status-pill::before{animation:pulseG 2.2s infinite}
+    @keyframes pulseG{0%{box-shadow:0 0 0 0 rgba(201,169,110,.55)}70%{box-shadow:0 0 0 7px rgba(201,169,110,0)}100%{box-shadow:0 0 0 0 rgba(201,169,110,0)}}
+    .btn-primary{border-radius:99px;color:#1b1407;letter-spacing:.14em;text-transform:uppercase;font-size:.7rem;font-weight:700;background:linear-gradient(135deg,#ecd9a8 0%,#c9a96e 50%,#a8843f 100%);box-shadow:0 8px 24px rgba(201,169,110,.28)}
+    .btn-primary:hover{box-shadow:0 10px 30px rgba(201,169,110,.45)}
+    .btn-primary .fill{background:rgba(255,255,255,.4)}
+    .btn-primary.done{background:linear-gradient(135deg,#3fae86,#2a7d5f);color:#fff;box-shadow:0 8px 24px rgba(42,125,95,.35)}
+    .btn-theme{background:transparent;border:1px solid var(--glass-border);color:var(--accent)}
+    .btn-theme:hover{background:var(--accent);color:#1b1407}
+    .nav-tabs{background:rgba(10,10,12,.55);border:1px solid var(--glass-border);border-radius:14px;padding:6px;gap:4px}
+    [data-theme="light"] .nav-tabs{background:rgba(255,253,248,.8)}
+    .tab-btn{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;border-radius:10px;padding:12px 18px;color:var(--text-muted)}
+    .tab-btn:hover{color:var(--text-main)}
+    .tab-btn.active{background:linear-gradient(135deg,rgba(201,169,110,.22),rgba(201,169,110,.08));color:var(--accent);box-shadow:inset 0 -2px 0 var(--accent)}
+    .kpi-card,.panel-card,.cap,.mod-card{border-radius:14px;border:1px solid var(--glass-border);background:var(--card-bg)}
+    .panel-card{padding:24px}
+    .kpi-card{padding:20px}
+    .kpi-card:hover,.cap:hover,.mod-card:hover{border-color:var(--accent);box-shadow:0 10px 30px rgba(201,169,110,.12)}
+    .kpi-title,.cap .l,.sum-title{font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);font-weight:600}
+    .kpi-value{font-size:2.1rem;font-weight:600;color:var(--text-main)}
+    .cap .v,.mod-card .v{font-weight:600;font-size:2rem}
+    .panel-title{font-size:1.45rem;font-weight:600}
+    .panel-header{padding-bottom:12px;border-bottom:1px solid var(--glass-border);margin-bottom:18px}
+    .search-box,.select-box{border-radius:10px;border:1px solid var(--glass-border);background:var(--input-bg);font-size:.82rem}
+    .search-box:focus,.select-box:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,169,110,.15)}
+    .table-container{border-radius:12px;border:1px solid var(--glass-border)}
+    th{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);background:var(--opt-bg);font-weight:700;border-bottom:1px solid var(--glass-border)}
+    td{border-bottom:1px solid rgba(201,169,110,.1);font-size:.82rem}
+    .page-btn{border-radius:8px;border:1px solid var(--glass-border);background:transparent}
+    .page-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+    .bar-fill,.pbar i{background:linear-gradient(90deg,#a8843f,#e6d3a3)}
+    .bar-track,.pbar{background:rgba(201,169,110,.12)}
+    .chip{border-color:var(--glass-border);letter-spacing:.08em;text-transform:uppercase;font-size:.64rem}
+    .chip.active{background:var(--accent);color:#1b1407;border-color:var(--accent)}
+    .av{background:linear-gradient(135deg,#e6d3a3,#a8843f);color:#1b1407}
+    .wa-btn{background:linear-gradient(135deg,#2fbf6b,#168a52);letter-spacing:.06em}
+    .modal{border-radius:18px;border:1px solid var(--glass-border);box-shadow:0 40px 90px rgba(0,0,0,.6)}
+    .modal-t{font-size:1.6rem;font-weight:600}
+    .matrix td.on{background:rgba(201,169,110,.2);color:var(--accent)}
+    .roster .today,.matrix .today{box-shadow:inset 0 0 0 1px var(--accent)}
+    ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(201,169,110,.35);border-radius:8px}::-webkit-scrollbar-track{background:transparent}
   </style>
 </head>
 <body>
@@ -172,8 +226,10 @@
       <button class="tab-btn active" onclick="switchModule('ops',this)">Module OPS</button>
       <button class="tab-btn" onclick="switchModule('ems',this)">Module EMS</button>
       <button class="tab-btn" onclick="switchModule('pnr',this)">Module PNR</button>
-      <button class="tab-btn" onclick="switchModule('all',this)">Summary</button>
       <button class="tab-btn" onclick="switchModule('roster',this)">Store Trainer Roster</button>
+      <button class="tab-btn" onclick="switchModule('all',this)">Summary</button>
+      
+      
     </div>
 
     <div id="panel-ops" class="module-panel active">
@@ -350,7 +406,7 @@
       return rows.map(c => ({
         store: c[iStore] || '', nama: c[iNama] || '', email: c[iEmail] || '',
         position: c[iPos] || '', trainerHO: c[iHO] || '', storeTrainer: c[iST] || '', nik: c[iNik] || '', exp: c[iExp] || '', type: c[iType] || ''
-      })).filter(r => r.store && r.store !== '0').map(r => {
+      })).filter(r => r.store && r.store !== '0' && !/^\s*q\d+/i.test(r.store)).map(r => {
         if (r.trainerHO === '0') r.trainerHO = '';
         if (r.nama === '0') r.nama = '';
         if (r.nik === '0') r.nik = '';
@@ -409,12 +465,18 @@
       resolveCache.set(raw, out);
       return out;
     }
-    function getRowStore(row) {
+    function rawStoreOf(row) {
       let raw = null; // abaikan kolom seperti "Type of Training (... In-Store Coaching ...)"
       for (const kw of ['location', 'lokasi', 'store', 'toko', 'cabang', 'outlet']) {
         const k = Object.keys(row).find(k => k.toLowerCase().includes(kw) && !/trainer|training|coaching|type|total/i.test(k) && row[k] != null && !['', '-', '0'].includes(String(row[k]).trim()));
         if (k) { raw = String(row[k]).trim(); break; }
       }
+      return raw;
+    }
+    const isQStore = s => /^\s*q\d+/i.test(String(s || ''));
+    const isQRow = r => isQStore(rawStoreOf(r));
+    function getRowStore(row) {
+      const raw = rawStoreOf(row);
       return raw ? resolveStore(raw) : null;
     }
 
@@ -647,6 +709,7 @@
     }
 
     function refreshAll() {
+      ['ops', 'ems', 'pnr'].forEach(t => { state[t] = (state[t] || []).filter(r => !isQRow(r)); }); // abaikan store berkode Q
       ['ops', 'ems', 'pnr'].forEach(populateDropdowns);
       renderCurrentModule();
     }
@@ -829,7 +892,7 @@
       renderCurrentModule();
     }
 
-    const PALETTE = ['#38bdf8', '#818cf8', '#c084fc', '#f472b6', '#fb7185', '#34d399'];
+    const PALETTE = ['#c9a96e', '#a8843f', '#7d6330', '#d8b97a', '#8c7a5a', '#5e5646'];
     const numPlugin = {
       id: 'numLabels',
       afterDatasetsDraw(chart) {
@@ -1262,7 +1325,7 @@
         roster.title = (grid.find(r => /roster/i.test(r[0] || '')) || [''])[0];
         roster.legend = (grid.find(r => /legend/i.test(r[0] || '')) || [''])[0];
         roster.days = days;
-        roster.rows = grid.slice(hi + (hasDays ? 2 : 1)).filter(r => r[iStore])
+        roster.rows = grid.slice(hi + (hasDays ? 2 : 1)).filter(r => r[iStore] && !/^\s*q\d+/i.test(r[iStore]))
           .map(r => ({ store: r[iStore], trainer: iTr >= 0 ? r[iTr] || '' : '', wa: iWa >= 0 ? r[iWa] || '' : '', shifts: days.map(d => (r[d.i] || '').toUpperCase()) }));
         const now = new Date();
         const ti = rosterMonth === ROSTER_MONTHS[now.getMonth()] ? days.findIndex(d => d.day === now.getDate()) : -1;
@@ -1478,7 +1541,7 @@
       const root = getComputedStyle(document.documentElement);
       const tc = root.getPropertyValue('--text-main').trim(), mc = root.getPropertyValue('--text-muted').trim();
       const ml = monthEntries(flat.map(x => x.m), true).map(e => e[0]).slice(-12);
-      const colors = ['#38bdf8', '#c084fc', '#34d399'];
+      const colors = ['#c9a96e', '#8c7a5a', '#e6d3a3'];
       chartInstances.allTrend = new Chart(document.getElementById('allTrendChart').getContext('2d'), {
         type: 'bar',
         data: { labels: ml, datasets: mods.map((t, i) => ({ label: t.toUpperCase(), data: ml.map(l => per[i].filter(x => x.m.month === l).length), backgroundColor: colors[i], borderRadius: 4 })) },
