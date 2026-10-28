@@ -340,6 +340,8 @@
       <button class="tab-btn" onclick="switchModule('pnr',this)">Module PNR</button>
       <button class="tab-btn" onclick="switchModule('roster',this)">Store Trainer Roster</button>
       <button class="tab-btn" onclick="switchModule('all',this)">Summary</button>
+      
+      
     </div>
 
     <div id="panel-ops" class="module-panel active">
@@ -402,16 +404,30 @@
     </div>
   </div>
 
+  <div class="modal-ov" id="settingsOv" onclick="if(event.target===this)closeSettings()"><div class="pop"><div class="pop-h"><div class="modal-t">Pengaturan</div><button class="btn-theme" onclick="closeSettings()" aria-label="Tutup">✕</button></div><div class="muted" style="font-size:.8rem;margin-bottom:6px">Muat ulang data dashboard atau jalankan update data dari GitHub.</div><button class="btn-primary" id="manualSyncBtn"><i class="fill"></i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg><span class="lbl">Refresh</span></button><button class="btn-run" id="ghRunBtn" onclick="runGithubAction()" title="Jalankan GitHub Action sync-data.yml"><i class="fill"></i><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Run Sync</span></button></div></div>
+  <div class="modal-ov" id="modalOv" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-h"><div><div class="modal-t" id="modalT"></div><div class="muted" id="modalS" style="font-size:.82rem;margin-top:2px"></div></div><button class="btn-theme" onclick="closeModal()" aria-label="Tutup">✕</button></div>
+      <div class="controls-row"><input id="modalQ" class="search-box" placeholder="Cari di detail..." oninput="renderModal()"></div>
+      <div class="table-container" id="modalB"></div>
+    </div>
+  </div>
+
   <script>
+    function fetchT(u, o, ms) { // fetch dengan batas waktu supaya loading tidak menggantung
+      const c = new AbortController(), t = setTimeout(() => c.abort(), ms || 25000);
+      return fetch(u, Object.assign({}, o || {}, { signal: c.signal })).finally(() => clearTimeout(t));
+    }
     const DATA_JSON_URL = "./data/data.json";
+    // Sheet "Recap" = data master (Store, Area, Nama Trainer/Presenter). Dibaca ulang setiap refresh.
     const RECAP_SHEET_URL = "https://docs.google.com/spreadsheets/d/1_lvhYAt2RozrhqMWCzFVvm8bCPm4yunnYcie4nM55U4/gviz/tq?tqx=out:json&sheet=Recap";
     const AUTO_REFRESH_INTERVAL = 300000;
     const PAGE_SIZE = 50;
     const MONTH_NAMES_ID = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 
     let recapMasterData = [];
-    let recapByEmail = new Map(), recapByName = new Map(), resolveCache = new Map(), storeCores = [], storeByCode = new Map(), trainerRecs = [], pnrTargets = new Map(), trLabelCache = new Map();
-    let storeIndex = new Map();
+    let metaCache = new WeakMap(), recapByEmail = new Map(), recapByName = new Map(), resolveCache = new Map(), storeCores = [], storeByCode = new Map(), trainerRecs = [], pnrTargets = new Map(), trLabelCache = new Map();   // [{store, nama, email, position, trainerHO}]
+    let storeIndex = new Map(); // norm(store) -> {name, ho}
     let state = {
       ops: [], ems: [], pnr: [], activeModule: 'ops',
       pages: {
@@ -448,9 +464,22 @@
       return clean;
     }
 
+    function getFlexibleValue(row, keywords) {
+      if (!row) return null;
+      const keys = Object.keys(row);
+      for (const kw of keywords) {
+        const matchKey = keys.find(k => String(k).toLowerCase().includes(kw.toLowerCase()));
+        if (matchKey && row[matchKey] !== undefined && row[matchKey] !== null) {
+          const val = String(row[matchKey]).trim();
+          if (val !== '' && val !== '-' && val !== '0') return val;
+        }
+      }
+      return null;
+    }
+
     /* ---------- Data master (sheet Recap) ---------- */
     function buildStoreIndex() {
-      recapByEmail = new Map(); recapByName = new Map(); resolveCache = new Map(); trLabelCache = new Map();
+      metaCache = new WeakMap(); recapByEmail = new Map(); recapByName = new Map(); resolveCache = new Map(); trLabelCache = new Map();
       storeIndex = new Map(); storeCores = []; storeByCode = new Map(); trainerRecs = [];
       recapMasterData.forEach(r => {
         const k = norm(r.store);
@@ -482,6 +511,7 @@
       const cols = (json.table?.cols || []).map(c => (c.label || '').trim());
       let rows = (json.table?.rows || []).map(r => (r.c || []).map(c => (c && c.v != null) ? String(c.v).trim() : ''));
       let headers = cols;
+      // Jika Google tidak mendeteksi header, baris pertama dipakai sebagai header
       if (!cols.some(Boolean) && rows.length) headers = rows.shift();
 
       const find = (re, exclude, fallback) => {
@@ -512,7 +542,7 @@
 
     async function fetchRecapMasterData() {
       try {
-        const res = await fetch(RECAP_SHEET_URL + '&_=' + Date.now(), { cache: 'no-store' });
+        const res = await fetchT(RECAP_SHEET_URL + '&_=' + Date.now(), { cache: 'no-store' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         recapMasterData = parseRecap(await res.text());
         localStorage.setItem('recap_cache', JSON.stringify(recapMasterData));
@@ -523,31 +553,7 @@
       buildStoreIndex();
     }
 
-    /* ---------- OPTIMASI 1: Metadata per baris Cache (O(1) Compute) ---------- */
-    // Proses ini sekarang dihitung 1x di awal, tidak lagi setiap saat filtering/render
-    const moduleKeysCache = { ops: null, ems: null, pnr: null };
-    function getModuleKeys(type, row) {
-        if (moduleKeysCache[type]) return moduleKeysCache[type];
-        const keys = Object.keys(row);
-        const findK = (kws, excl) => keys.find(k => kws.some(kw => String(k).toLowerCase().includes(kw)) && (!excl || !excl.test(k)));
-        const m = {
-            store: findK(['location', 'lokasi', 'store', 'toko', 'cabang', 'outlet'], /trainer|training|coaching|type|total/i),
-            trainer: findK(['trainer', 'presenter', 'nama trainer', 'nama presenter', 'staff', 'nama', 'nps', 'participants name']),
-            email: findK(['email', 'e-mail']),
-            month: findK(['month', 'bulan']),
-            year: findK(['year', 'tahun']),
-            date: findK(['date', 'tanggal']),
-            timestamp: findK(['timestamp', 'waktu']),
-            status: findK(['status']),
-            hours: findK(['hours']),
-            topics: findK(['topics', 'topik', 'topic', 'kategori', 'category']),
-            participant: findK(['participant', 'peserta']),
-            units: findK(['unit yang terjual', 'unit terjual', 'terjual'])
-        };
-        moduleKeysCache[type] = m;
-        return m;
-    }
-
+    /* ---------- Metadata per baris aktivitas ---------- */
     const STOP = new Set(['digimap', 'apple', 'premium', 'partner', 'store', 'toko', 'ibox', 'mall', 'mal', 'street', 'raya', 'the']);
     function storeTokens(s) { return norm(s).replace(/\bm\d{2,4}\b/g, ' ').split(/[^a-z0-9]+/).filter(t => t && !STOP.has(t)); }
     function lev(a, b) {
@@ -561,7 +567,7 @@
       }
       return prev[n];
     }
-    
+    // Padankan nama store aktivitas ke nama store di sheet Recap: nama persis -> nama inti -> sebagian kata -> typo -> kode store
     function resolveStore(raw) {
       const hit = storeIndex.get(norm(raw));
       if (hit) return hit.name;
@@ -583,6 +589,24 @@
       else { const code = (String(raw).match(/\bm\d{2,4}\b/i) || [])[0]; if (code && storeByCode.has(code.toLowerCase())) out = storeByCode.get(code.toLowerCase()); }
       resolveCache.set(raw, out);
       return out;
+    }
+    function rawStoreOf(row) {
+      let raw = null; // abaikan kolom seperti "Type of Training (... In-Store Coaching ...)"
+      for (const kw of ['location', 'lokasi', 'store', 'toko', 'cabang', 'outlet']) {
+        const k = Object.keys(row).find(k => k.toLowerCase().includes(kw) && !(kw === 'store' ? /trainer|training|coaching|type|total/i : /coaching|type of|total/i).test(k) && row[k] != null && !['', '-', '0'].includes(String(row[k]).trim()));
+        if (k) { raw = String(row[k]).trim(); break; }
+      }
+      return raw;
+    }
+    const isQStore = s => /^\s*q\S*\d\S*(\s|$)/i.test(String(s || ''));
+    const isQRow = r => isQStore(rawStoreOf(r));
+    function getRowStore(row) {
+      const raw = rawStoreOf(row);
+      return raw ? resolveStore(raw) : null;
+    }
+
+    function getRowTrainer(row) {
+      return getFlexibleValue(row, ['trainer', 'presenter', 'nama trainer', 'nama presenter', 'staff', 'nama', 'nps', 'participants name']);
     }
 
     function monthKeyFromLabel(label) {
@@ -610,8 +634,33 @@
       const d = new Date(s);
       return isNaN(d.getTime()) ? null : d;
     }
-
+    function getRowMonthInfo(row) {
+      const kv = names => { const k = Object.keys(row).find(k => names.includes(norm(k))); return k && row[k] != null ? String(row[k]).trim() : ''; };
+      const mName = kv(['month', 'bulan']), yr = kv(['year', 'tahun']), dd = kv(['date', 'tanggal']);
+      if (mName && /^\d{4}$/.test(yr)) { // kolom Month + Date + Year terpisah (mis. data PnR)
+        const mi = monthFromText(norm(mName));
+        if (mi >= 0) return { label: `${MONTH_NAMES_ID[mi]} ${yr}`, key: +yr * 100 + mi, date: new Date(+yr, mi, /^\d{1,2}$/.test(dd) ? +dd : 1) };
+      }
+      const direct = getFlexibleValue(row, ['bulan', 'month']);
+      const cands = [direct, ...['tanggal', 'date', 'waktu', 'timestamp'].map(k => getFlexibleValue(row, [k]))];
+      for (const v of cands) {
+        if (!v) continue;
+        const d = parseAnyDate(v);
+        if (d && d.getFullYear() > 1990) return { label: `${MONTH_NAMES_ID[d.getMonth()]} ${d.getFullYear()}`, key: d.getFullYear() * 100 + d.getMonth(), date: d };
+      }
+      return direct ? { label: direct, key: monthKeyFromLabel(direct), date: null } : null;
+    }
+    function statusOf(row) {
+      const v = getFlexibleValue(row, ['status']);
+      if (!v) return '';
+      return /plan/i.test(v) ? 'Planning' : /deliver/i.test(v) ? 'Delivered' : v;
+    }
+    const exactKey = (r, names) => { const k = Object.keys(r).find(k => names.includes(norm(k))); return k && r[k] != null ? String(r[k]).trim() : ''; };
+    const inclKey = (r, part) => { const k = Object.keys(r).find(k => norm(k).includes(part)); return k && r[k] != null ? String(r[k]).trim() : ''; };
+    const fmtDate = d => `${d.getDate()} ${MONTH_NAMES_ID[d.getMonth()]} ${d.getFullYear()}`;
     const hourNum = v => { const n = parseFloat(String(v == null ? '' : v).replace(',', '.')); return isNaN(n) ? 0 : n; };
+    const partOf = r => parseInt(getFlexibleValue(r, ['participant', 'peserta'])) || 0;
+    const unitsOf = r => parseInt(getFlexibleValue(r, ['unit yang terjual', 'unit terjual', 'terjual'])) || 0;
     const tokensOf = s => norm(s).split(/[^a-z0-9]+/).filter(Boolean);
     function sameName(a, b) {
       const x = tokensOf(a), y = tokensOf(b);
@@ -619,117 +668,36 @@
       const [sm, lg] = x.length <= y.length ? [x, y] : [y, x];
       return sm.every(t => lg.includes(t)) && (sm.length >= 2 || sm[0].length >= 4);
     }
-
-    // Hitung Meta Sekali Saja
-    function _calcMeta(type, row) {
-      const mk = getModuleKeys(type, row);
-      
-      let storeRaw = mk.store && row[mk.store] ? String(row[mk.store]).trim() : '';
-      if (['-', '0', ''].includes(storeRaw)) storeRaw = '';
-      let trainerRaw = mk.trainer && row[mk.trainer] ? String(row[mk.trainer]).trim() : '';
-      if (['-', '0', ''].includes(trainerRaw)) trainerRaw = '';
-
-      let store = storeRaw ? resolveStore(storeRaw) : '';
-      let trainer = trainerRaw;
-      let rec = null;
-
-      if (!store || !trainer) {
-        const em = mk.email && row[mk.email] ? String(row[mk.email]).trim() : '';
+    // Slot sesi Open Studio (13:00 / 15:00 / 18:00): dari kolom jam sesi, jika tidak ada dari jam pengisian form
+    function slotOf(row) {
+      let h = null;
+      for (const k of Object.keys(row)) {
+        if (!/jam|time|sesi|session|slot/i.test(k) || /timestamp|input/i.test(k)) continue;
+        const m = String(row[k] == null ? '' : row[k]).match(/(?<![\d:])([01]?\d|2[0-3])\s*[:.]\s*[0-5]\d(?!\d)/);
+        if (m) { h = +m[1]; break; }
+      }
+      if (h == null) { const ts = getFlexibleValue(row, ['timestamp', 'waktu']); const m = ts && ts.match(/(\d{1,2}):\d{2}/); if (m) h = +m[1]; }
+      return h == null ? '' : h < 14 ? '13:00' : h < 17 ? '15:00' : '18:00';
+    }
+    function _calcMeta(row) {
+      let store = getRowStore(row) || '', trainer = getRowTrainer(row) || '', rec = null;
+      if (!store || !trainer) { // lengkapi lewat email / nama staff di sheet Recap
+        const em = getFlexibleValue(row, ['email', 'e-mail']);
         rec = (em && recapByEmail.get(norm(em))) || (trainer && recapByName.get(norm(trainer))) || null;
-        if (rec) {
-          if (!store && rec.store) store = resolveStore(rec.store);
-          if (!trainer) trainer = rec.nama || '';
-        }
+        if (rec) { if (!store && rec.store) store = resolveStore(rec.store); if (!trainer) trainer = rec.nama || ''; }
       }
-
-      // Parsing Tanggal
-      let mi = null;
-      let mName = mk.month ? String(row[mk.month] || '').trim() : '';
-      let yr = mk.year ? String(row[mk.year] || '').trim() : '';
-      let dd = mk.date ? String(row[mk.date] || '').trim() : '';
-
-      if (mName && /^\d{4}$/.test(yr)) {
-        const mIdx = monthFromText(norm(mName));
-        if (mIdx >= 0) mi = { label: `${MONTH_NAMES_ID[mIdx]} ${yr}`, key: +yr * 100 + mIdx, date: new Date(+yr, mIdx, /^\d{1,2}$/.test(dd) ? +dd : 1) };
-      }
-      if (!mi) {
-        const cands = [mName, dd, mk.timestamp ? String(row[mk.timestamp] || '') : ''];
-        for (const v of cands) {
-          if (!v) continue;
-          const d = parseAnyDate(v);
-          if (d && d.getFullYear() > 1990) { mi = { label: `${MONTH_NAMES_ID[d.getMonth()]} ${d.getFullYear()}`, key: d.getFullYear() * 100 + d.getMonth(), date: d }; break; }
-        }
-        if (!mi && mName) mi = { label: mName, key: monthKeyFromLabel(mName), date: null };
-      }
-
+      const mi = getRowMonthInfo(row);
       const idx = store ? storeIndex.get(norm(store)) : null;
       let ho = idx ? idx.ho : '';
       if (!ho) { const r2 = rec || (trainer && recapByName.get(norm(trainer))); if (r2 && r2.trainerHO) ho = r2.trainerHO; }
-
-      let status = mk.status && row[mk.status] ? String(row[mk.status]).trim() : '';
-      if (status) status = /plan/i.test(status) ? 'Planning' : /deliver/i.test(status) ? 'Delivered' : status;
-
-      let h = null;
-      if (mk.timestamp && row[mk.timestamp]) { const match = String(row[mk.timestamp]).match(/(\d{1,2}):\d{2}/); if (match) h = +match[1]; }
-      if (h == null) {
-        for (const k of Object.keys(row)) {
-          if (!/jam|time|sesi|session|slot/i.test(k) || /timestamp|input/i.test(k)) continue;
-          const m2 = String(row[k] || '').match(/(?<![\d:])([01]?\d|2[0-3])\s*[:.]\s*[0-5]\d(?!\d)/);
-          if (m2) { h = +m2[1]; break; }
-        }
-      }
-      let slot = h == null ? '' : h < 14 ? '13:00' : h < 17 ? '15:00' : '18:00';
-      
-      // Topik Cache
-      let tMan = [], tOth = [], tAll = [];
-      const split = v => String(v).split(/[,;\n]+/).map(x => x.trim()).filter(x => x && x !== '-' && x !== '0');
-      if (type === 'pnr') {
-         Object.keys(row).forEach(k => {
-           const kl = k.toLowerCase();
-           if (/photo|foto|email|date|tanggal|timestamp/.test(kl) || row[k] == null) return;
-           const isM = kl.includes('mandatory'), isO = !isM && kl.includes('other');
-           if (isM) tMan.push(...split(row[k]));
-           if (isO) tOth.push(...split(row[k]));
-         });
-         tAll = [...tMan, ...tOth];
-      } else {
-         tAll = [(mk.topics && row[mk.topics]) ? String(row[mk.topics]).trim() : 'Lainnya'];
-      }
-
-      return { 
-        store, trainer, month: mi ? mi.label : '', monthKey: mi ? mi.key : 0, date: mi && mi.date ? mi.date : null,
-        ho, st: idx ? Array.from(idx.trainers) : [], status, slot, hours: mk.hours ? hourNum(row[mk.hours]) : 0,
-        _part: mk.participant ? parseInt(row[mk.participant]) || 0 : 0,
-        _units: mk.units ? parseInt(row[mk.units]) || 0 : 0,
-        _topics: { all: tAll, mandatory: tMan, other: tOth }
-      };
+      return { store, trainer, month: mi ? mi.label : '', monthKey: mi ? mi.key : 0, date: mi && mi.date ? mi.date : null,
+        ho, st: idx ? Array.from(idx.trainers) : [], status: statusOf(row), slot: slotOf(row), hours: hourNum(exactKey(row, ['hours'])) };
     }
-
-    function precomputeAllMeta(forceRebuild = false) {
-      ['ops', 'ems', 'pnr'].forEach(type => {
-        const data = state[type] || [];
-        data.forEach(row => {
-          if (forceRebuild || !row._meta) { row._meta = _calcMeta(type, row); }
-        });
-      });
-    }
-
     function getRowMeta(row) {
-      return row._meta || {}; 
+      let m = metaCache.get(row);
+      if (!m) { m = _calcMeta(row); metaCache.set(row, m); }
+      return m;
     }
-    
-    const fmtDate = d => `${d.getDate()} ${MONTH_NAMES_ID[d.getMonth()]} ${d.getFullYear()}`;
-    const partOf = r => r._meta ? r._meta._part : 0;
-    const unitsOf = r => r._meta ? r._meta._units : 0;
-    function getTopics(type, row, mode) {
-      if (!row._meta || !row._meta._topics) return [];
-      if (type === 'pnr') {
-        if (mode === 'mandatory') return row._meta._topics.mandatory;
-        if (mode === 'other') return row._meta._topics.other;
-      }
-      return row._meta._topics.all;
-    }
-    const isQRow = r => /^\s*q\S*\d\S*(\s|$)/i.test(getRowMeta(r).store || '');
 
     /* ---------- Dropdown berkelompok & saling terhubung ---------- */
     function groupBy(items, keyFn) {
@@ -737,7 +705,23 @@
       items.forEach(it => { const k = keyFn(it); if (!g.has(k)) g.set(k, []); g.get(k).push(it); });
       return g;
     }
-    const byName = (a, b) => String(a||'').localeCompare(String(b||''), 'id', { numeric: true, sensitivity: 'base' });
+    const byName = (a, b) => a.localeCompare(b, 'id', { numeric: true, sensitivity: 'base' });
+
+    function renderSelect(id, defaultText, groups, current) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const esc = escapeHtml;
+      let html = `<option value="all">${defaultText}</option>`;
+      const labels = Array.from(groups.keys()).sort((a, b) => (a === NO_HO) - (b === NO_HO) || byName(a, b));
+      const useGroups = labels.length > 1 || (labels.length === 1 && labels[0] !== NO_HO && groups.get(labels[0]).length > 0 && groups.__grouped);
+      labels.forEach(label => {
+        const opts = groups.get(label).map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+        html += groups.__grouped ? `<optgroup label="${esc(label)}">${opts}</optgroup>` : opts;
+      });
+      el.innerHTML = html;
+      el.value = current;
+      if (el.value !== current) el.value = 'all';
+    }
 
     const DIMS = ['month', 'trainerHO', 'store', 'trainer', 'status'];
     function dimMatch(type, m, dim, v) {
@@ -794,6 +778,8 @@
       if (el.value !== current) el.value = 'all';
     }
 
+    // Opsi tiap dropdown hanya berisi nilai yang benar-benar ada di data aktivitas (sudah dipadankan dengan sheet Recap),
+    // dan menyesuaikan pilihan dropdown lainnya, sehingga setiap pilihan pasti menghasilkan data.
     function populateDropdowns(type) {
       const p = state.pages[type], isPNR = type === 'pnr';
       const metas = (state[type] || []).map(getRowMeta);
@@ -823,8 +809,9 @@
       const lastSync = localStorage.getItem('last_sync');
       const fallbackTime = lastSync ? formatDateTime(lastSync) : formatDateTime(new Date());
 
+      
       try {
-        const res = await fetch(DATA_JSON_URL + '?t=' + Date.now(), { cache: 'no-store' });
+        const res = await fetchT(DATA_JSON_URL + '?t=' + Date.now(), { cache: 'no-store' });
         if (!res.ok) throw new Error('File data.json tidak ditemukan');
         const data = await res.json();
 
@@ -840,6 +827,7 @@
           localStorage.setItem('cached_state', JSON.stringify({ ops: state.ops, ems: state.ems, pnr: state.pnr }));
           localStorage.setItem('last_sync', syncTimestamp);
         } catch (e) {}
+        refreshAll();
         updateSyncStatus(`Diperbarui ${formatDateTime(syncTimestamp)}`);
       } catch (err) {
         console.warn('Membaca data dari cache lokal:', err);
@@ -849,13 +837,14 @@
           state.ops = parsed.ops || [];
           state.ems = parsed.ems || [];
           state.pnr = parsed.pnr || [];
+          refreshAll();
         }
         updateSyncStatus(`Offline · cache ${fallbackTime}`, 'warn');
       }
     }
 
     function refreshAll() {
-      ['ops', 'ems', 'pnr'].forEach(t => { state[t] = (state[t] || []).filter(r => !isQRow(r)); }); 
+      ['ops', 'ems', 'pnr'].forEach(t => { state[t] = (state[t] || []).filter(r => !isQRow(r)); }); // abaikan store berkode Q
       ['ops', 'ems', 'pnr'].forEach(populateDropdowns);
       renderCurrentModule();
     }
@@ -883,12 +872,15 @@
     const STORE_TARGET = 85;
     function renderOPS() {
       const filteredData = getFilteredData('ops');
+      
       let totalParticipants = 0, totalUnits = 0;
       const topicCounts = {};
       filteredData.forEach(row => {
         totalParticipants += partOf(row); totalUnits += unitsOf(row);
-        getTopics('ops', row, 'all').forEach(t => { topicCounts[t] = (topicCounts[t] || 0) + 1; });
+        const t = getFlexibleValue(row, ['topics', 'topik']) || 'Lainnya';
+        topicCounts[t] = (topicCounts[t] || 0) + 1;
       });
+      
       
       renderOpsStoreTable(filteredData);
       renderModuleSummary('ops', filteredData, [
@@ -899,6 +891,7 @@
       renderCompare('ops'); renderMatrix('ops');
     }
 
+    // Data Detail OPS: Store x slot 13:00 / 15:00 / 18:00, total, target 85 per store, % — klik store untuk detail
     function renderOpsStoreTable(data) {
       const p = state.pages.ops;
       const blank = name => ({ name, s: { '13:00': 0, '15:00': 0, '18:00': 0 }, total: 0, rows: [] });
@@ -930,6 +923,7 @@
 
     function renderEMS() {
       const d = getFilteredData('ems');
+      
       renderTableWithPagination('ems', d);
       renderModuleSummary('ems', d);
       renderChart('emsChart', countTopics('ems', d), k => openModal({ title: `Topik ${k}`, sub: 'EMS', ...detailRows('ems', d.filter(r => getTopics('ems', r, 'all').includes(k))) }));
@@ -938,6 +932,7 @@
 
     function renderPNR() {
       const d = getFilteredData('pnr');
+      
       renderTableWithPagination('pnr', d);
       renderModuleSummary('pnr', d);
       renderChart('pnrChart', countTopics('pnr', d), k => openModal({ title: `Topik ${k}`, sub: 'PNR', ...detailRows('pnr', d.filter(r => getTopics('pnr', r, topicMode).includes(k))) }));
@@ -949,9 +944,6 @@
       data.forEach(row => Object.keys(row).forEach(k => s.add(k)));
       return Array.from(s);
     }
-
-    const exactKey = (r, names) => { const k = Object.keys(r).find(k => names.includes(norm(k))); return k && r[k] != null ? String(r[k]).trim() : ''; };
-    const inclKey = (r, part) => { const k = Object.keys(r).find(k => norm(k).includes(part)); return k && r[k] != null ? String(r[k]).trim() : ''; };
 
     const PNR_SPEC = [
       { h: 'Store', f: r => getRowMeta(r).store || inclKey(r, 'location') },
@@ -1035,7 +1027,7 @@
       const id = `${type}${key.charAt(0).toUpperCase() + key.slice(1)}Filter`;
       state.pages[type][key] = document.getElementById(id).value;
       state.pages[type].page = 1;
-      populateDropdowns(type); 
+      populateDropdowns(type); // dropdown lain ikut menyesuaikan (HO -> Store -> Trainer)
       renderCurrentModule();
     }
 
@@ -1103,7 +1095,7 @@
       pill.innerHTML = `<span>${msg}</span>`;
     }
 
-    /* ---------- OPTIMASI 2: Loading Paralel (Background Fetch) ---------- */
+    /* ---------- Summary ---------- */
     let isLoading = false;
     function toggleSettings(e) { e.stopPropagation(); document.getElementById('settingsOv').classList.add('open'); document.body.style.overflow = 'hidden'; }
     function closeSettings() { document.getElementById('settingsOv').classList.remove('open'); document.body.style.overflow = ''; }
@@ -1114,42 +1106,21 @@
       document.getElementById('settingsBtn').style.setProperty('--p', (pc >= 100 ? 0 : pc) + '%');
       b.querySelector('.lbl').textContent = label;
     }
-    
     async function fetchLatestData() {
       if (isLoading) return;
       isLoading = true;
       const btn = document.getElementById('manualSyncBtn');
       btn.disabled = true; btn.classList.remove('done'); btn.classList.add('loading');
-      
-      setProg(20, 'Memuat Data Utama...');
-      updateSyncStatus('Memuat data…', 'loading');
-
+      let done = 0;
+      const tick = () => { done++; const v = Math.round(done / 4 * 100); setProg(v, `Memuat ${v}%`); };
+      const t = pr => pr.then(r => { tick(); return r; }, e => { tick(); throw e; });
+      setProg(6, 'Memuat 6%'); updateSyncStatus('Memuat data…', 'loading');
       try {
-        // TAHAP 1: Render secepat kilat dari data lokal (Mencegah Layar Kosong)
-        await _fetchLatestData();
-        setProg(40, 'Render Awal...');
-        precomputeAllMeta(false); // Hitung meta cepat tanpa nunggu data Recap
-        refreshAll();
-
-        // TAHAP 2: Muat data eksternal berat (Google Sheets) secara asinkron di belakang layar
-        setProg(60, 'Update Master Data...');
-        await Promise.all([
-          fetchRecapMasterData().catch(e => console.warn('Recap err:', e)),
-          fetchTargets().catch(e => console.warn('Target err:', e)),
-          fetchRoster().catch(e => console.warn('Roster err:', e))
-        ]);
-
-        // TAHAP 3: Refresh ulang UI setelah Master Data komplit
-        setProg(90, 'Update UI...');
-        precomputeAllMeta(true); // Hitung ulang status HO, Trainer, Target pakai Master Data
-        refreshAll();
-
+        await Promise.all([t(fetchRecapMasterData()), t(fetchTargets()), t(fetchRoster())]);
+        await t(_fetchLatestData());
         const off = document.getElementById('cloudStatusPill').classList.contains('warn');
         setProg(100, off ? 'Selesai · offline' : '✓ Berhasil 100%'); btn.classList.add('done');
-      } catch (e) {
-        setProg(100, 'Gagal memuat'); 
-      }
-      
+      } catch (e) { setProg(100, 'Gagal memuat'); }
       isLoading = false;
       await new Promise(r => setTimeout(r, 1800));
       btn.disabled = false; btn.classList.remove('loading', 'done'); setProg(0, 'Refresh');
@@ -1170,7 +1141,7 @@
         const sum = mk(`${t}-summary`, 'panel-card sum-wrap'), cmp = mk(`${t}-compare`, 'panel-card sum-wrap');
         const kg0 = document.querySelector(`#panel-${t} .kpi-grid`); kg0.after(sum); kg0.remove();
         sum.after(cmp);
-        if (t !== 'ops') { 
+        if (t !== 'ops') { // tabel + diagram Topik Terpopuler berdampingan
           const tp = document.querySelector(`#panel-${t} > .panel-card:not(.sum-wrap)`);
           const grid = document.createElement('div'); grid.className = 'content-grid';
           const cp = document.createElement('div'); cp.className = 'panel-card';
@@ -1180,12 +1151,13 @@
         }
         if (t === 'pnr') document.getElementById('panel-pnr').appendChild(mk('pnr-rekap', 'panel-card sum-wrap'));
         document.getElementById(`panel-${t}`).appendChild(mk(`${t}-matrix`, 'panel-card sum-wrap'));
-        const fb = mk(`${t}-filterbar`, 'panel-card filter-bar');
+        const fb = mk(`${t}-filterbar`, 'panel-card filter-bar'); // semua sort by di paling atas tab
         const crow = document.querySelector(`#panel-${t} .controls-row`);
         crow.insertAdjacentHTML('beforeend', EXPORT_BTN(t));
         fb.appendChild(crow);
         document.getElementById(`panel-${t}`).prepend(fb);
       });
+      // urutan sort PNR: bulan, store, status, store trainer, staff
       const row = document.querySelector('#panel-pnr .controls-row');
       ['MonthFilter', 'StoreFilter', 'StatusFilter', 'TrainerHOFilter'].forEach(id => row.appendChild(document.getElementById('pnr' + id)));
       document.getElementById('pnrTrainerFilter').style.display = 'none';
@@ -1206,7 +1178,7 @@
       });
       return Array.from(m.entries()).sort((a, b) => asc ? a[1].k - b[1].k : b[1].k - a[1].k).map(([l, e]) => [l, e.n]);
     }
-    
+    /* ---------- Detail modal & drill-down ---------- */
     let DR = [];
     function reg(fn) { DR.push(fn); return DR.length - 1; }
     function openDrill(i) { openModal(DR[i]()); }
@@ -1231,6 +1203,7 @@
     function closeModal() { document.getElementById('modalOv').classList.remove('open'); document.body.style.overflow = ''; }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeSettings(); } });
 
+    /* ---------- Komponen umum ---------- */
     const fmt = n => Number(n).toLocaleString('id-ID');
     const pct = (a, b) => b ? Math.round(a / b * 100) + '%' : '0%';
     const num1 = n => n.toFixed(1).replace('.', ',');
@@ -1266,17 +1239,33 @@
       return m;
     }
 
+    /* ---------- Topik ---------- */
+    function getTopics(type, row, mode) {
+      const split = v => String(v).split(/[,;\n]+/).map(x => x.trim()).filter(x => x && x !== '-' && x !== '0');
+      if (type === 'pnr') { // kolom Mandatory & Other
+        const out = [];
+        Object.keys(row).forEach(k => {
+          const kl = k.toLowerCase();
+          if (/photo|foto|email|date|tanggal|timestamp/.test(kl)) return;
+          const isM = kl.includes('mandatory'), isO = !isM && kl.includes('other');
+          if ((isM && mode !== 'other') || (isO && mode !== 'mandatory')) { if (row[k] != null) out.push(...split(row[k])); }
+        });
+        return out;
+      }
+      return [getFlexibleValue(row, ['topics', 'topik', 'topic', 'kategori', 'category']) || 'Lainnya'];
+    }
     function countTopics(type, data, mode) {
       const c = {};
       data.forEach(r => getTopics(type, r, mode || topicMode).forEach(t => { c[t] = (c[t] || 0) + 1; }));
       return c;
     }
 
+    /* ---------- Target PnR (sheet OPS EMS PNR, kolom U3 & V3 ke bawah) ---------- */
     const OPS_SRC_ID = '1VIjDE5YvDsBv3YEfrXatVoKSL2GaAgIkAPC3qRlwyjA';
     async function fetchTargets() {
       try {
         const url = `https://docs.google.com/spreadsheets/d/${OPS_SRC_ID}/gviz/tq?tqx=out:json&headers=0&gid=1480672322&range=U3:V500&_=${Date.now()}`;
-        const res = await fetch(url, { cache: 'no-store' });
+        const res = await fetchT(url, { cache: 'no-store' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const txt = await res.text();
         const json = JSON.parse(txt.substring(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
@@ -1296,11 +1285,13 @@
       return null;
     }
 
+    /* ---------- Summary per modul ---------- */
     const tokSame = (x, y) => {
       if (!x.length || !y.length) return false;
       const [sm, lg] = x.length <= y.length ? [x, y] : [y, x];
       return sm.every(t => lg.includes(t)) && (sm.length >= 2 || sm[0].length >= 4);
     };
+    // Daftar staff (sheet Recap) sesuai filter aktif; PNR = store trainer saja. Staff tanpa aktivitas ikut dihitung (0).
     function staffPool(type, p) {
       const seen = new Set(), out = [];
       recapMasterData.forEach(r => {
@@ -1333,6 +1324,7 @@
       const all = staffCounts(pool, names);
       return { active: all.filter(x => x.n > 0).sort((a, b) => a.n - b.n || byName(a.s.nama, b.s.nama)), zero: all.filter(x => x.n === 0).sort((a, b) => byName(a.s.nama, b.s.nama)) };
     }
+    // Paling sedikit aktivitas = jumlah entry terkecil dari data OPS / EMS / PNR (minimal 1 entry)
     function bottomStaffBlock(title, pool, names, detailFn) {
       const { active } = staffSplit(pool, names);
       const keyMap = new Map();
@@ -1340,12 +1332,13 @@
       const all = () => ({ title, sub: `${active.length} orang yang beraktivitas, dari entry paling sedikit`, heads: ['Nama', 'Store', 'Area', 'Posisi', 'Entry'], rows: active.map(x => [escapeHtml(x.s.nama), escapeHtml(x.s.store || '-'), escapeHtml(x.s.ho || '-'), escapeHtml(x.s.pos || '-'), fmt(x.n)]) });
       return barList(title, entries, 5, k => detailFn(keyMap.get(k)), { label: `Lihat semua ${active.length} yang aktif`, fn: all });
     }
+    // Kelompok yang tidak punya aktivitas sama sekali (0 entry), ditampilkan sebagai capsule
     function zeroBlock(title, items, heads, rowFn, limit) {
       const lim = limit || 24, rows = items.map(rowFn);
       const detail = () => ({ title, sub: `${items.length} tanpa aktivitas sama sekali (0 entry)`, heads, rows: rows.map(r => r.cells.map(escapeHtml)) });
       const cap = (r, x) => `<span class="capsule clickable${x}" onclick="openDrill(${reg(() => ({ title: r.label, sub: 'Tidak ada aktivitas (0 entry)', heads, rows: [r.cells.map(escapeHtml)] }))})">${escapeHtml(r.label)}</span>`;
       let html = rows.slice(0, lim).map(r => cap(r, '')).join('');
-      if (rows.length > lim && limit) { 
+      if (rows.length > lim && limit) { // tab modul: tampil 5, sisanya show more
         html += rows.slice(lim, 300).map(r => cap(r, ' zx')).join('') + (rows.length > 300 ? `<span class="capsule clickable zx" onclick="openDrill(${reg(detail)})">+${rows.length - 300} lainnya ›</span>` : '')
           + `<span class="capsule zbtn clickable" onclick="this.parentNode.classList.toggle('open')"><i class="m">Show more (${rows.length - lim})</i><i class="l">Show less</i></span>`;
       } else if (rows.length > lim) html += `<span class="capsule clickable" onclick="openDrill(${reg(detail)})">+${rows.length - lim} lainnya ›</span>`;
@@ -1400,6 +1393,7 @@
         kpiCard('Bulan Berjalan', months.length ? months[0][1] : 0, months.length ? months[0][0] + (trend ? ' · ' + trend : '') : '', D(months.length ? months[0][0] : '-', by(m => months.length && m.month === months[0][0]))),
         kpiCard('Rata-rata Entry / Store', stores.size ? num1(data.length / stores.size) : '0', '', () => listDetail('Entry per store', storeCnt)),
         kpiCard(`Rata-rata Entry / ${who}`, staff.size ? num1(data.length / staff.size) : '0', '', () => listDetail(`Entry per ${who.toLowerCase()}`, staffCnt)),
+        
       ];
       if (!isPNR) {
         const scope = storeIndex.size || stores.size, hit = allStores.filter(e => e[1] >= STORE_TARGET).length;
@@ -1424,6 +1418,7 @@
       el.innerHTML = `<div class="panel-title" style="margin-bottom:14px">Summary ${type.toUpperCase()}</div><div class="kpi-grid">${kp.join('')}</div><div class="sum-cols">${blocks.join('')}</div>${zeroBlocks(type, data)}<div class="muted" style="font-size:.75rem;margin-top:10px">Klik kartu atau baris untuk melihat detailnya.</div>`;
     }
 
+    /* ---------- Comparison like for like (minggu & bulan sebelumnya) ---------- */
     function renderCompare(type) {
       const el = document.getElementById(`${type}-compare`);
       if (!el) return;
@@ -1465,6 +1460,7 @@
       el.innerHTML = `${title}<div class="muted" style="font-size:.8rem;margin-bottom:14px">Acuan tanggal ${fmtDate(anchor)} (data terbaru) · dibandingkan dengan jumlah hari yang sama · klik baris untuk detail</div><div class="sum-cols" style="grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr))">${block('Minggu ini vs Minggu lalu', wCur, wPrev)}${block('Bulan ini vs Bulan lalu', mCur, mPrev)}</div>`;
     }
 
+    /* ---------- Matriks Partisipasi Staff Bulanan (monitoring harian OPS / EMS) ---------- */
     function renderMatrix(type) {
       const el = document.getElementById(`${type}-matrix`);
       if (!el) return;
@@ -1497,6 +1493,7 @@
         <tfoot><tr><td>Total per hari</td>${dayTot.map(n => `<td>${n || ''}</td>`).join('')}<td>${grand}</td></tr></tfoot></table></div>`;
     }
 
+    /* ---------- Rekapitulasi PNR per Toko ---------- */
     let rekapMode = 'delivered';
     function setRekapMode(m) { rekapMode = m; renderRekapPNR(); }
     function renderRekapPNR() {
@@ -1531,6 +1528,7 @@
         <div class="table-container" style="max-height:560px"><table><thead><tr><th>Store</th><th>Store Trainer</th><th>Total Employee</th><th>Min Target per month Training and Roleplay</th><th>Current Progress</th><th>%</th></tr></thead><tbody>${list.length ? `<tr class="totrow"><td>Semua Store (${list.length})</td><td></td><td>${tE}</td><td>${r1(tT)} Hours</td><td>${r1(tP)} Hours</td><td>${cell(tT, tP)}</td></tr>` + rows : '<tr><td colspan="6" style="text-align:center;padding:24px">Belum ada data.</td></tr>'}</tbody></table></div>`;
     }
 
+    /* ---------- Store Trainer Roster (Google Sheet realtime, tab = bulan berjalan) ---------- */
     const ROSTER_ID = '1d93koBxpwMDtK6tYrDkRyuu30pb8drm54-Xh5Gk1L6U';
     const ROSTER_MONTHS = MONTH_NAMES_ID.map(n => n.toUpperCase());
     let rosterMonth = ROSTER_MONTHS[new Date().getMonth()];
@@ -1539,7 +1537,7 @@
     async function fetchRoster() {
       try {
         const url = `https://docs.google.com/spreadsheets/d/${ROSTER_ID}/gviz/tq?tqx=out:json&headers=0&sheet=${encodeURIComponent(rosterMonth)}&_=${Date.now()}`;
-        const res = await fetch(url, { cache: 'no-store' });
+        const res = await fetchT(url, { cache: 'no-store' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const txt = await res.text();
         const json = JSON.parse(txt.substring(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
@@ -1582,6 +1580,7 @@
       const n = d.startsWith('0') ? '62' + d.slice(1) : d.startsWith('62') ? d : '62' + d;
       return `<a class="wa-btn" href="https://wa.me/${n}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>WhatsApp</a>`;
     };
+    const initials = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
 
     function renderRoster() {
       const host = document.getElementById('panel-roster');
@@ -1632,6 +1631,7 @@
       const cap = (cls, label, val, sub, fn) => `<div class="cap ${cls}" onclick="openDrill(${reg(fn)})"><div class="l">${label}</div><div class="v">${val}</div><div class="muted" style="font-size:.72rem">${sub}</div></div>`;
       $('rosterKpi').innerHTML = [
         cap('', 'Total Store', roster.rows.length, 'semua toko', listD('Semua Toko', roster.rows)),
+        
         cap('e', 'Early (E)', onShift('E').length, dayLbl, listD('Shift Early (Pagi)', onShift('E'))),
         cap('m', 'Middle (M)', onShift('M').length, dayLbl, listD('Shift Middle', onShift('M'))),
         cap('l2', 'Late (L)', onShift('L').length, dayLbl, listD('Shift Late (Siang)', onShift('L'))),
@@ -1649,6 +1649,7 @@
         (roster.error ? `<div style="color:#f59e0b">⚠️ ${escapeHtml(roster.error)}</div>` : (roster.loaded ? '' : '<div>Memuat roster…</div>'));
     }
 
+    /* ---------- Rapor Trainer ---------- */
     function fillRaporOptions() {
       const sel = document.getElementById('raporSel');
       if (!sel) return;
@@ -1688,6 +1689,7 @@
         <div class="sum-title">Entry per Bulan</div>${miniTable(['Bulan', 'OPS', 'EMS', 'PNR', 'Total'], mrows, 260)}`;
     }
 
+    /* ---------- Summary keseluruhan ---------- */
     let allMonth = 'all';
     function renderAllSummary() {
       const host = document.getElementById('panel-all');
@@ -1829,6 +1831,7 @@
       });
     }
 
+    /* ---------- Export .xls ---------- */
     const EXPORT_BTN = t => `<button class="btn-export" onclick="exportTab('${t}')" title="Export data ke Excel (.xls)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Export .xls</button>`;
     let lastAllSel = [];
     const plain = c => String(c == null ? '' : c).replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
@@ -1873,9 +1876,10 @@
       exportXls(`Activity-Performance-Hub_${tab.toUpperCase()}_${new Date().toISOString().slice(0, 10)}.xls`, secs);
     }
 
+    /* ---------- GitHub Action (sync-data.yml) ---------- */
     const GH = { owner: 'steeshigeo', repo: 'Activity-Performance-Hub', wf: 'sync-data.yml', sheet: '1nSMZjGUWdKVXXn1EiYt95giow4_vDeSfP8KWovS0FF0', poll: 5000, reset: 4000 };
     let ghRunning = false;
-    async function ghToken() { 
+    async function ghToken() { // token dibaca dari sheet kolom A2 hanya saat tombol ditekan, tidak disimpan
       const res = await fetch(`https://docs.google.com/spreadsheets/d/${GH.sheet}/gviz/tq?tqx=out:json&headers=0&gid=0&range=A2:A2&_=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error('Sheet token tidak bisa dibaca (HTTP ' + res.status + ')');
       let json;
@@ -1886,7 +1890,7 @@
       if (!t) throw new Error('Token di kolom A2 kosong');
       return t;
     }
-    const ghErr = r => r.status === 401 || r.status === 403 ? 'Token ditolak GitHub' : r.status === 404 ? 'Repo atau workflow tidak ditemukan' : `GitHub membalas HTTP ${r.status}`;
+    const ghErr = r => r.status === 401 || r.status === 403 ? 'Token ditolak GitHub (cek token aktif dan izin Actions: write)' : r.status === 404 ? 'Repo atau workflow tidak ditemukan / token tanpa akses ke repo' : `GitHub membalas HTTP ${r.status}`;
     async function runGithubAction() {
       if (ghRunning) return;
       if (!confirm('Run update data?')) return;
@@ -1922,7 +1926,7 @@
         if (run.conclusion !== 'success') throw new Error('Workflow selesai dengan status: ' + run.conclusion);
         setB(100, '✓ Sync selesai 100%', 'done');
         updateSyncStatus('GitHub Action berhasil', '');
-        await fetchLatestData();
+        await fetchLatestData(); // muat data terbaru setelah sync
       } catch (err) {
         console.warn('GitHub Action gagal:', err.message);
         setB(100, 'Gagal', 'err'); updateSyncStatus(String(err.message || err), 'warn');
@@ -1939,7 +1943,7 @@
       try { localStorage.setItem('theme', nt); } catch (e) {}
       renderCurrentModule();
     });
-    document.getElementById('manualSyncBtn').addEventListener('click', fetchLatestData);
+    { const mb = document.getElementById('manualSyncBtn'); if (mb) mb.addEventListener('click', fetchLatestData); }
 
     document.addEventListener('DOMContentLoaded', () => {
       initSummaryHosts();
@@ -1950,13 +1954,5 @@
       });
     });
   </script>
-<div class="modal-ov" id="settingsOv" onclick="if(event.target===this)closeSettings()"><div class="pop"><div class="pop-h"><div class="modal-t">Pengaturan</div><button class="btn-theme" onclick="closeSettings()" aria-label="Tutup">✕</button></div><div class="muted" style="font-size:.8rem;margin-bottom:6px">Muat ulang data dashboard atau jalankan update data dari GitHub.</div><button class="btn-primary" id="manualSyncBtn"><i class="fill"></i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg><span class="lbl">Refresh</span></button><button class="btn-run" id="ghRunBtn" onclick="runGithubAction()" title="Jalankan GitHub Action sync-data.yml"><i class="fill"></i><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Run Sync</span></button></div></div>
-  <div class="modal-ov" id="modalOv" onclick="if(event.target===this)closeModal()">
-    <div class="modal">
-      <div class="modal-h"><div><div class="modal-t" id="modalT"></div><div class="muted" id="modalS" style="font-size:.82rem;margin-top:2px"></div></div><button class="btn-theme" onclick="closeModal()" aria-label="Tutup">✕</button></div>
-      <div class="controls-row"><input id="modalQ" class="search-box" placeholder="Cari di detail..." oninput="renderModal()"></div>
-      <div class="table-container" id="modalB"></div>
-    </div>
-  </div>
 </body>
 </html>
