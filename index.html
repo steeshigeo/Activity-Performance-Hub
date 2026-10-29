@@ -495,7 +495,7 @@
       if (!str) return '';
       let clean = String(str).replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim();
       const lower = clean.toLowerCase();
-      if (lower.includes('presenter name') || lower.includes('fill in your full name') || lower.includes('trainer name')) return type === 'pnr' ? 'Trainer Name' : 'Presenter';
+      if (lower.includes('presenter name') || lower.includes('fill in your full name') || lower.includes('trainer name')) return type === 'pnr' ? 'Trainer Name' : type === 'ems' ? 'Store Trainer' : 'Presenter';
       if (lower.includes('tanggal (') || lower.includes('tanggal ( hari')) return 'Tanggal Sesi';
       if (lower.includes('total participants') || lower.includes('berapa banyak pelanggan')) return 'Total Peserta';
       if (lower.includes('unit yang terjual')) return 'Unit Terjual';
@@ -682,7 +682,7 @@
       const mName = kv(['month', 'bulan']), yr = kv(['year', 'tahun']), dd = kv(['date', 'tanggal']);
       if (mName && /^\d{4}$/.test(yr)) { // kolom Month + Date + Year terpisah (mis. data PnR)
         const mi = monthFromText(norm(mName));
-        if (mi >= 0) return { label: `${MONTH_NAMES_ID[mi]} ${yr}`, key: +yr * 100 + mi, date: new Date(+yr, mi, /^\d{1,2}$/.test(dd) ? +dd : 1) };
+        if (mi >= 0) return { label: `${MONTH_NAMES_ID[mi]} ${yr}`, key: +yr * 100 + mi, date: new Date(+yr, mi, /^\d{1,2}$/.test(dd) ? +dd : (parseAnyDate(dd) || { getDate: () => 1 }).getDate()) };
       }
       const direct = getFlexibleValue(row, ['bulan', 'month']);
       const cands = [direct, ...['tanggal', 'date', 'waktu', 'timestamp'].map(k => getFlexibleValue(row, [k]))];
@@ -1003,6 +1003,7 @@
       { h: 'Modules', f: r => exactKey(r, ['modules']) },
       { h: 'Type of Training', f: r => inclKey(r, 'type of training') },
       { h: 'Total Session', f: r => inclKey(r, 'total session') },
+      { h: 'Hours', f: r => exactKey(r, ['hours']) },
       { h: 'Total Staff Trained', f: r => inclKey(r, 'total staff trained') },
       { h: 'Month & Date', f: r => {
         const mm = exactKey(r, ['month']), yy = exactKey(r, ['year']), dd = exactKey(r, ['date']);
@@ -1016,12 +1017,52 @@
       } },
       { h: 'Status', html: true, f: r => { const s = getRowMeta(r).status; return s ? `<span class="badge ${s === 'Delivered' ? 'b-del' : 'b-plan'}">${escapeHtml(s)}</span>` : '-'; } },
       { h: 'Participant name', f: r => inclKey(r, 'participant') },
-      { h: 'Any Comment', f: r => inclKey(r, 'comment') },
-      { h: 'Hours', f: r => exactKey(r, ['hours']) }
+      { h: 'Any Comment', f: r => inclKey(r, 'comment') }
     ];
+    // Format Indonesia seperti di Google Sheet: dd/mm/yyyy HH:mm:ss (zona WIB)
+    function fmtStamp(v) {
+      if (v == null || v === '') return '';
+      const s = String(v).trim();
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(s)) return s.replace(/\./g, ':');
+      const p2 = n => String(n).padStart(2, '0');
+      let d = null;
+      if (/^\d{4}-\d{2}-\d{2}T/.test(s)) d = new Date(s);
+      else if (/^\d{10,13}$/.test(s)) d = new Date(s.length === 10 ? +s * 1000 : +s);
+      else {
+        const x = parseAnyDate(s);
+        if (!x) return s;
+        const t = s.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+        return `${p2(x.getDate())}/${p2(x.getMonth() + 1)}/${x.getFullYear()}${t ? ` ${p2(t[1])}:${t[2]}:${t[3] || '00'}` : ''}`;
+      }
+      if (!d || isNaN(d.getTime())) return s;
+      const o = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).formatToParts(d).reduce((a, x) => (a[x.type] = x.value, a), {});
+      return `${o.day}/${o.month}/${o.year} ${o.hour === '24' ? '00' : o.hour}:${o.minute}:${o.second}`;
+    }
+    function fmtAnyDate(v) { // tanggal bulan tahun, mis. 2 Oktober 2025
+      const s = String(v == null ? '' : v).trim();
+      if (!s) return '';
+      if (/^\d{4}-\d{2}-\d{2}T/.test(s)) { const d = new Date(s); if (!isNaN(d.getTime())) return new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', day: 'numeric', month: 'long', year: 'numeric' }).format(d); }
+      const d = parseAnyDate(s);
+      return d ? fmtDate(d) : s;
+    }
+    function emsDate(r, k) {
+      const raw = r[k] == null ? '' : String(r[k]).trim();
+      const mm = exactKey(r, ['month', 'bulan']), yy = exactKey(r, ['year', 'tahun']);
+      if (/^\d{1,2}$/.test(raw) && mm && /^\d{4}$/.test(yy)) return `${raw} ${mm} ${yy}`;
+      return fmtAnyDate(raw) || (getRowMeta(r).date ? fmtDate(getRowMeta(r).date) : '');
+    }
     function tableSpec(type) {
       if (type === 'pnr') return PNR_SPEC;
-      return [{ h: 'Bulan', f: r => getRowMeta(r).month || '-' }].concat(getAllHeaders(state[type]).map(k => ({ h: cleanHeaderName(k, type), f: r => r[k] })));
+      const cols = [];
+      getAllHeaders(state[type]).forEach(k => {
+        const h = cleanHeaderName(k, type);
+        if (type === 'ems' && ['month', 'bulan'].includes(norm(k))) return;     // EMS: Bulan / Month dihapus
+        if (type === 'ops' && h === 'Tanggal Sesi') return;                     // OPS: tanggal sesi dihapus
+        if (h === 'Waktu Input' || /timestamp/i.test(k)) cols.push({ h: 'Waktu Input', f: r => fmtStamp(r[k]) });
+        else if (type === 'ems' && (h === 'Tanggal Sesi' || ['date', 'tanggal'].includes(norm(k)))) cols.push({ h: 'Date', f: r => emsDate(r, k) });
+        else cols.push({ h, f: r => r[k] });
+      });
+      return cols;
     }
     function detailRows(type, rows) {
       const spec = tableSpec(type);
@@ -1517,11 +1558,11 @@
           const d = r1(c[k] - pv[k]), pc = pv[k] ? Math.round(d / pv[k] * 100) : null;
           const col = d > 0 ? '#10b981' : d < 0 ? '#f43f5e' : 'var(--text-muted)';
           const dr = reg(() => ({ title: `${name} · ${k}`, sub: `${lbl(cur)} · ${cl.length} entry`, ...detailRows(type, cl.map(x => x.r)) }));
-          return `<tr class="clickable" onclick="openDrill(${dr})"><td>${k}</td><td><strong>${fmt(c[k])}</strong></td><td>${fmt(pv[k])}</td><td style="color:${col}">${d > 0 ? '▲ +' : d < 0 ? '▼ ' : ''}${fmt(d)}</td><td style="color:${col}">${pc === null ? (c[k] ? 'baru' : '0%') : (pc >= 0 ? '+' : '') + pc + '%'}</td></tr>`;
+          return `<tr class="clickable" onclick="openDrill(${dr})"><td>${k}</td><td>${fmt(pv[k])}</td><td><strong>${fmt(c[k])}</strong></td><td style="color:${col}">${d > 0 ? '▲ +' : d < 0 ? '▼ ' : ''}${fmt(d)}</td><td style="color:${col}">${pc === null ? (c[k] ? 'baru' : '0%') : (pc >= 0 ? '+' : '') + pc + '%'}</td></tr>`;
         }).join('');
-        return `<div class="sum-block"><div class="sum-title">${name}</div><div class="muted" style="font-size:.78rem;margin-bottom:8px">${lbl(cur)} vs ${lbl(prev)}</div><div class="table-container cmp" style="max-height:none"><table><thead><tr><th>Metrik</th><th>Saat ini</th><th>Sebelumnya</th><th>Selisih</th><th>%</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+        return `<div class="sum-block"><div class="sum-title">${name}</div><div class="muted" style="font-size:.78rem;margin-bottom:8px">${lbl(prev)} vs ${lbl(cur)}</div><div class="table-container cmp" style="max-height:none"><table><thead><tr><th>Metrik</th><th>Sebelumnya</th><th>Saat ini</th><th>Selisih</th><th>%</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
       };
-      el.innerHTML = `${title}<div class="muted" style="font-size:.8rem;margin-bottom:14px">Acuan tanggal ${fmtDate(anchor)} (data terbaru) · dibandingkan dengan jumlah hari yang sama · klik baris untuk detail</div><div class="sum-cols" style="grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr))">${block('Minggu ini vs Minggu lalu', wCur, wPrev)}${block('Bulan ini vs Bulan lalu', mCur, mPrev)}</div>`;
+      el.innerHTML = `${title}<div class="muted" style="font-size:.8rem;margin-bottom:14px">Acuan tanggal ${fmtDate(anchor)} (data terbaru) · dibandingkan dengan jumlah hari yang sama · klik baris untuk detail</div><div class="sum-cols" style="grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr))">${block('Minggu lalu vs Minggu ini', wCur, wPrev)}${block('Bulan lalu vs Bulan ini', mCur, mPrev)}</div>`;
     }
 
     /* ---------- Matriks Partisipasi Staff Bulanan (monitoring harian OPS / EMS) ---------- */
