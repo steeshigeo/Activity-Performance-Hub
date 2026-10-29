@@ -378,6 +378,7 @@
     body.role-trainer .mgr-only{display:none!important}
     body.role-trainer .nav-tabs .tab-btn[data-mgr]{display:none}
     body.role-manager .tr-only{display:none!important}
+    .grade-pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:99px;font-size:.75rem;font-weight:700;letter-spacing:.02em;white-space:nowrap}
   </style>
 </head>
 <body>
@@ -2518,46 +2519,115 @@
     function myData(type) {
       return (state[type] || []).filter(r => trainerMatch(getRowMeta(r).trainer));
     }
+    // Target pribadi bulanan (bisa disesuaikan). OPS & EMS belum ada target resmi di sheet → pakai soft target.
+    const PERSONAL_OPS_TARGET = 20;  // entry OPS / bulan
+    const PERSONAL_EMS_TARGET = 12;  // entry EMS / bulan
+
+    function gradeOf(pct) {
+      if (pct == null || isNaN(pct)) return { letter: '–', label: 'Belum ada data', cls: 'grade-na', color: 'var(--text-muted)' };
+      if (pct >= 100) return { letter: 'A', label: 'Excellent', cls: 'grade-a', color: '#30d158' };
+      if (pct >= 80)  return { letter: 'B', label: 'Good', cls: 'grade-b', color: '#64d2ff' };
+      if (pct >= 60)  return { letter: 'C', label: 'Fair', cls: 'grade-c', color: '#ffd60a' };
+      if (pct >= 40)  return { letter: 'D', label: 'Needs Improvement', cls: 'grade-d', color: '#ff9f0a' };
+      return { letter: 'E', label: 'Critical', cls: 'grade-e', color: '#ff453a' };
+    }
+    function progressBlock(title, current, target, unit, extra) {
+      const hasTarget = target > 0;
+      const pct = hasTarget ? Math.round(current / target * 100) : null;
+      const g = gradeOf(pct);
+      const barW = pct == null ? 0 : Math.min(100, pct);
+      const barColor = g.color;
+      return `<div class="sum-block" style="margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+          <div class="sum-title" style="margin:0">${escapeHtml(title)}</div>
+          <span class="grade-pill ${g.cls}" style="background:${g.color}22;color:${g.color};border:1px solid ${g.color}55">${g.letter} · ${g.label}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="bar-track" style="flex:1;height:12px"><div class="bar-fill" style="width:${barW}%;background:${barColor}"></div></div>
+          <span class="pct" style="color:${g.color};min-width:48px;text-align:right">${pct == null ? '–' : pct + '%'}</span>
+        </div>
+        <div class="muted" style="font-size:.78rem;margin-top:6px">
+          ${hasTarget ? `${typeof current === 'number' && current % 1 ? r1(current) : fmt(current)} / ${typeof target === 'number' && target % 1 ? r1(target) : fmt(target)} ${unit}` : `${fmt(current)} ${unit} · target belum diatur`}
+          ${extra ? ' · ' + extra : ''}
+        </div>
+      </div>`;
+    }
+
     function renderMyPerf() {
       const el = document.getElementById('myperfBody');
       if (!el || !isTrainerView()) return;
-      const ops = myData('ops'), ems = myData('ems'), pnr = myData('pnr');
+      const opsAll = myData('ops'), emsAll = myData('ems'), pnrAll = myData('pnr');
+
+      // Tentukan bulan berjalan (bulan terbaru yang punya data, atau bulan kalender sekarang)
+      let monthLabel = '', monthKey = -1;
+      [...opsAll, ...emsAll, ...pnrAll].forEach(r => {
+        const m = getRowMeta(r);
+        if (m.month && m.monthKey > monthKey) { monthKey = m.monthKey; monthLabel = m.month; }
+      });
+      if (!monthLabel) {
+        const now = new Date();
+        monthLabel = `${MONTH_NAMES_ID[now.getMonth()]} ${now.getFullYear()}`;
+      }
+      const inMonth = rows => rows.filter(r => getRowMeta(r).month === monthLabel);
+
+      const ops = inMonth(opsAll), ems = inMonth(emsAll), pnr = inMonth(pnrAll);
       const dv = pnr.filter(r => getRowMeta(r).status === 'Delivered');
       const pl = pnr.filter(r => getRowMeta(r).status === 'Planning');
       const part = ops.reduce((a, r) => a + partOf(r), 0);
       const units = ops.reduce((a, r) => a + unitsOf(r), 0);
+
       const tg = findTarget(auth.name);
-      let hrs = 0, monthLabel = '';
-      if (tg) {
-        let lk = -1;
-        pnr.forEach(r => { const m = getRowMeta(r); if (m.month && m.monthKey > lk) { lk = m.monthKey; monthLabel = m.month; } });
-        hrs = r1(dv.filter(r => getRowMeta(r).month === monthLabel).reduce((a, r) => a + getRowMeta(r).hours, 0));
-      }
-      const tgPct = tg && tg.hours ? Math.round(hrs / tg.hours * 100) : 0;
+      const hrs = r1(dv.reduce((a, r) => a + getRowMeta(r).hours, 0));
+      const pnrTarget = tg ? tg.hours : 0;
+
+      const opsPct = PERSONAL_OPS_TARGET ? Math.round(ops.length / PERSONAL_OPS_TARGET * 100) : null;
+      const emsPct = PERSONAL_EMS_TARGET ? Math.round(ems.length / PERSONAL_EMS_TARGET * 100) : null;
+      const pnrPct = pnrTarget ? Math.round(hrs / pnrTarget * 100) : null;
+
+      // Overall grade = rata-rata dari modul yang punya target
+      const pcts = [opsPct, emsPct, pnrPct].filter(p => p != null);
+      const overallPct = pcts.length ? Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length) : null;
+      const overall = gradeOf(overallPct);
+
       const recent = sortNewest([].concat(
-        ops.map(r => ({ r, t: 'OPS', m: getRowMeta(r) })),
-        ems.map(r => ({ r, t: 'EMS', m: getRowMeta(r) })),
-        pnr.map(r => ({ r, t: 'PNR', m: getRowMeta(r) }))
+        opsAll.map(r => ({ r, t: 'OPS', m: getRowMeta(r) })),
+        emsAll.map(r => ({ r, t: 'EMS', m: getRowMeta(r) })),
+        pnrAll.map(r => ({ r, t: 'PNR', m: getRowMeta(r) }))
       )).slice(0, 8);
 
       el.innerHTML = `
         <div class="panel-card sum-wrap">
-          <div class="muted" style="font-size:.85rem;margin-bottom:12px">Halo, <strong>${escapeHtml(auth.name)}</strong>${auth.store ? ' · ' + escapeHtml(auth.store) : ''}</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+            <div>
+              <div class="muted" style="font-size:.85rem">Halo, <strong style="color:var(--text-main)">${escapeHtml(auth.name)}</strong>${auth.store ? ' · ' + escapeHtml(auth.store) : ''}</div>
+              <div class="muted" style="font-size:.78rem;margin-top:2px">Periode: <strong style="color:var(--text-main)">${escapeHtml(monthLabel)}</strong></div>
+            </div>
+            <div style="text-align:center;padding:10px 18px;border-radius:16px;background:${overall.color}18;border:1px solid ${overall.color}44">
+              <div style="font-size:1.8rem;font-weight:800;color:${overall.color};line-height:1">${overall.letter}</div>
+              <div style="font-size:.72rem;font-weight:600;color:${overall.color};margin-top:2px">${overall.label}</div>
+              <div class="muted" style="font-size:.68rem;margin-top:2px">${overallPct != null ? overallPct + '% avg' : '–'}</div>
+            </div>
+          </div>
           <div class="kpi-grid">
-            ${kpiCard('Entry OPS', ops.length, part ? `${fmt(part)} peserta · ${fmt(units)} unit` : '')}
-            ${kpiCard('Entry EMS', ems.length)}
+            ${kpiCard('Entry OPS', ops.length, part ? `${fmt(part)} peserta · ${fmt(units)} unit` : `target ${PERSONAL_OPS_TARGET}/bulan`)}
+            ${kpiCard('Entry EMS', ems.length, `target ${PERSONAL_EMS_TARGET}/bulan`)}
             ${kpiCard('PNR Delivered', dv.length, pl.length ? `Planning ${pl.length}` : '')}
-            ${kpiCard('Hours Delivered', hrs, tg ? `Target ${r1(tg.hours)} jam (${tgPct}%)` : 'Target belum terbaca')}
+            ${kpiCard('Hours Delivered', hrs, pnrTarget ? `target ${r1(pnrTarget)} jam` : 'target belum terbaca')}
           </div>
         </div>
-        ${tg ? `<div class="panel-card sum-wrap">
-          <div class="sum-title">Progress Target PNR · ${escapeHtml(monthLabel || 'Bulan berjalan')}</div>
-          <div style="display:flex;align-items:center;gap:14px;margin-top:8px">
-            <div class="bar-track" style="flex:1;height:12px"><div class="bar-fill" style="width:${Math.min(100, tgPct)}%"></div></div>
-            <span class="pct ${tgPct >= 100 ? 'g' : tgPct >= 50 ? 'a' : 'r'}">${tgPct}%</span>
+
+        <div class="panel-card sum-wrap">
+          <div class="sum-title" style="margin-bottom:14px">Progress Target · ${escapeHtml(monthLabel)}</div>
+          ${progressBlock('OPS · Open Studio', ops.length, PERSONAL_OPS_TARGET, 'entry', part ? `${fmt(part)} peserta` : '')}
+          ${progressBlock('EMS · Education', ems.length, PERSONAL_EMS_TARGET, 'entry', '')}
+          ${progressBlock('PNR · Training & Roleplay', hrs, pnrTarget, 'jam', dv.length ? `${dv.length} delivered` : '')}
+          <div class="muted" style="font-size:.72rem;margin-top:4px">
+            Grade: <strong>A</strong> ≥100% · <strong>B</strong> 80–99% · <strong>C</strong> 60–79% · <strong>D</strong> 40–59% · <strong>E</strong> &lt;40%
+            ${!pnrTarget ? ' · Target PNR belum terbaca dari sheet.' : ''}
+            · Target OPS/EMS bersifat soft target pribadi (${PERSONAL_OPS_TARGET}/${PERSONAL_EMS_TARGET} entry per bulan).
           </div>
-          <div class="muted" style="font-size:.78rem;margin-top:6px">${hrs} / ${r1(tg.hours)} jam</div>
-        </div>` : ''}
+        </div>
+
         <div class="panel-card sum-wrap">
           <div class="sum-title">Aktivitas Terakhir</div>
           ${recent.length ? `<div class="table-container" style="max-height:none"><table><thead><tr><th>Tanggal</th><th>Modul</th><th>Store</th><th>Detail</th></tr></thead><tbody>
