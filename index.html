@@ -378,7 +378,7 @@
       <button class="tab-btn active" onclick="switchModule('ops',this)">Module OPS</button>
       <button class="tab-btn" onclick="switchModule('ems',this)">Module EMS</button>
       <button class="tab-btn" onclick="switchModule('pnr',this)">Module PNR</button>
-      <button class="tab-btn" onclick="switchModule('roster',this)">Store Trainer Roster</button>
+      <button class="tab-btn" onclick="switchModule('roster',this)">Store Trainer Profile</button>
       <button class="tab-btn" onclick="switchModule('all',this)">Summary</button>
       
       
@@ -921,7 +921,85 @@
       }));
     }
 
-    const STORE_TARGET = 85;
+    // Target OPS dinamis: Sen-Jum 3, Sab-Min 2 per hari. Target EMS: 2 per hari. Mengikuti kalender bulan berjalan / bulan filter.
+    function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
+    function calcOpsTarget(year, month) { // month 0-based
+      let t = 0;
+      const dim = daysInMonth(year, month);
+      for (let d = 1; d <= dim; d++) {
+        const wd = new Date(year, month, d).getDay(); // 0=Min, 6=Sab
+        t += (wd === 0 || wd === 6) ? 2 : 3;
+      }
+      return t;
+    }
+    function calcEmsTarget(year, month) {
+      return daysInMonth(year, month) * 2;
+    }
+    function getActiveMonthKey(type) {
+      const p = state.pages[type];
+      if (p.month && p.month !== 'all') {
+        const mi = MONTH_NAMES_ID.findIndex(n => p.month.toLowerCase().includes(n.toLowerCase()));
+        const y = (p.month.match(/\b(19|20)\d{2}\b/) || [])[0];
+        if (mi >= 0 && y) return { y: +y, m: mi, label: p.month };
+      }
+      const now = new Date();
+      return { y: now.getFullYear(), m: now.getMonth(), label: MONTH_NAMES_ID[now.getMonth()] + ' ' + now.getFullYear() };
+    }
+    function getStoreTarget(type) {
+      const mk = getActiveMonthKey(type);
+      if (type === 'ops') return calcOpsTarget(mk.y, mk.m);
+      if (type === 'ems') return calcEmsTarget(mk.y, mk.m);
+      return 0;
+    }
+    const STORE_TARGET = 85; // fallback lama, diganti dinamis di bawah
+    function renderTargetLine(type, data) {
+      const canvasId = type + 'LineChart';
+      if (chartInstances[canvasId]) { try { chartInstances[canvasId].destroy(); } catch(e) {} }
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const metas = data.map(getRowMeta);
+      const months = monthEntries(metas, true);
+      const labels = months.map(m => m[0]);
+      const actual = months.map(m => m[1]);
+      let targets = [];
+      if (type === 'ops' || type === 'ems') {
+        targets = labels.map(l => {
+          const mi = MONTH_NAMES_ID.findIndex(n => l.toLowerCase().includes(n.toLowerCase()));
+          const y = (l.match(/\b(19|20)\d{2}\b/) || [])[0];
+          if (mi < 0 || !y) return 0;
+          const perStore = type === 'ops' ? calcOpsTarget(+y, mi) : calcEmsTarget(+y, mi);
+          // Scope store
+          const p = state.pages[type];
+          let nStore = storeIndex.size;
+          if (p.trainerHO !== 'all') nStore = Array.from(storeIndex.values()).filter(s => s.ho === p.trainerHO).length;
+          if (p.store !== 'all') nStore = 1;
+          return perStore * nStore;
+        });
+      } else {
+        // PNR: sum of trainer targets (approx total hours)
+        let totalTargetHrs = 0;
+        pnrTargets.forEach(v => { totalTargetHrs += v.hours; });
+        targets = labels.map(() => totalTargetHrs);
+      }
+      const root = getComputedStyle(document.documentElement);
+      const tc = root.getPropertyValue('--text-main').trim(), mc = root.getPropertyValue('--text-muted').trim();
+      chartInstances[canvasId] = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Pencapaian', data: actual, borderColor: '#0a84ff', backgroundColor: 'rgba(10,132,255,.15)', fill: true, tension: .35, pointRadius: 4, borderWidth: 2.5 },
+            { label: 'Target', data: targets, borderColor: '#ff9f0a', borderDash: [6, 4], tension: .35, pointRadius: 3, borderWidth: 2 }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: { x: { ticks: { color: mc }, grid: { display: false } }, y: { beginAtZero: true, ticks: { color: mc, precision: 0 }, grid: { color: 'rgba(152,152,159,.15)' } } },
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, color: tc } } }
+        }
+      });
+    }
+
     function renderOPS() {
       const filteredData = getFilteredData('ops');
       
@@ -936,16 +1014,23 @@
       
       renderOpsStoreTable(filteredData);
       renderModuleSummary('ops', filteredData, [
-        ['Rata-rata Peserta / Sesi', filteredData.length ? (totalParticipants / filteredData.length).toFixed(1).replace('.', ',') : '0'],
-        ['Unit Terjual Setelah OPS / Peserta', totalParticipants ? (totalUnits / totalParticipants).toFixed(2).replace('.', ',') : '0']
+        ['Rata-rata Peserta Per Sesi', filteredData.length ? (totalParticipants / filteredData.length).toFixed(1) : '0'],
+        ['Unit Terjual Setelah OPS', totalParticipants ? (totalUnits / totalParticipants).toFixed(2) : '0']
       ]);
+      renderTargetLine('ops', filteredData);
       renderChart('opsChart', topicCounts, k => openModal({ title: `Topik ${k}`, sub: 'OPS', ...detailRows('ops', filteredData.filter(r => getTopics('ops', r, 'all').includes(k))) }));
       renderCompare('ops'); renderMatrix('ops');
     }
 
-    // Data Detail OPS: Store x slot 13:00 / 15:00 / 18:00, total, target 85 per store, % — klik store untuk detail
+    // Data Detail OPS: Store x slot + Target dinamis (Sen-Jum 3, Sab-Min 2) + indikator Good/Need Attention/Bad
+    function statusBadge(pct) {
+      if (pct >= 100) return { cls: 'g', label: 'Good · Keep it up' };
+      if (pct >= 50) return { cls: 'a', label: 'Need Attention' };
+      return { cls: 'r', label: 'Bad · Pls improve' };
+    }
     function renderOpsStoreTable(data) {
       const p = state.pages.ops;
+      const TARGET = getStoreTarget('ops');
       const blank = name => ({ name, s: { '13:00': 0, '15:00': 0, '18:00': 0 }, total: 0, rows: [] });
       const agg = new Map();
       data.forEach(r => {
@@ -955,40 +1040,120 @@
         if (m.slot) e.s[m.slot]++;
         e.total++; e.rows.push(r);
       });
-      if (!p.filter && p.store === 'all' && p.trainer === 'all' && p.trainerHO === 'all') storeIndex.forEach(v => { if (!agg.has(v.name)) agg.set(v.name, blank(v.name)); });
+      // Scope store mengikuti filter area
+      let scopeStores = Array.from(storeIndex.values());
+      if (p.trainerHO !== 'all') scopeStores = scopeStores.filter(s => s.ho === p.trainerHO);
+      if (p.store !== 'all') scopeStores = scopeStores.filter(s => norm(s.name) === norm(p.store));
+      if (!p.filter && p.store === 'all' && p.trainer === 'all') scopeStores.forEach(v => { if (!agg.has(v.name)) agg.set(v.name, blank(v.name)); });
       const list = Array.from(agg.values()).sort((a, b) => b.total - a.total || byName(a.name, b.name));
       const sum = list.reduce((a, e) => { a.t += e.total; ['13:00', '15:00', '18:00'].forEach(k => { a[k] += e.s[k]; }); return a; }, { t: 0, '13:00': 0, '15:00': 0, '18:00': 0 });
       const cls = v => v >= 100 ? 'g' : v >= 50 ? 'a' : 'r';
-      const pc = n => Math.round(n / STORE_TARGET * 100);
-      document.getElementById('opsThead').innerHTML = ['Store', '13:00', '15:00', '18:00', 'TOTAL', 'TARGET', '%'].map(h => `<th>${h}</th>`).join('');
-      const totTarget = STORE_TARGET * list.length, tp = totTarget ? Math.round(sum.t / totTarget * 100) : 0;
+      const pc = n => TARGET ? Math.round(n / TARGET * 100) : 0;
+      document.getElementById('opsThead').innerHTML = ['Store', '13:00', '15:00', '18:00', 'TOTAL', 'TARGET', '%', 'Status'].map(h => `<th>${h}</th>`).join('');
+      const totTarget = TARGET * list.length, tp = totTarget ? Math.round(sum.t / totTarget * 100) : 0;
       const rowsHtml = list.map(e => {
         const v = pc(e.total);
-        const dr = reg(() => ({ title: e.name, sub: `OPS ${fmt(e.total)} entry · target ${STORE_TARGET} (${v}%)`, ...detailRows('ops', e.rows) }));
-        return `<tr class="clickable" onclick="openDrill(${dr})"><td>${escapeHtml(e.name)}</td><td>${e.s['13:00']}</td><td>${e.s['15:00']}</td><td>${e.s['18:00']}</td><td><strong>${e.total}</strong></td><td>${STORE_TARGET}</td><td><span class="pct ${cls(v)}">${v}%</span><span class="pbar"><i style="width:${Math.min(100, v)}%"></i></span></td></tr>`;
+        const st = statusBadge(v);
+        const dr = reg(() => ({ title: e.name, sub: `OPS ${fmt(e.total)} entry · target ${TARGET} (${v}%) · ${st.label}`, ...detailRows('ops', e.rows) }));
+        return `<tr class="clickable" onclick="openDrill(${dr})"><td>${escapeHtml(e.name)}</td><td>${e.s['13:00']}</td><td>${e.s['15:00']}</td><td>${e.s['18:00']}</td><td><strong>${e.total}</strong></td><td>${TARGET}</td><td><span class="pct ${cls(v)}">${v}%</span><span class="pbar"><i style="width:${Math.min(100, v)}%"></i></span></td><td><span class="badge ${v >= 100 ? 'b-del' : v >= 50 ? 'b-plan' : 'b-man'}">${st.label}</span></td></tr>`;
       }).join('');
       document.getElementById('opsTbody').innerHTML = list.length
-        ? `<tr class="totrow"><td>Semua Store (${list.length})</td><td>${sum['13:00']}</td><td>${sum['15:00']}</td><td>${sum['18:00']}</td><td>${sum.t}</td><td>${fmt(totTarget)}</td><td><span class="pct ${cls(tp)}">${tp}%</span></td></tr>` + rowsHtml
-        : '<tr><td colspan="7" style="text-align:center;padding:24px">Data tidak ditemukan untuk kombinasi filter ini.</td></tr>';
-      document.getElementById('opsPagination').innerHTML = `<div>${list.length} store · target ${STORE_TARGET} entry per store${p.month === 'all' ? ' (pilih bulan agar % sesuai target bulanan)' : ''}</div><div>Klik store untuk melihat detail</div>`;
+        ? `<tr class="totrow"><td>Semua Store (${list.length})</td><td>${sum['13:00']}</td><td>${sum['15:00']}</td><td>${sum['18:00']}</td><td>${sum.t}</td><td>${fmt(totTarget)}</td><td><span class="pct ${cls(tp)}">${tp}%</span></td><td></td></tr>` + rowsHtml
+        : '<tr><td colspan="8" style="text-align:center;padding:24px">Data tidak ditemukan untuk kombinasi filter ini.</td></tr>';
+      const mk = getActiveMonthKey('ops');
+      document.getElementById('opsPagination').innerHTML = `<div>${list.length} store · target ${TARGET} entry/store (${mk.label}, Sen-Jum 3 · Sab-Min 2)</div><div>Klik store untuk melihat detail</div>`;
     }
 
     function renderEMS() {
       const d = getFilteredData('ems');
-      
-      renderTableWithPagination('ems', d);
+      renderEmsStoreTable(d);
       renderModuleSummary('ems', d);
+      renderTargetLine('ems', d);
       renderChart('emsChart', countTopics('ems', d), k => openModal({ title: `Topik ${k}`, sub: 'EMS', ...detailRows('ems', d.filter(r => getTopics('ems', r, 'all').includes(k))) }));
       renderCompare('ems'); renderMatrix('ems');
     }
 
+    function renderEmsStoreTable(data) {
+      const p = state.pages.ems;
+      const TARGET = getStoreTarget('ems');
+      const blank = name => ({ name, total: 0, rows: [] });
+      const agg = new Map();
+      data.forEach(r => {
+        const m = getRowMeta(r), k = m.store || '(Tanpa Store)';
+        let e = agg.get(k);
+        if (!e) { e = blank(k); agg.set(k, e); }
+        e.total++; e.rows.push(r);
+      });
+      let scopeStores = Array.from(storeIndex.values());
+      if (p.trainerHO !== 'all') scopeStores = scopeStores.filter(s => s.ho === p.trainerHO);
+      if (p.store !== 'all') scopeStores = scopeStores.filter(s => norm(s.name) === norm(p.store));
+      if (!p.filter && p.store === 'all' && p.trainer === 'all') scopeStores.forEach(v => { if (!agg.has(v.name)) agg.set(v.name, blank(v.name)); });
+      const list = Array.from(agg.values()).sort((a, b) => b.total - a.total || byName(a.name, b.name));
+      const sumT = list.reduce((a, e) => a + e.total, 0);
+      const cls = v => v >= 100 ? 'g' : v >= 50 ? 'a' : 'r';
+      const pc = n => TARGET ? Math.round(n / TARGET * 100) : 0;
+      document.getElementById('emsThead').innerHTML = ['Store', 'Aktual', 'TARGET', '%', 'Status'].map(h => `<th>${h}</th>`).join('');
+      const totTarget = TARGET * list.length, tp = totTarget ? Math.round(sumT / totTarget * 100) : 0;
+      const rowsHtml = list.map(e => {
+        const v = pc(e.total);
+        const st = statusBadge(v);
+        const dr = reg(() => ({ title: e.name, sub: `EMS ${fmt(e.total)} entry · target ${TARGET} (${v}%) · ${st.label}`, ...detailRows('ems', e.rows) }));
+        return `<tr class="clickable" onclick="openDrill(${dr})"><td>${escapeHtml(e.name)}</td><td><strong>${e.total}</strong></td><td>${TARGET}</td><td><span class="pct ${cls(v)}">${v}%</span><span class="pbar"><i style="width:${Math.min(100, v)}%"></i></span></td><td><span class="badge ${v >= 100 ? 'b-del' : v >= 50 ? 'b-plan' : 'b-man'}">${st.label}</span></td></tr>`;
+      }).join('');
+      document.getElementById('emsTbody').innerHTML = list.length
+        ? `<tr class="totrow"><td>Semua Store (${list.length})</td><td>${sumT}</td><td>${fmt(totTarget)}</td><td><span class="pct ${cls(tp)}">${tp}%</span></td><td></td></tr>` + rowsHtml
+        : '<tr><td colspan="5" style="text-align:center;padding:24px">Data tidak ditemukan untuk kombinasi filter ini.</td></tr>';
+      const mk = getActiveMonthKey('ems');
+      document.getElementById('emsPagination').innerHTML = `<div>${list.length} store · target ${TARGET} entry/store (${mk.label}, 2 aktivitas/hari)</div><div>Klik store untuk melihat detail</div>`;
+    }
+
     function renderPNR() {
       const d = getFilteredData('pnr');
-      
-      renderTableWithPagination('pnr', d);
+      renderPnrStoreTable(d);
       renderModuleSummary('pnr', d);
+      renderTargetLine('pnr', d);
       renderChart('pnrChart', countTopics('pnr', d), k => openModal({ title: `Topik ${k}`, sub: 'PNR', ...detailRows('pnr', d.filter(r => getTopics('pnr', r, topicMode).includes(k))) }));
-      renderCompare('pnr'); renderRekapPNR(); renderMatrix('pnr');
+      renderCompare('pnr'); renderMatrix('pnr');
+    }
+
+    function renderPnrStoreTable(data) {
+      const p = state.pages.pnr;
+      // Sort by status: Planning / Delivered / All (dari filter status atau chip)
+      const statusFilter = p.status || 'all';
+      const blank = name => ({ name, trainers: [], total: 0, hours: 0, target: 0, rows: [], delivered: 0, planning: 0 });
+      const agg = new Map();
+      data.forEach(r => {
+        const m = getRowMeta(r), k = m.store || '(Tanpa Store)';
+        let e = agg.get(k);
+        if (!e) { e = blank(k); const ix = storeIndex.get(norm(k)); if (ix) e.trainers = Array.from(ix.trainers); agg.set(k, e); }
+        e.total++; e.rows.push(r);
+        e.hours += m.hours || 0;
+        if (m.status === 'Delivered') e.delivered++;
+        if (m.status === 'Planning') e.planning++;
+      });
+      agg.forEach(e => {
+        e.trainers.forEach(t => { const f = findTarget(t); if (f) e.target += f.hours; });
+      });
+      let scopeStores = Array.from(storeIndex.values());
+      if (p.trainerHO !== 'all') scopeStores = scopeStores.filter(s => s.ho === p.trainerHO);
+      if (p.store !== 'all') scopeStores = scopeStores.filter(s => norm(s.name) === norm(p.store));
+      if (p.st && p.st !== 'all') scopeStores = scopeStores.filter(s => s.trainers.has(p.st));
+      if (!p.filter && p.store === 'all') scopeStores.forEach(v => { if (!agg.has(v.name)) { const e = blank(v.name); e.trainers = Array.from(v.trainers); e.trainers.forEach(t => { const f = findTarget(t); if (f) e.target += f.hours; }); agg.set(v.name, e); } });
+      const list = Array.from(agg.values()).sort((a, b) => b.total - a.total || byName(a.name, b.name));
+      const cls = v => v >= 100 ? 'g' : v >= 50 ? 'a' : 'r';
+      document.getElementById('pnrThead').innerHTML = ['Store', 'Store Trainer', 'Aktual Sesi', 'Hours', 'Min Target (jam)', '%', 'Status'].map(h => `<th>${h}</th>`).join('');
+      const sumT = list.reduce((a, e) => a + e.total, 0), sumH = list.reduce((a, e) => a + e.hours, 0), sumTg = list.reduce((a, e) => a + e.target, 0);
+      const rowsHtml = list.map(e => {
+        const v = e.target ? Math.round(e.hours / e.target * 100) : 0;
+        const st = statusBadge(v);
+        const dr = reg(() => ({ title: e.name, sub: `PNR ${fmt(e.total)} sesi · ${r1(e.hours)} jam / target ${r1(e.target)} jam (${v}%) · ${st.label}`, ...detailRows('pnr', e.rows) }));
+        return `<tr class="clickable" onclick="openDrill(${dr})"><td>${escapeHtml(e.name)}</td><td>${escapeHtml(e.trainers.join(', ') || '-')}</td><td><strong>${e.total}</strong></td><td>${r1(e.hours)}</td><td>${e.target ? r1(e.target) : '-'}</td><td><span class="pct ${cls(v)}">${v}%</span><span class="pbar"><i style="width:${Math.min(100, v)}%"></i></span></td><td><span class="badge ${v >= 100 ? 'b-del' : v >= 50 ? 'b-plan' : 'b-man'}">${st.label}</span></td></tr>`;
+      }).join('');
+      const tp = sumTg ? Math.round(sumH / sumTg * 100) : 0;
+      document.getElementById('pnrTbody').innerHTML = list.length
+        ? `<tr class="totrow"><td>Semua Store (${list.length})</td><td></td><td>${sumT}</td><td>${r1(sumH)}</td><td>${r1(sumTg)}</td><td><span class="pct ${cls(tp)}">${tp}%</span></td><td></td></tr>` + rowsHtml
+        : '<tr><td colspan="7" style="text-align:center;padding:24px">Data tidak ditemukan untuk kombinasi filter ini.</td></tr>';
+      document.getElementById('pnrPagination').innerHTML = `<div>${list.length} store · target dari sheet PNR (${pnrTargets.size} trainer terbaca)</div><div>Klik store untuk melihat detail · Sort status via filter</div>`;
     }
 
     function getAllHeaders(data) {
@@ -1232,8 +1397,10 @@
       ['ops', 'ems', 'pnr'].forEach(t => {
         state.pages[t].status = 'all'; state.pages[t].st = 'all';
         const sum = mk(`${t}-summary`, 'panel-card sum-wrap'), cmp = mk(`${t}-compare`, 'panel-card sum-wrap');
+        const lineChart = mk(`${t}-linechart`, 'panel-card sum-wrap');
+        lineChart.innerHTML = `<div class="muted" style="font-size:.8rem;margin-bottom:10px">Target vs Pencapaian · ${t.toUpperCase()}</div><div class="chart-wrap" style="height:260px;flex:none;min-height:0"><canvas id="${t}LineChart"></canvas></div>`;
         const kg0 = document.querySelector(`#panel-${t} .kpi-grid`); kg0.after(sum); kg0.remove();
-        sum.after(cmp);
+        sum.after(lineChart); lineChart.after(cmp);
         if (t !== 'ops') { // tabel + diagram Topik Terpopuler berdampingan
           const tp = document.querySelector(`#panel-${t} > .panel-card:not(.sum-wrap)`);
           const grid = document.createElement('div'); grid.className = 'content-grid';
@@ -1242,7 +1409,6 @@
           cp.innerHTML = `${chips ? `<div class="panel-header">${chips}</div>` : ''}<div class="chart-wrap"><canvas id="${t}Chart"></canvas></div>`;
           tp.before(grid); grid.append(tp, cp);
         }
-        if (t === 'pnr') document.getElementById('panel-pnr').appendChild(mk('pnr-rekap', 'panel-card sum-wrap'));
         document.getElementById(`panel-${t}`).appendChild(mk(`${t}-matrix`, 'panel-card sum-wrap'));
         const fb = mk(`${t}-filterbar`, 'panel-card filter-bar'); // semua sort by di paling atas tab
         const crow = document.querySelector(`#panel-${t} .controls-row`);
@@ -1251,19 +1417,27 @@
         fb.insertAdjacentHTML('beforeend', `<div class="export-row">${EXPORT_BTN(t)}${CS_BTN(t)}</div>`);
         document.getElementById(`panel-${t}`).prepend(fb);
       });
-      // urutan sort PNR: bulan, store, status, store trainer, staff
+      // urutan sort PNR: bulan, area, store, status, store trainer
       const row = document.querySelector('#panel-pnr .controls-row');
-      ['MonthFilter', 'TrainerHOFilter', 'StoreFilter', 'StFilter'].forEach(id => row.appendChild(document.getElementById('pnr' + id)));
-      document.getElementById('pnrStatusFilter').style.display = 'none';
-      document.getElementById('pnrTrainerFilter').style.display = 'none';
+      ['MonthFilter', 'TrainerHOFilter', 'StoreFilter', 'StatusFilter', 'StFilter'].forEach(id => {
+        const el = document.getElementById('pnr' + id);
+        if (el) row.appendChild(el);
+      });
+      const stf = document.getElementById('pnrTrainerFilter');
+      if (stf) stf.style.display = 'none';
+      // Pastikan status filter punya opsi
+      const statusEl = document.getElementById('pnrStatusFilter');
+      if (statusEl && !statusEl.options.length) {
+        statusEl.innerHTML = '<option value="all">📌 Semua Status</option><option value="Planning">Planning</option><option value="Delivered">Delivered</option>';
+      }
       ['all', 'roster'].forEach(id => document.querySelector('.app-shell').appendChild(mk(`panel-${id}`, 'module-panel')));
       ['ops', 'ems', 'pnr'].forEach(t => { // semua section di bawah filter: default collapsed
         const N = t.toUpperCase(), P = id => document.getElementById(id);
         csWrap(P(`${t}-summary`), `Summary ${N}`, t);
+        csWrap(P(`${t}-linechart`), `Grafik Target vs Pencapaian · ${N}`, t);
         csWrap(P(`${t}-compare`), 'Comparison LFL', t);
         const cells = Array.from(document.querySelector(`#panel-${t} .content-grid`).children);
         csWrap(cells[0], `Data Detail ${N}`, t); csWrap(cells[1], 'Topik Terpopuler', t);
-        if (t === 'pnr') csWrap(P('pnr-rekap'), 'Rekapitulasi PNR per Toko', t);
         csWrap(P(`${t}-matrix`), `Matriks Partisipasi ${t === 'pnr' ? 'Trainer' : 'Staff'} Bulanan · ${N}`, t);
       });
     }
@@ -1492,34 +1666,45 @@
       if (months.length > 1 && months[1][1]) { const d = Math.round((months[0][1] - months[1][1]) / months[1][1] * 100); trend = `${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% vs ${months[1][0]}`; }
       const topics = Object.entries(countTopics(type, data)).sort((a, b) => b[1] - a[1]);
       const who = isPNR ? 'Trainer' : type === 'ems' ? 'Participant' : 'Presenter';
+      const p = state.pages[type];
+      // Scope store mengikuti filter area
+      let scopeSize = storeIndex.size;
+      if (p.trainerHO !== 'all') {
+        scopeSize = Array.from(storeIndex.values()).filter(s => s.ho === p.trainerHO).length;
+      }
+      if (p.store !== 'all') scopeSize = 1;
+      const TARGET = !isPNR ? getStoreTarget(type) : 0;
       const kp = [
-        kpiCard('Store Aktif', stores.size, storeIndex.size ? `${pct(stores.size, storeIndex.size)} dari ${storeIndex.size} store` : '', () => listDetail('Store aktif', storeCnt, isPNR ? 0 : STORE_TARGET)),
+        kpiCard('Store Aktif', stores.size, scopeSize ? `${pct(stores.size, scopeSize)} dari ${scopeSize} store` : '', () => listDetail('Store aktif', storeCnt, isPNR ? 0 : TARGET)),
         kpiCard(`${who} Aktif`, staff.size, '', () => listDetail(`${who} aktif`, staffCnt)),
-        kpiCard('Bulan Berjalan', months.length ? months[0][1] : 0, months.length ? months[0][0] + (trend ? ' · ' + trend : '') : '', D(months.length ? months[0][0] : '-', by(m => months.length && m.month === months[0][0]))),
-        kpiCard('Rata-rata Entry / Store', stores.size ? num1(data.length / stores.size) : '0', '', () => listDetail('Entry per store', storeCnt)),
-        kpiCard(`Rata-rata Entry / ${who}`, staff.size ? num1(data.length / staff.size) : '0', '', () => listDetail(`Entry per ${who.toLowerCase()}`, staffCnt)),
-        
+        kpiCard('Entry di bulan ini', months.length ? months[0][1] : 0, months.length ? months[0][0] + (trend ? ' · ' + trend : '') : '', D(months.length ? months[0][0] : '-', by(m => months.length && m.month === months[0][0]))),
+        kpiCard(`Rata-rata Entry ${who}`, staff.size ? (data.length / staff.size).toFixed(1) : '0', '', () => listDetail(`Entry per ${who.toLowerCase()}`, staffCnt)),
       ];
       if (!isPNR) {
-        const scope = storeIndex.size || stores.size, hit = allStores.filter(e => e[1] >= STORE_TARGET).length;
-        kp.push(kpiCard(`Pencapaian Target ${STORE_TARGET}/store`, scope ? Math.round(data.length / (STORE_TARGET * scope) * 100) + '%' : '0%', `${hit} store ≥ ${STORE_TARGET}`, () => listDetail('Pencapaian per store', allStores, STORE_TARGET)));
+        const hit = allStores.filter(e => e[1] >= TARGET).length;
+        kp.push(kpiCard('Pencapaian Target Per Store', scopeSize && TARGET ? Math.round(data.length / (TARGET * scopeSize) * 100) + '%' : '0%', `${hit} store ≥ ${TARGET}`, () => listDetail('Pencapaian per store', allStores, TARGET)));
       } else {
         const dv = by(m => m.status === 'Delivered'), pl = by(m => m.status === 'Planning');
         const hrs = r1(dv.reduce((a, r) => a + getRowMeta(r).hours, 0));
         kp.push(kpiCard('Delivered', dv.length, pct(dv.length, data.length) + ' dari entry', D('Delivered', dv)), kpiCard('Planning', pl.length, pct(pl.length, data.length) + ' dari entry', D('Planning', pl)), kpiCard('Hours Delivered', hrs, 'total jam sesi delivered', D('Hours Delivered', dv)));
       }
       (extras || []).forEach(e => kp.push(kpiCard(e[0], e[1], '', D(e[0], data))));
-      const blocks = [
-        barList('Entry per Bulan', months, 6, k => D(`Entry ${k}`, by(m => m.month === k))()),
-        barList('Top 5 Store', storeCnt, 5, k => D(k, by(m => m.store === k))()),
-        barList('Bottom 5 Store', bottomStores, 5, k => D(k, by(m => m.store === k))()),
-        barList(`Top 5 ${who}`, staffCnt, 5, k => D(k, by(m => m.trainer === k))()),
-        staffBlock(type, data),
-        isPNR ? barList('Entry per Status', countBy(mm, m => m.status), 5, k => D(`Status ${k}`, by(m => m.status === k))())
-              : barList('Entry per Area', countBy(mm, m => m.ho), 5, k => D(`Area ${k}`, by(m => m.ho === k))()),
-        isPNR ? barList('Entry per Store Trainer', countBy(mm.flatMap(m => m.st), x => x), 5, k => D(`Store Trainer ${k}`, by(m => m.st.includes(k)))()) : '',
-        barList(isPNR ? 'Top Topik (Mandatory & Other)' : 'Top Topik', topics, 5, k => D(`Topik ${k}`, data.filter(r => getTopics(type, r, 'all').includes(k)))())
-      ];
+      // Auto-hide sections when specific filters are active
+      const hideMonthStore = (type === 'ops' || type === 'ems') && p.month !== 'all' && p.store !== 'all';
+      const hidePnr = type === 'pnr' && p.month !== 'all' && p.store !== 'all' && p.st && p.st !== 'all';
+      const blocks = [];
+      if (!hideMonthStore && !hidePnr) blocks.push(barList('Entry per Bulan', months, 6, k => D(`Entry ${k}`, by(m => m.month === k))()));
+      if (!hideMonthStore && !hidePnr) blocks.push(barList('Top Store', storeCnt, 5, k => D(k, by(m => m.store === k))()));
+      if (!hideMonthStore && !hidePnr) blocks.push(barList('Bottom Store', bottomStores, 5, k => D(k, by(m => m.store === k))()));
+      if (!hidePnr) blocks.push(barList(`Top ${who}`, staffCnt, 5, k => D(k, by(m => m.trainer === k))()));
+      blocks.push(staffBlock(type, data));
+      if (isPNR) {
+        blocks.push(barList('Entry per Status', countBy(mm, m => m.status), 5, k => D(`Status ${k}`, by(m => m.status === k))()));
+        if (!hidePnr) blocks.push(barList('Entry per Store Trainer', countBy(mm.flatMap(m => m.st), x => x), 5, k => D(`Store Trainer ${k}`, by(m => m.st.includes(k)))()));
+      } else if (!hideMonthStore) {
+        blocks.push(barList('Entry per Area', countBy(mm, m => m.ho), 5, k => D(`Area ${k}`, by(m => m.ho === k))()));
+      }
+      blocks.push(barList(isPNR ? 'Top Topik (Mandatory & Other)' : 'Top Topik', topics, 5, k => D(`Topik ${k}`, data.filter(r => getTopics(type, r, 'all').includes(k)))()));
       el.innerHTML = `<div class="kpi-grid">${kp.join('')}</div><div class="sum-cols">${blocks.join('')}</div>${zeroBlocks(type, data)}<div class="muted" style="font-size:.75rem;margin-top:10px">Klik kartu atau baris untuk melihat detailnya.</div>`;
     }
 
@@ -1811,17 +1996,24 @@
     }
 
     /* ---------- Summary keseluruhan ---------- */
-    let allMonth = 'all';
+    let allMonth = 'all', allArea = 'all', allStore = 'all';
     function renderAllSummary() {
       const host = document.getElementById('panel-all');
       if (!host) return;
       ['allTrend', 'allLine', 'allDay'].forEach(k => { if (chartInstances[k]) { chartInstances[k].destroy(); delete chartInstances[k]; } });
       const mods = ['ops', 'ems', 'pnr'];
       const per = mods.map(t => (state[t] || []).map(r => ({ t, r, m: getRowMeta(r), part: t === 'ops' ? partOf(r) : 0, units: t === 'ops' ? unitsOf(r) : 0 })));
-      const flat = [].concat(...per);
+      let flat = [].concat(...per);
       const monthLabels = monthEntries(flat.map(x => x.m)).map(e => e[0]);
       if (allMonth !== 'all' && !monthLabels.includes(allMonth)) allMonth = 'all';
-      const sel = allMonth === 'all' ? flat : flat.filter(x => x.m.month === allMonth);
+      if (allMonth !== 'all') flat = flat.filter(x => x.m.month === allMonth);
+      const areaLabels = Array.from(new Set(flat.map(x => x.m.ho).filter(Boolean))).sort(byName);
+      if (allArea !== 'all' && !areaLabels.includes(allArea)) allArea = 'all';
+      if (allArea !== 'all') flat = flat.filter(x => x.m.ho === allArea);
+      const storeLabels = Array.from(new Set(flat.map(x => x.m.store).filter(Boolean))).sort(byName);
+      if (allStore !== 'all' && !storeLabels.includes(allStore)) allStore = 'all';
+      if (allStore !== 'all') flat = flat.filter(x => x.m.store === allStore);
+      const sel = flat;
       const mix = (title, list) => () => mixedDetail(title, list);
       const stores = new Set(sel.map(x => x.m.store).filter(Boolean)), staff = new Set(sel.map(x => norm(x.m.trainer)).filter(Boolean));
       const part = sel.reduce((a, x) => a + x.part, 0), units = sel.reduce((a, x) => a + x.units, 0);
@@ -1850,10 +2042,20 @@
       const storeDr = stE.map(([k]) => mix(k, sel.filter(x => x.m.store === k)));
 
       host.innerHTML = `
-        <div class="panel-card filter-bar"><div class="controls-row"><select class="select-box" style="flex:none;min-width:200px" onchange="allMonth=this.value;renderAllSummary()">
+        <div class="panel-card filter-bar"><div class="controls-row">
+            <select class="select-box" style="flex:none;min-width:160px" onchange="allMonth=this.value;allArea='all';allStore='all';renderAllSummary()">
               <option value="all">📅 Semua Bulan</option>
               ${monthLabels.map(l => `<option value="${escapeHtml(l)}" ${l === allMonth ? 'selected' : ''}>${escapeHtml(l)}</option>`).join('')}
-            </select></div></div>
+            </select>
+            <select class="select-box" style="flex:none;min-width:160px" onchange="allArea=this.value;allStore='all';renderAllSummary()">
+              <option value="all">👔 Semua Area</option>
+              ${areaLabels.map(l => `<option value="${escapeHtml(l)}" ${l === allArea ? 'selected' : ''}>${escapeHtml(l)}</option>`).join('')}
+            </select>
+            <select class="select-box" style="flex:none;min-width:180px" onchange="allStore=this.value;renderAllSummary()">
+              <option value="all">🏪 Semua Store</option>
+              ${storeLabels.map(l => `<option value="${escapeHtml(l)}" ${l === allStore ? 'selected' : ''}>${escapeHtml(l)}</option>`).join('')}
+            </select>
+          </div></div>
         <div class="panel-card sum-wrap" data-title="Summary Keseluruhan">
           <div class="kpi-grid" style="margin-bottom:0">
             ${kpiCard('Total Entry', sel.length, '', mix('Semua entry', sel))}${kpiCard('Entry OPS', of('ops').length, '', mix('Entry OPS', of('ops')))}${kpiCard('Entry EMS', of('ems').length, '', mix('Entry EMS', of('ems')))}${kpiCard('Entry PNR', pnrRows.length, '', mix('Entry PNR', pnrRows))}
@@ -2004,7 +2206,6 @@
         secs.push({ title: 'Data Detail EMS', ...detailPlain('ems', getFilteredData('ems')) });
       } else if (tab === 'pnr') {
         secs.push({ title: 'Data Detail PNR', ...detailPlain('pnr', getFilteredData('pnr')) });
-        secs.push(domSection(document.querySelector('#pnr-rekap table'), 'Rekapitulasi PNR per Toko'));
       } else {
         document.querySelectorAll('#panel-all .table-container table').forEach(t => {
           const c = t.closest('.panel-card'), ttl = c && c.querySelector('.sum-title');
