@@ -366,6 +366,10 @@
     .ti{width:16px;height:16px;flex:none}
     .rapor-sel{display:flex;gap:8px;flex-wrap:wrap}
     .mod-card .ln strong{color:var(--text-main)}
+  
+    .rapor-grid{align-items:stretch}
+    .mod-card{display:flex;flex-direction:column}
+    .mod-card .prog{margin-top:auto;padding-top:12px}
   </style>
 </head>
 <body>
@@ -1981,12 +1985,8 @@
       selA.value = area;
       const seen = new Set();
       const list = trainerRecs.filter(r => { if (area !== 'all' && hoOf(r) !== area) return false; const k = norm(r.nama) + '|' + norm(r.store); if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => byName(a.nama, b.nama));
-      sel.innerHTML = list.map(r => `<option value="${esc(r.nama + '@@' + r.store)}">${esc(r.nama)} · ${esc(shortStore(r.store))} (${tc.get(norm(r.nama)) || 0})</option>`).join('');
-      sel.value = cur;
-      if ((sel.value !== cur || !sel.value) && list.length) { // default: store trainer pertama yang punya aktivitas (tidak kosong)
-        const f = list.find(r => tc.get(norm(r.nama))) || list[0];
-        sel.value = f.nama + '@@' + f.store;
-      }
+      sel.innerHTML = '<option value="">👤 Pilih Store Trainer</option>' + list.map(r => `<option value="${esc(r.nama + '@@' + r.store)}">${esc(r.nama)} · ${esc(shortStore(r.store))} (${tc.get(norm(r.nama)) || 0})</option>`).join('');
+      sel.value = cur; if (sel.value !== cur) sel.value = '';
     }
     // grading pencapaian: >=100% Good, 50-99% Lack, <50% Bad
     const GRADE = pc => pc === null ? '' : pc >= 100 ? '<span class="badge b-good">Good · Keep it up</span>' : pc >= 50 ? '<span class="badge b-mid">Lack · Need improvement</span>' : '<span class="badge b-bad">Bad · Need attention</span>';
@@ -2010,9 +2010,9 @@
       };
       const bar = (a, tg, unit, note) => {
         const pc = tg ? Math.round(a / tg * 100) : null;
-        return pc === null ? `<div class="ln">${note}: target belum terbaca</div>` : `<div class="ln">${note}: ${fmt(r1(a))} / ${fmt(r1(tg))} ${unit} · <strong>${pc}%</strong></div><div class="pbar" style="display:block;width:100%;margin:6px 0"><i style="width:${Math.min(100, pc)}%"></i></div>${GRADE(pc)}`;
+        return '<div class="prog">' + (pc === null ? `<div class="ln">${note}: target belum terbaca</div>` : `<div class="ln">${note}: ${fmt(r1(a))} / ${fmt(r1(tg))} ${unit} · <strong>${pc}%</strong></div><div class="pbar" style="display:block;width:100%;margin:6px 0"><i style="width:${Math.min(100, pc)}%"></i></div>${GRADE(pc)}`) + '</div>';
       };
-      const act = (t, rows, sub, lines, extra) => `<div class="mod-card" onclick="openDrill(${reg(() => ({ title: `${t.toUpperCase()} · ${rec.nama}`, sub: `${rows.length} entry · ${sub}`, ...detailRows(t, rows) }))})"><div class="kpi-title">${t.toUpperCase()}</div><div class="v">${fmt(rows.length)}</div><div class="muted" style="font-size:.72rem">${sub}</div>${lines.map(l => `<div class="ln">${l}</div>`).join('')}${extra}</div>`;
+      const act = (t, rows, sub, lines, extra) => `<div class="mod-card" onclick="openDrill(${reg(() => ({ title: `${t.toUpperCase()} · ${rec.nama}`, sub: `${rows.length} entry`, ...detailRows(t, rows) }))})"><div class="kpi-title">${t.toUpperCase()}</div><div class="v">${fmt(rows.length)}</div>${lines.map(l => `<div class="ln">${l}</div>`).join('')}${extra}</div>`;
       const monthsOf = rows => new Set(rows.map(r => getRowMeta(r).month).filter(Boolean)).size;
       const slotLine = rows => ['13:00', '15:00', '18:00'].map(k => `${k} · ${rows.filter(r => getRowMeta(r).slot === k).length}`).join('  |  ');
       const tOps = keysOf('ops').reduce((a, k) => a + monthTargetDays('ops', k), 0), tEms = keysOf('ems').reduce((a, k) => a + monthTargetDays('ems', k), 0);
