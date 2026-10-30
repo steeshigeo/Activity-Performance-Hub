@@ -1647,7 +1647,7 @@
       const act = new Set(data.map(r => getRowMeta(r).store).filter(Boolean));
       const stores = Array.from(storeIndex.values()).filter(s => !act.has(s.name) && (p.store === 'all' || norm(s.name) === norm(p.store)) && (p.trainerHO === 'all' || s.ho === p.trainerHO) && (!isPNR || !p.st || p.st === 'all' || s.trainers.has(p.st)));
       const { zero } = staffSplit(staffPool(type, p), data.map(r => getRowMeta(r).trainer));
-      return `<div class="sum-cols" style="margin-top:18px">${zeroBlock('Store Tanpa Aktivitas', stores, Z_STORE_HEADS, zStoreRow, 5)}${zeroBlock(isPNR ? 'Store Trainer Tanpa Aktivitas' : 'Staff Tanpa Aktivitas', zero, Z_STAFF_HEADS, zStaffRow, 5)}</div>`;
+      return `<div class="sum-cols" style="margin-top:18px">${zeroBlock('Store Tanpa Aktivitas', stores, Z_STORE_HEADS, zStoreRow, 5)}${!isPNR && p.trainer !== 'all' ? '' : zeroBlock(isPNR ? 'Store Trainer Tanpa Aktivitas' : 'Staff Tanpa Aktivitas', zero, Z_STAFF_HEADS, zStaffRow, 5)}</div>`;
     }
     function staffBlock(type, data) {
       const title = (type === 'pnr' ? 'Trainer' : 'Staff') + ' Paling Sedikit Aktivitas';
@@ -1695,15 +1695,15 @@
       }
       (extras || []).forEach(e => kp.push(kpiCard(e[0], e[1], '', D(e[0], data))));
       // blok yang tidak relevan disembunyikan otomatis saat filter spesifik dipilih
-      const mSel = p.month !== 'all', sSel = p.store !== 'all', aSel = p.trainerHO !== 'all', tSel = isPNR && p.st && p.st !== 'all';
+      const mSel = p.month !== 'all', sSel = p.store !== 'all', aSel = p.trainerHO !== 'all', tSel = isPNR && p.st && p.st !== 'all', pSel = !isPNR && p.trainer !== 'all';
       const blocks = [
         mSel ? '' : barList('Entry per Bulan', months, 6, k => D(`Entry ${k}`, by(m => m.month === k))()),
         sSel ? '' : barList('Top Store', storeCnt, 5, k => D(k, by(m => m.store === k))()),
         sSel ? '' : barList('Bottom Store', bottomStores, 5, k => D(k, by(m => m.store === k))()),
-        tSel || (isPNR && sSel) ? '' : barList(`Top ${who}`, staffCnt, 5, k => D(k, by(m => m.trainer === k))()),
-        isPNR && sSel ? '' : staffBlock(type, data),
+        tSel || pSel || (isPNR && sSel) ? '' : barList(`Top ${who}`, staffCnt, 5, k => D(k, by(m => m.trainer === k))()),
+        (isPNR && sSel) || pSel ? '' : staffBlock(type, data),
         isPNR ? barList('Entry per Status', countBy(mm, m => m.status), 5, k => D(`Status ${k}`, by(m => m.status === k))())
-              : (aSel || sSel ? '' : barList('Entry per Area', countBy(mm, m => m.ho), 5, k => D(`Area ${k}`, by(m => m.ho === k))())),
+              : (aSel || sSel || pSel ? '' : barList('Entry per Area', countBy(mm, m => m.ho), 5, k => D(`Area ${k}`, by(m => m.ho === k))())),
         isPNR && !tSel && !sSel ? barList('Entry per Store Trainer', countBy(mm.flatMap(m => m.st), x => x), 5, k => D(`Store Trainer ${k}`, by(m => m.st.includes(k)))()) : '',
         barList(isPNR ? 'Top Topik (Mandatory & Other)' : 'Top Topik', topics, 5, k => D(`Topik ${k}`, data.filter(r => getTopics(type, r, 'all').includes(k)))())
       ];
@@ -1888,7 +1888,7 @@
         host.innerHTML = `
           <div class="panel-card sum-wrap">
             <div class="panel-header"><div><div class="muted" style="font-size:.8rem">Pilih Store Trainer untuk melihat profil dan ringkasan OPS, EMS, PNR</div></div>
-              <div class="rapor-sel"><select id="raporAreaSel" class="select-box" onchange="fillRaporOptions();renderRapor()"></select><select id="raporSel" class="select-box" style="min-width:240px" onchange="renderRapor()"></select><select id="raporMonthSel" class="select-box" onchange="renderRapor()"></select></div></div>
+              <div class="rapor-sel"><select id="raporMonthSel" class="select-box" onchange="renderRapor()"></select><select id="raporAreaSel" class="select-box" onchange="fillRaporOptions();renderRapor()"></select><select id="raporSel" class="select-box" style="min-width:240px" onchange="renderRapor()"></select></div></div>
             <div id="raporBody"></div>
           </div>
           <div class="panel-card sum-wrap">
@@ -1966,8 +1966,14 @@
       selA.value = curA; if (selA.value !== curA) selA.value = 'all';
       const seen = new Set();
       const list = trainerRecs.filter(r => { if (selA.value !== 'all' && hoOf(r) !== selA.value) return false; const k = norm(r.nama) + '|' + norm(r.store); if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => byName(a.nama, b.nama));
-      sel.innerHTML = `<option value="">👤 Pilih Store Trainer (${list.length})</option>` + list.map(r => `<option value="${escapeHtml(r.nama + '@@' + r.store)}">${escapeHtml(r.nama)} · ${escapeHtml(r.store)}</option>`).join('');
-      sel.value = cur; if (sel.value !== cur) sel.value = '';
+      sel.innerHTML = list.map(r => `<option value="${escapeHtml(r.nama + '@@' + r.store)}">${escapeHtml(r.nama)} · ${escapeHtml(r.store)}</option>`).join('');
+      sel.value = cur;
+      if ((sel.value !== cur || !sel.value) && list.length) { // default: trainer pertama yang punya aktivitas (tidak kosong)
+        const act = new Set();
+        ['ops', 'ems', 'pnr'].forEach(t => (state[t] || []).forEach(r => { const k = norm(getRowMeta(r).trainer); if (k) act.add(k); }));
+        const f = list.find(r => act.has(norm(r.nama))) || list[0];
+        sel.value = f.nama + '@@' + f.store;
+      }
       const months = new Map();
       ['ops', 'ems', 'pnr'].forEach(t => (state[t] || []).forEach(r => { const m = getRowMeta(r); if (m.month) months.set(m.month, m.monthKey); }));
       selM.innerHTML = '<option value="all">📅 Semua Bulan</option>' + Array.from(months.entries()).sort((a, b) => b[1] - a[1]).map(([l]) => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
