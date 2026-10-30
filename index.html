@@ -479,7 +479,7 @@
 
     let recapMasterData = [];
     const rowType = new WeakMap();
-    let metaCache = new WeakMap(), recapByEmail = new Map(), recapByName = new Map(), resolveCache = new Map(), storeCores = [], storeByCode = new Map(), trainerRecs = [], pnrTargets = new Map(), trLabelCache = new Map();   // [{store, nama, email, position, trainerHO}]
+    let metaCache = new WeakMap(), recapByEmail = new Map(), recapByName = new Map(), resolveCache = new Map(), storeCores = [], storeByCode = new Map(), trainerRecs = [], pnrTargets = new Map(), trLabelCache = new Map(), staffCache = new Map(), staffList = [];   // [{store, nama, email, position, trainerHO}]
     let storeIndex = new Map(); // norm(store) -> {name, ho}
     let state = {
       ops: [], ems: [], pnr: [], activeModule: 'ops',
@@ -532,7 +532,7 @@
 
     /* ---------- Data master (sheet Recap) ---------- */
     function buildStoreIndex() {
-      metaCache = new WeakMap(); recapByEmail = new Map(); recapByName = new Map(); resolveCache = new Map(); trLabelCache = new Map();
+      metaCache = new WeakMap(); recapByEmail = new Map(); recapByName = new Map(); resolveCache = new Map(); trLabelCache = new Map(); staffCache = new Map(); staffList = [];
       storeIndex = new Map(); storeCores = []; storeByCode = new Map(); trainerRecs = [];
       recapMasterData.forEach(r => {
         const k = norm(r.store);
@@ -556,6 +556,13 @@
         const st = r.storeTrainer || (isTr ? r.nama : '');
         if (st && st !== '0') cur.trainers.add(st);
         if (isTr && r.nama) trainerRecs.push(r);
+      });
+      const seenS = new Set();
+      recapMasterData.forEach(r => {
+        if (!r.nama || r.nama === '0' || !r.store) return;
+        const st = (storeIndex.get(norm(r.store)) || {}).name || r.store, k = norm(r.nama) + '|' + norm(st);
+        if (seenS.has(k)) return;
+        seenS.add(k); staffList.push({ nama: r.nama, store: st, tokens: tokensOf(r.nama) });
       });
     }
 
@@ -722,6 +729,55 @@
       return sm.every(t => lg.includes(t)) && (sm.length >= 2 || sm[0].length >= 4);
     }
     // Slot sesi Open Studio (13:00 / 15:00 / 18:00): dari kolom jam sesi, jika tidak ada dari jam pengisian form
+    // Pemadanan nama: nama di data OPS/EMS/PNR yang mirip / terkandung di sheet Recap otomatis diganti nama lengkap dari Recap
+    function nameScore(ta, tb) {
+      let total = 0;
+      for (const a of ta) {
+        let best = 0;
+        for (const b of tb) {
+          let sc = 0;
+          if (a === b) sc = 3;
+          else if (a.length >= 3 && b.startsWith(a)) sc = 2;
+          else if (a.length >= 4 && b.includes(a)) sc = 1.5;
+          else if (a.length >= 5 && b.length >= 5 && lev(a, b) <= 1) sc = 1;
+          if (sc > best) best = sc;
+        }
+        if (!best) return 0;
+        total += best;
+      }
+      return total;
+    }
+    function resolveStaff(raw, store) {
+      const s0 = String(raw == null ? '' : raw).trim();
+      if (!s0) return '';
+      const key = norm(s0) + '|' + norm(store);
+      if (staffCache.has(key)) return staffCache.get(key);
+      let out = s0;
+      const exact = recapByName.get(norm(s0));
+      if (exact && exact.nama) out = exact.nama;
+      else {
+        const ta = tokensOf(s0), scored = [];
+        if (ta.length) staffList.forEach(x => {
+          let sc = nameScore(ta, x.tokens);
+          if (!sc && x.tokens.length >= 2 && ta.length >= 2) sc = nameScore(x.tokens, ta) * 0.9; // nama di data lebih panjang dari Recap
+          if (sc > 0) scored.push({ x, sc });
+        });
+        const pick = list => {
+          if (!list.length) return null;
+          const top = Math.max.apply(null, list.map(e => e.sc)), best = list.filter(e => e.sc === top);
+          return new Set(best.map(e => norm(e.x.nama))).size === 1 ? best[0].x.nama : null;
+        };
+        const same = store ? scored.filter(e => norm(e.x.store) === norm(store)) : [];
+        out = pick(same) || pick(scored) || s0;
+      }
+      staffCache.set(key, out);
+      return out;
+    }
+    function canonNames(str, store) { // satu atau beberapa nama (dipisah koma / dan / &)
+      const s0 = String(str == null ? '' : str).trim();
+      if (!s0) return '';
+      return s0.split(/[,;\n]+|\s+dan\s+|\s*&\s*/i).map(x => x.trim()).filter(Boolean).map(x => resolveStaff(x, store)).join(', ');
+    }
     function participantName(row) { // EMS: nama staff diambil dari kolom participant name
       const keys = Object.keys(row), ok = k => row[k] != null && !['', '-', '0'].includes(String(row[k]).trim());
       let k = keys.find(k => /participant/i.test(k) && /name|nama/i.test(k) && ok(k));
@@ -741,6 +797,7 @@
     function _calcMeta(row) {
       const isEms = rowType.get(row) === 'ems';
       let store = getRowStore(row) || '', trainer = (isEms ? participantName(row) : getRowTrainer(row)) || '', rec = null;
+      trainer = canonNames(trainer, store);
       if (!store || !trainer) { // lengkapi lewat email / nama staff di sheet Recap
         const em = getFlexibleValue(row, ['email', 'e-mail']);
         rec = (em && recapByEmail.get(norm(em))) || (trainer && recapByName.get(norm(trainer))) || null;
@@ -1146,7 +1203,7 @@
         return (tag ? `<span class="badge ${tag === 'Mandatory' ? 'b-man' : 'b-oth'}">${tag}</span> ` : '') + escapeHtml(t || '-');
       } },
       { h: 'Status', html: true, f: r => { const s = getRowMeta(r).status; return s ? `<span class="badge ${s === 'Delivered' ? 'b-del' : 'b-plan'}">${escapeHtml(s)}</span>` : '-'; } },
-      { h: 'Participant name', f: r => inclKey(r, 'participant') },
+      { h: 'Participant name', f: r => canonNames(inclKey(r, 'participant'), getRowMeta(r).store) },
       { h: 'Any Comment', f: r => inclKey(r, 'comment') }
     ];
     // Format Indonesia seperti di Google Sheet: dd/mm/yyyy HH:mm:ss (zona WIB)
@@ -1190,6 +1247,7 @@
         if (type === 'ops' && h === 'Tanggal Sesi') return;                     // OPS: tanggal sesi dihapus
         if (h === 'Waktu Input' || /timestamp/i.test(k)) cols.push({ h: 'Waktu Input', f: r => fmtStamp(r[k]) });
         else if (type === 'ems' && (h === 'Tanggal Sesi' || ['date', 'tanggal'].includes(norm(k)))) cols.push({ h: 'Date', f: r => emsDate(r, k) });
+        else if (h === 'Presenter' || h === 'Store Trainer' || (/participant|nama peserta/i.test(k) && !/total|jumlah|count|number|qty|berapa/i.test(k))) cols.push({ h, f: r => canonNames(r[k], getRowMeta(r).store) });
         else cols.push({ h, f: r => r[k] });
       });
       return cols;
