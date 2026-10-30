@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-10-30T16:04:31.999Z",
+  "last_updated": "2026-10-30T20:56:10.776Z",
   "sheets": {
     "ops": [
       {
@@ -94335,6 +94335,21 @@
         "Report Photo": "",
         "Unit yang terjual setelah Open Studio": 0,
         "Produk apa yang pelanggan minati": "-",
+        "Bulan": "Oktober 2026",
+        "Date": "30 Oktober 2026"
+      },
+      {
+        "Timestamp": "2026-10-30T16:43:10.000Z",
+        "Email": "dirgadigimap1@gmail.com",
+        "Presenter Name\nFill in your full name": "Dirga Agustira",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-10-29T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 1,
+        "Store": "M228 Digimap Citimall Cianjur 2",
+        "Open Studio Topics": "Preview App",
+        "Sessions": "18:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "iPhone",
         "Bulan": "Oktober 2026",
         "Date": "30 Oktober 2026"
       },
