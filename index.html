@@ -1957,29 +1957,38 @@
 
     /* ---------- Rapor Trainer ---------- */
     function fillRaporOptions() {
-      const selA = document.getElementById('raporAreaSel'), sel = document.getElementById('raporSel'), selM = document.getElementById('raporMonthSel');
+      const selM = document.getElementById('raporMonthSel'), selA = document.getElementById('raporAreaSel'), sel = document.getElementById('raporSel');
       if (!sel || !selA || !selM) return;
-      const curA = selA.value, cur = sel.value, curM = selM.value;
+      const curM = selM.value, curA = selA.value, cur = sel.value;
+      const esc = escapeHtml, items = [];
+      ['ops', 'ems', 'pnr'].forEach(t => (state[t] || []).forEach(r => items.push(getRowMeta(r))));
       const hoOf = r => { const ix = storeIndex.get(norm(r.store)); return ix ? ix.ho : ''; };
-      const areas = Array.from(new Set(trainerRecs.map(hoOf).filter(Boolean))).sort(byName);
-      selA.innerHTML = '<option value="all">👔 Semua Area</option>' + areas.map(a => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('');
-      selA.value = curA; if (!selA.value) selA.value = 'all';
+      // seperti sort by di module PNR: pilihan memuat seluruh data Recap + jumlah entry; Area -> Bulan -> Store Trainer saling menyesuaikan
+      const hos = Array.from(new Set(Array.from(storeIndex.values()).map(x => x.ho).filter(Boolean))).sort(byName);
+      const area = hos.includes(curA) ? curA : 'all', inArea = m => area === 'all' || m.ho === area;
+      const mm = new Map();
+      items.forEach(m => { if (!m.month || !inArea(m)) return; const e = mm.get(m.month) || { k: m.monthKey, n: 0 }; e.n++; mm.set(m.month, e); });
+      const month = curM !== 'all' && mm.has(curM) ? curM : 'all', inMonth = m => month === 'all' || m.month === month;
+      const ac = new Map(), tc = new Map();
+      items.forEach(m => {
+        if (m.ho && inMonth(m)) ac.set(m.ho, (ac.get(m.ho) || 0) + 1);
+        const k = norm(m.trainer); if (k && inMonth(m) && inArea(m)) tc.set(k, (tc.get(k) || 0) + 1);
+      });
+      const total = items.filter(m => inArea(m) && m.month).length;
+      selM.innerHTML = `<option value="all">📅 Semua Bulan (${total})</option>` + Array.from(mm.entries()).sort((a, b) => b[1].k - a[1].k).map(([l, e]) => `<option value="${esc(l)}">${esc(l)} (${e.n})</option>`).join('');
+      selM.value = month;
+      selA.innerHTML = '<option value="all">👔 Semua Area</option>' + hos.map(a => `<option value="${esc(a)}">${esc(a)} (${ac.get(a) || 0})</option>`).join('');
+      selA.value = area;
       const seen = new Set();
-      const list = trainerRecs.filter(r => { if (selA.value !== 'all' && hoOf(r) !== selA.value) return false; const k = norm(r.nama) + '|' + norm(r.store); if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => byName(a.nama, b.nama));
-      sel.innerHTML = list.map(r => `<option value="${escapeHtml(r.nama + '@@' + r.store)}">${escapeHtml(r.nama)} · ${escapeHtml(r.store)}</option>`).join('');
+      const list = trainerRecs.filter(r => { if (area !== 'all' && hoOf(r) !== area) return false; const k = norm(r.nama) + '|' + norm(r.store); if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => byName(a.nama, b.nama));
+      sel.innerHTML = list.map(r => `<option value="${esc(r.nama + '@@' + r.store)}">${esc(r.nama)} · ${esc(shortStore(r.store))} (${tc.get(norm(r.nama)) || 0})</option>`).join('');
       sel.value = cur;
-      if ((sel.value !== cur || !sel.value) && list.length) { // default: trainer pertama yang punya aktivitas (tidak kosong)
-        const act = new Set();
-        ['ops', 'ems', 'pnr'].forEach(t => (state[t] || []).forEach(r => { const k = norm(getRowMeta(r).trainer); if (k) act.add(k); }));
-        const f = list.find(r => act.has(norm(r.nama))) || list[0];
+      if ((sel.value !== cur || !sel.value) && list.length) { // default: store trainer pertama yang punya aktivitas (tidak kosong)
+        const f = list.find(r => tc.get(norm(r.nama))) || list[0];
         sel.value = f.nama + '@@' + f.store;
       }
-      const months = new Map();
-      ['ops', 'ems', 'pnr'].forEach(t => (state[t] || []).forEach(r => { const m = getRowMeta(r); if (m.month) months.set(m.month, m.monthKey); }));
-      selM.innerHTML = '<option value="all">📅 Semua Bulan</option>' + Array.from(months.entries()).sort((a, b) => b[1] - a[1]).map(([l]) => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
-      selM.value = curM; if (!selM.value) selM.value = 'all';
     }
-    // grading pencapaian trainer: >=100% Good, 50-99% Lack, <50% Bad
+    // grading pencapaian: >=100% Good, 50-99% Lack, <50% Bad
     const GRADE = pc => pc === null ? '' : pc >= 100 ? '<span class="badge b-good">Good · Keep it up</span>' : pc >= 50 ? '<span class="badge b-mid">Lack · Need improvement</span>' : '<span class="badge b-bad">Bad · Need attention</span>';
     function renderRapor() {
       const sel = document.getElementById('raporSel'), body = document.getElementById('raporBody');
@@ -1989,9 +1998,10 @@
       if (!rec) { body.innerHTML = '<div class="muted">Pilih nama Store Trainer untuk menampilkan rapor.</div>'; return; }
       const idx = storeIndex.get(norm(rec.store));
       const mOk = r => rm === 'all' || getRowMeta(r).month === rm;
+      // OPS & EMS = data store trainer tersebut di Data Detail OPS / EMS (per store); PNR = aktivitas trainer itu sendiri
+      const storeRows = t => (state[t] || []).filter(r => norm(getRowMeta(r).store) === norm(rec.store) && mOk(r));
+      const mine = { ops: storeRows('ops'), ems: storeRows('ems'), pnr: (state.pnr || []).filter(r => sameName(getRowMeta(r).trainer, rec.nama) && mOk(r)) };
       const prof = [['Store', rec.store], ['Type Store', rec.type || '-'], ['NIK', rec.nik || '-'], ['Work Experience', rec.exp && rec.exp !== 'Empty' ? rec.exp : '-'], ['Total Employee', idx ? idx.employees : '-']];
-      const mine = {};
-      ['ops', 'ems', 'pnr'].forEach(t => { mine[t] = (state[t] || []).filter(r => sameName(getRowMeta(r).trainer, rec.nama) && mOk(r)); });
       const keysOf = t => {
         if (rm !== 'all') { const k = monthKeyFromLabel(rm); return k ? [k] : []; }
         const ks = new Set(); (state[t] || []).forEach(r => { const k = getRowMeta(r).monthKey; if (k) ks.add(k); });
@@ -2002,11 +2012,11 @@
         const pc = tg ? Math.round(a / tg * 100) : null;
         return pc === null ? `<div class="ln">${note}: target belum terbaca</div>` : `<div class="ln">${note}: ${fmt(r1(a))} / ${fmt(r1(tg))} ${unit} · <strong>${pc}%</strong></div><div class="pbar" style="display:block;width:100%;margin:6px 0"><i style="width:${Math.min(100, pc)}%"></i></div>${GRADE(pc)}`;
       };
-      const act = (t, rows, lines, extra) => `<div class="mod-card" onclick="openDrill(${reg(() => ({ title: `${t.toUpperCase()} · ${rec.nama}`, sub: `${rows.length} entry`, ...detailRows(t, rows) }))})"><div class="kpi-title">${t.toUpperCase()}</div><div class="v">${fmt(rows.length)}</div><div class="muted" style="font-size:.72rem">entry trainer</div>${lines.map(l => `<div class="ln">${l}</div>`).join('')}${extra}</div>`;
+      const act = (t, rows, sub, lines, extra) => `<div class="mod-card" onclick="openDrill(${reg(() => ({ title: `${t.toUpperCase()} · ${rec.nama}`, sub: `${rows.length} entry · ${sub}`, ...detailRows(t, rows) }))})"><div class="kpi-title">${t.toUpperCase()}</div><div class="v">${fmt(rows.length)}</div><div class="muted" style="font-size:.72rem">${sub}</div>${lines.map(l => `<div class="ln">${l}</div>`).join('')}${extra}</div>`;
       const monthsOf = rows => new Set(rows.map(r => getRowMeta(r).month).filter(Boolean)).size;
-      const storeN = t => (state[t] || []).filter(r => norm(getRowMeta(r).store) === norm(rec.store) && mOk(r)).length;
+      const slotLine = rows => ['13:00', '15:00', '18:00'].map(k => `${k} · ${rows.filter(r => getRowMeta(r).slot === k).length}`).join('  |  ');
       const tOps = keysOf('ops').reduce((a, k) => a + monthTargetDays('ops', k), 0), tEms = keysOf('ems').reduce((a, k) => a + monthTargetDays('ems', k), 0);
-      const ops = mine.ops, pnr = mine.pnr;
+      const ops = mine.ops, ems = mine.ems, pnr = mine.pnr;
       const dv = pnr.filter(r => getRowMeta(r).status === 'Delivered'), pl = pnr.filter(r => getRowMeta(r).status === 'Planning');
       const dvH = r1(dv.reduce((a, r) => a + getRowMeta(r).hours, 0)), tg = findTarget(rec.nama);
       const tPnr = tg ? tg.hours * keysOf('pnr').length : 0;
@@ -2014,8 +2024,8 @@
       ['ops', 'ems', 'pnr'].forEach(t => mine[t].forEach(r => { const m = getRowMeta(r); if (!m.month) return; const e = mt.get(m.month) || { k: m.monthKey, ops: 0, ems: 0, pnr: 0 }; e[t]++; mt.set(m.month, e); }));
       const mrows = Array.from(mt.entries()).sort((a, b) => b[1].k - a[1].k).map(([l, e]) => [escapeHtml(l), e.ops, e.ems, e.pnr, `<strong>${e.ops + e.ems + e.pnr}</strong>`]);
       body.innerHTML = `<div class="rapor-grid">${prof.map(([l, v]) => `<div class="cap"><div class="l">${l}</div><div class="v" style="font-size:${String(v).length > 14 ? '1rem' : '1.4rem'}">${escapeHtml(v)}</div></div>`).join('')}</div>
-        <div class="sum-title">Pencapaian Aktivitas · ${escapeHtml(rec.nama)}${rm === 'all' ? '' : ' · ' + escapeHtml(rm)} <span class="muted" style="text-transform:none">(klik kartu untuk detail)</span></div>
-        <div class="rapor-grid">${act('ops', ops, [`${fmt(ops.reduce((a, r) => a + partOf(r), 0))} peserta · ${fmt(ops.reduce((a, r) => a + unitsOf(r), 0))} unit terjual`, `${monthsOf(ops)} bulan aktif`], bar(storeN('ops'), tOps, 'sesi', 'Target store'))}${act('ems', mine.ems, [`${monthsOf(mine.ems)} bulan aktif`], bar(storeN('ems'), tEms, 'sesi', 'Target store'))}${act('pnr', pnr, [`Delivered ${dv.length} · Planning ${pl.length}`], bar(dvH, tPnr, 'jam', 'Target trainer (Delivered)'))}</div>
+        <div class="sum-title">Pencapaian Aktivitas · ${escapeHtml(rec.nama)}${rm === 'all' ? '' : ' · ' + escapeHtml(rm)} <span class="muted" style="text-transform:none">(OPS &amp; EMS = data store ${escapeHtml(shortStore(rec.store))} seperti di Data Detail · klik kartu untuk detail)</span></div>
+        <div class="rapor-grid">${act('ops', ops, 'entry store (Data Detail OPS)', [`${fmt(ops.reduce((a, r) => a + partOf(r), 0))} peserta · ${fmt(ops.reduce((a, r) => a + unitsOf(r), 0))} unit terjual`, slotLine(ops), `${monthsOf(ops)} bulan aktif`], bar(ops.length, tOps, 'sesi', 'Target store'))}${act('ems', ems, 'entry store (Data Detail EMS)', [`${monthsOf(ems)} bulan aktif`], bar(ems.length, tEms, 'sesi', 'Target store'))}${act('pnr', pnr, 'entry trainer', [`Delivered ${dv.length} · Planning ${pl.length}`], bar(dvH, tPnr, 'jam', 'Target trainer (Delivered)'))}</div>
         <div class="sum-title">Entry per Bulan</div>${miniTable(['Bulan', 'OPS', 'EMS', 'PNR', 'Total'], mrows, 260)}`;
     }
 
