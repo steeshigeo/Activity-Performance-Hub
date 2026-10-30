@@ -1963,7 +1963,7 @@
       const hoOf = r => { const ix = storeIndex.get(norm(r.store)); return ix ? ix.ho : ''; };
       const areas = Array.from(new Set(trainerRecs.map(hoOf).filter(Boolean))).sort(byName);
       selA.innerHTML = '<option value="all">👔 Semua Area</option>' + areas.map(a => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('');
-      selA.value = curA; if (selA.value !== curA) selA.value = 'all';
+      selA.value = curA; if (!selA.value) selA.value = 'all';
       const seen = new Set();
       const list = trainerRecs.filter(r => { if (selA.value !== 'all' && hoOf(r) !== selA.value) return false; const k = norm(r.nama) + '|' + norm(r.store); if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => byName(a.nama, b.nama));
       sel.innerHTML = list.map(r => `<option value="${escapeHtml(r.nama + '@@' + r.store)}">${escapeHtml(r.nama)} · ${escapeHtml(r.store)}</option>`).join('');
@@ -1977,7 +1977,7 @@
       const months = new Map();
       ['ops', 'ems', 'pnr'].forEach(t => (state[t] || []).forEach(r => { const m = getRowMeta(r); if (m.month) months.set(m.month, m.monthKey); }));
       selM.innerHTML = '<option value="all">📅 Semua Bulan</option>' + Array.from(months.entries()).sort((a, b) => b[1] - a[1]).map(([l]) => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
-      selM.value = curM; if (selM.value !== curM) selM.value = 'all';
+      selM.value = curM; if (!selM.value) selM.value = 'all';
     }
     // grading pencapaian trainer: >=100% Good, 50-99% Lack, <50% Bad
     const GRADE = pc => pc === null ? '' : pc >= 100 ? '<span class="badge b-good">Good · Keep it up</span>' : pc >= 50 ? '<span class="badge b-mid">Lack · Need improvement</span>' : '<span class="badge b-bad">Bad · Need attention</span>';
