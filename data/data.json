@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-10-31T00:13:53.152Z",
+  "last_updated": "2026-10-31T06:00:01.114Z",
   "sheets": {
     "ops": [
       {
@@ -94352,6 +94352,36 @@
         "Produk apa yang pelanggan minati": "iPhone",
         "Bulan": "Oktober 2026",
         "Date": "30 Oktober 2026"
+      },
+      {
+        "Timestamp": "2026-10-31T05:49:03.000Z",
+        "Email": "ayuditha.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Putu Ayu Ditha Novi Cahyani",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-10-30T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 0,
+        "Store": "M134 Digimap Beachwalk Bali",
+        "Open Studio Topics": "Preview App",
+        "Sessions": "13:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 1,
+        "Produk apa yang pelanggan minati": "iPad",
+        "Bulan": "Oktober 2026",
+        "Date": "31 Oktober 2026"
+      },
+      {
+        "Timestamp": "2026-10-31T05:54:43.000Z",
+        "Email": "key.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Kessy Safitri",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-10-30T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 0,
+        "Store": "M225 Digimap Citimall Dumai",
+        "Open Studio Topics": "Find My on Apple Watch",
+        "Sessions": "13:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "iPhone",
+        "Bulan": "Oktober 2026",
+        "Date": "31 Oktober 2026"
       },
       {
         "Timestamp": "",
@@ -210106,6 +210136,66 @@
         "Date": 30,
         "Score": 80,
         "Any Comment": "Terus tingkatkan kepercayaan diri, penguasaan produk, dan kemampuan menggali kebutuhan customer. Jangan hanya berfokus menjelaskan spesifikasi, tetapi tonjolkan manfaat dan solusi yang bisa diberikan MacBook Air M5 sehingga customer semakin yakin untuk melakukan pembelian"
+      },
+      {
+        "Timestamp": "2026-10-31T03:13:37.000Z",
+        "Store": "M225 Digimap Citimall Dumai",
+        "Trainer Name": "Martina Gladys Sianturi ",
+        "Participants name": "Iqbal Firnandes ",
+        "Participants Sales Coach": "Iqbalfirnandes.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "October",
+        "Date": 30,
+        "Score": 70,
+        "Any Comment": "Lebih aware dalam mengajukan pertanyaan agar tidak los customer"
+      },
+      {
+        "Timestamp": "2026-10-31T03:15:00.000Z",
+        "Store": "M225 Digimap Citimall Dumai",
+        "Trainer Name": "Martina Gladys Sianturi ",
+        "Participants name": "Fajri Salam",
+        "Participants Sales Coach": "fajrisalam.digimap@gmail.com",
+        "Topic": "Demo Aksesoris",
+        "Month": "October",
+        "Date": 31,
+        "Score": 90,
+        "Any Comment": "Good selalu menawarkan dengan solusi terbaik dan menanyakan kebutuhan customer secara natural dan nyaman"
+      },
+      {
+        "Timestamp": "2026-10-31T03:15:38.000Z",
+        "Store": "M120 Digimap Sun Plaza Medan",
+        "Trainer Name": "Nanda Syahra Nasution",
+        "Participants name": "Dwiki indrawan lubis",
+        "Participants Sales Coach": "dwikiindlubis.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "October",
+        "Date": 31,
+        "Score": 90,
+        "Any Comment": "Memberikan demo macbook dengan baik dengan staff lainnya"
+      },
+      {
+        "Timestamp": "2026-10-31T03:18:46.000Z",
+        "Store": "M223 Digimap Roxy Square Jember",
+        "Trainer Name": "Atha Albarru Dewantara",
+        "Participants name": "Andi Wicaksono",
+        "Participants Sales Coach": "andii.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "October",
+        "Date": 31,
+        "Score": 100,
+        "Any Comment": "Penyampaian dan oengetahuan produk sudah bagus"
+      },
+      {
+        "Timestamp": "2026-10-31T03:19:59.000Z",
+        "Store": "M223 Digimap Roxy Square Jember",
+        "Trainer Name": "Atha Albarru Dewantara",
+        "Participants name": "Andi Wicaksono",
+        "Participants Sales Coach": "andii.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "October",
+        "Date": 31,
+        "Score": 100,
+        "Any Comment": "Produk knowladge sangat bagus"
       }
     ],
     "pnr": [
@@ -408352,25 +408442,25 @@
         "Target PnR": ""
       },
       {
-        "Timestamp": "",
-        "Year": "",
-        "Location of training": "",
-        "Trainer Name": "",
-        "Participants name": "",
-        "Total Employee": "",
-        "Modules": "",
+        "Timestamp": "2026-10-31T03:16:50.000Z",
+        "Year": 2026,
+        "Location of training": "M225 Digimap Citimall Dumai",
+        "Trainer Name": "Martina Gladys Sianturi",
+        "Participants name": "Fajri Salam",
+        "Total Employee": 6,
+        "Modules": "Other",
         "Mandatory": "",
-        "Other": "",
-        "Type of Training\n(Classroom/VILT/In-Store Coaching/Online)": "",
-        "Total Session": "",
-        "Total Staff Trained": "",
-        "Month": "",
-        "Date": "",
-        "Status": "",
-        "Pre-Session quiz score (AVERAGE)": "",
-        "Post-Session quiz score (AVERAGE)": "",
-        "Any Comment": "",
-        "Hours": 0,
+        "Other": "Roleplay Try On Mac",
+        "Type of Training\n(Classroom/VILT/In-Store Coaching/Online)": "In-Store Coaching",
+        "Total Session": 0.5,
+        "Total Staff Trained": 2,
+        "Month": "October",
+        "Date": 31,
+        "Status": "Planning",
+        "Pre-Session quiz score (AVERAGE)": "None",
+        "Post-Session quiz score (AVERAGE)": "None",
+        "Any Comment": "Plan",
+        "Hours": 1.5,
         "Target PnR": ""
       },
       {
@@ -410548,7 +410638,7 @@
         "Pre-Session quiz score (AVERAGE)": "",
         "Post-Session quiz score (AVERAGE)": "",
         "Any Comment": "",
-        "Hours": "",
+        "Hours": 0,
         "Target PnR": ""
       },
       {
