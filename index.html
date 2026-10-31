@@ -370,13 +370,89 @@
     .rapor-grid{align-items:stretch}
     .mod-card{display:flex;flex-direction:column}
     .mod-card .prog{margin-top:auto;padding-top:12px}
+
+    /* ---------- Login ---------- */
+    body.locked{overflow:hidden}
+    body.locked .app-shell{display:none}
+    #loginOv{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:var(--bg-gradient);overflow:auto}
+    body.locked #loginOv{display:flex}
+    #loginOv:before,#loginOv:after{content:"";position:absolute;width:46vmax;height:46vmax;border-radius:50%;filter:blur(90px);opacity:.35;pointer-events:none}
+    #loginOv:before{background:#0a84ff;top:-18vmax;left:-14vmax}
+    #loginOv:after{background:#bf5af2;bottom:-20vmax;right:-14vmax}
+    .lg-card{position:relative;z-index:1;width:100%;max-width:400px;padding:34px 28px 26px;border-radius:28px;background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:blur(28px) saturate(1.6);-webkit-backdrop-filter:blur(28px) saturate(1.6);box-shadow:0 30px 70px rgba(0,0,0,.35);text-align:center}
+    .lg-logo{width:72px;height:72px;margin:0 auto 18px;border-radius:18px;background:linear-gradient(145deg,#0a84ff,#5e5ce6);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(10,132,255,.45)}
+    .lg-card h2{font-size:1.45rem;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+    .lg-card .lg-sub{font-size:.85rem;color:var(--text-muted);margin-bottom:22px;line-height:1.45}
+    .lg-group{border-radius:14px;border:1px solid var(--glass-border);background:var(--input-bg);overflow:hidden;text-align:left}
+    .lg-row{position:relative;display:flex;align-items:center;gap:10px;padding:0 14px;min-height:50px}
+    .lg-row+.lg-row{border-top:1px solid var(--glass-border)}
+    .lg-row label{font-size:.78rem;color:var(--text-muted);font-weight:600;min-width:74px}
+    .lg-row select,.lg-row input{flex:1;min-width:0;height:50px;border:none;outline:none;background:transparent;color:var(--text-main);font-size:.95rem;font-family:inherit;-webkit-appearance:none;appearance:none}
+    .lg-row select{cursor:pointer;padding-right:18px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right center}
+    .lg-row select option{background:var(--opt-bg);color:var(--text-main)}
+    .lg-row.hide{display:none}
+    .lg-go{flex:none;width:34px;height:34px;border-radius:50%;border:none;background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s,opacity .15s}
+    .lg-go:hover{transform:scale(1.08)}.lg-go:disabled{opacity:.4;cursor:default;transform:none}
+    .lg-err{min-height:20px;margin:12px 0 2px;font-size:.8rem;color:#ff453a;font-weight:500}
+    .lg-note{font-size:.72rem;color:var(--text-muted);margin-top:8px;line-height:1.5}
+    .lg-remember{display:flex;align-items:center;justify-content:center;gap:8px;font-size:.78rem;color:var(--text-muted);margin-top:14px;cursor:pointer}
+    .lg-remember input{accent-color:var(--accent);width:16px;height:16px}
+    .lg-card.shake{animation:lgshake .4s}
+    @keyframes lgshake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+    .lg-user{display:none;font-size:.78rem;color:var(--text-muted);align-items:center;gap:6px;padding:6px 12px;border-radius:99px;border:1px solid var(--glass-border);background:rgba(255,255,255,.05);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+    body.authed .lg-user{display:inline-flex}
+    body.role-trainer .btn-export,body.role-trainer #ghRunBtn{display:none!important}
+    @media(max-width:600px){.lg-user{display:none!important}.lg-card{padding:28px 20px 22px;border-radius:24px}}
+
+    /* ---------- Peer comparison ---------- */
+    .peer-wrap{margin:18px 0 6px}
+    .peer-scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+    .peer-total{grid-column:1/-1;border-radius:18px;padding:16px 18px;border:1px solid var(--glass-border);background:linear-gradient(135deg,rgba(10,132,255,.18),rgba(94,92,230,.14))}
+    .peer-total .t{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+    .peer-total .big{font-size:2rem;font-weight:800;letter-spacing:-.02em}
+    .peer-total .rk{font-size:.85rem;color:var(--text-muted)}
+    .peer-card{border-radius:16px;padding:14px;border:1px solid var(--glass-border);background:var(--card-bg)}
+    .peer-card .k{font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px}
+    .peer-card .v{font-size:1.5rem;font-weight:800;margin:2px 0}
+    .peer-card .ln{font-size:.76rem;color:var(--text-muted);margin-top:4px;line-height:1.4}
+    .peer-bar{height:8px;border-radius:99px;background:var(--input-bg);overflow:hidden;margin:8px 0}
+    .peer-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#0a84ff,#64d2ff)}
+    .peer-lb{border-radius:16px;border:1px solid var(--glass-border);background:var(--card-bg);padding:12px 14px}
+    .peer-lb .row{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid var(--glass-border)}
+    .peer-lb .row:last-of-type{border-bottom:none}
+    .peer-lb .rn{width:34px;font-weight:800;text-align:center;font-size:1.05rem}
+    .peer-lb .nm{flex:1;min-width:0}.peer-lb .nm b{display:block;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .peer-lb .nm span{font-size:.74rem;color:var(--text-muted)}
+    .peer-lb .pc{font-weight:800;font-size:.95rem}
+    .peer-lb .row.me{background:rgba(10,132,255,.14);border-radius:12px;border-bottom-color:transparent}
+    .peer-lb .gap{text-align:center;color:var(--text-muted);letter-spacing:4px;font-size:.8rem;line-height:1}
+    .peer-more{display:block;width:100%;margin-top:8px;padding:10px;border-radius:12px;border:1px solid var(--glass-border);background:transparent;color:var(--accent);font-weight:600;font-size:.85rem;cursor:pointer}
+    .peer-more:hover{background:var(--accent);color:#fff}
+    .peer-chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
   </style>
 </head>
-<body>
+<body class="locked">
+  <div id="loginOv" role="dialog" aria-modal="true" aria-label="Login">
+    <div class="lg-card" id="lgCard">
+      <div class="lg-logo"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+      <h2>Activity Performance Hub</h2>
+      <div class="lg-sub">Masuk untuk melihat OPS, EMS &amp; PNR.</div>
+      <div class="lg-group">
+        <div class="lg-row"><label for="lgRole">Login as</label><select id="lgRole" onchange="lgChange()"><option value="trainer">Store Trainer</option><option value="ho">Trainer HO</option></select></div>
+        <div class="lg-row" id="lgAreaRow"><label for="lgArea">Area</label><select id="lgArea" onchange="lgFillTrainers()"></select></div>
+        <div class="lg-row" id="lgNameRow"><label for="lgName">Trainer</label><select id="lgName"></select></div>
+        <div class="lg-row"><label for="lgPass" id="lgPassLbl">NIK</label><input id="lgPass" type="password" autocomplete="off" placeholder="Password" onkeydown="if(event.key==='Enter')lgSubmit()"><button class="lg-go" id="lgGo" onclick="lgSubmit()" aria-label="Masuk"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+      </div>
+      <div class="lg-err" id="lgErr"></div>
+      <label class="lg-remember"><input type="checkbox" id="lgRem" checked> Ingat saya di perangkat ini</label>
+      <div class="lg-note" id="lgNote">Password Store Trainer adalah NIK masing-masing.</div>
+    </div>
+  </div>
   <div class="app-shell">
     <header>
       <div class="brand"><h1>Activity Performance Hub</h1><p>OPS EMS PNR</p></div>
       <div class="header-actions">
+        <span class="lg-user" id="lgUser"></span>
         <div id="cloudStatusPill" class="status-pill loading"><span>Memuat data…</span></div>
         <div class="settings-wrap">
           <button class="btn-theme" id="settingsBtn" aria-label="Pengaturan" title="Pengaturan" onclick="toggleSettings(event)"><i class="fill"></i><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
@@ -459,7 +535,7 @@
     </div>
   </div>
 
-  <div class="modal-ov" id="settingsOv" onclick="if(event.target===this)closeSettings()"><div class="pop"><div class="pop-h"><div class="modal-t">Pengaturan</div><button class="btn-theme" onclick="closeSettings()" aria-label="Tutup">✕</button></div><div class="muted" style="font-size:.8rem;margin-bottom:6px">Muat ulang data dashboard atau jalankan update data dari GitHub.</div><button class="btn-primary" id="manualSyncBtn"><i class="fill"></i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg><span class="lbl">Refresh</span></button><button class="btn-run" id="ghRunBtn" onclick="runGithubAction()" title="Jalankan GitHub Action sync-data.yml"><i class="fill"></i><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Run Sync</span></button></div></div>
+  <div class="modal-ov" id="settingsOv" onclick="if(event.target===this)closeSettings()"><div class="pop"><div class="pop-h"><div class="modal-t">Pengaturan</div><button class="btn-theme" onclick="closeSettings()" aria-label="Tutup">✕</button></div><div class="muted" style="font-size:.8rem;margin-bottom:6px">Muat ulang data dashboard atau jalankan update data dari GitHub.</div><button class="btn-primary" id="manualSyncBtn"><i class="fill"></i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg><span class="lbl">Refresh</span></button><button class="btn-run" id="ghRunBtn" onclick="runGithubAction()" title="Jalankan GitHub Action sync-data.yml"><i class="fill"></i><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Run Sync</span></button><button class="btn-run" style="background:rgba(255,69,58,.15);color:#ff453a;border:1px solid rgba(255,69,58,.35)" onclick="lgLogout()">Keluar (Logout)</button></div></div>
   <div class="modal-ov" id="modalOv" onclick="if(event.target===this)closeModal()">
     <div class="modal">
       <div class="modal-h"><div><div class="modal-t" id="modalT"></div><div class="muted" id="modalS" style="font-size:.82rem;margin-top:2px"></div></div><button class="btn-theme" onclick="closeModal()" aria-label="Tutup">✕</button></div>
@@ -615,6 +691,7 @@
         try { recapMasterData = JSON.parse(localStorage.getItem('recap_cache') || '[]'); } catch (e) { recapMasterData = []; }
       }
       buildStoreIndex();
+      try { loginRefresh(); } catch (e) {}
     }
 
     /* ---------- Metadata per baris aktivitas ---------- */
@@ -1990,6 +2067,79 @@
     }
     // grading pencapaian: >=100% Good, 50-99% Lack, <50% Bad
     const GRADE = pc => pc === null ? '' : pc >= 100 ? '<span class="badge b-good">Good · Keep it up</span>' : pc >= 50 ? '<span class="badge b-mid">Lack · Need improvement</span>' : '<span class="badge b-bad">Bad · Need attention</span>';
+
+    /* ---------- Posisi vs trainer lain ---------- */
+    const PEER_W = { ops: 30, ems: 30, pnr: 40 };   // bobot skor gabungan (%); jika PNR tidak punya target, bobot dibagi ulang
+    let peerGroup = 'all', peerMetric = 'total';
+    function setPeerGroup(g) { peerGroup = g; renderRapor(); }
+    function setPeerMetric(m) { peerMetric = m; renderRapor(); }
+    function peerKeys(t, rm) {
+      if (rm !== 'all') { const k = monthKeyFromLabel(rm); return k ? [k] : []; }
+      const ks = new Set(); (state[t] || []).forEach(r => { const k = getRowMeta(r).monthKey; if (k) ks.add(k); });
+      if (!ks.size) { const n = new Date(); ks.add(n.getFullYear() * 100 + n.getMonth()); }
+      return Array.from(ks);
+    }
+    function peerScores(rm) {
+      const mOk = r => rm === 'all' || getRowMeta(r).month === rm;
+      const cnt = { ops: new Map(), ems: new Map() };
+      ['ops', 'ems'].forEach(t => (state[t] || []).forEach(r => { if (!mOk(r)) return; const k = norm(getRowMeta(r).store); cnt[t].set(k, (cnt[t].get(k) || 0) + 1); }));
+      const ph = new Map();
+      (state.pnr || []).forEach(r => { const m = getRowMeta(r); if (m.status !== 'Delivered' || !mOk(r)) return; const k = norm(m.trainer); if (k) ph.set(k, (ph.get(k) || 0) + (m.hours || 0)); });
+      const tOps = peerKeys('ops', rm).reduce((a, k) => a + monthTargetDays('ops', k), 0), tEms = peerKeys('ems', rm).reduce((a, k) => a + monthTargetDays('ems', k), 0), nP = peerKeys('pnr', rm).length;
+      const seen = new Set(), out = [];
+      trainerRecs.forEach(rec => {
+        const key = norm(rec.nama) + '|' + norm(rec.store);
+        if (!rec.nama || seen.has(key)) return; seen.add(key);
+        const ops = tOps ? (cnt.ops.get(norm(rec.store)) || 0) / tOps * 100 : null, ems = tEms ? (cnt.ems.get(norm(rec.store)) || 0) / tEms * 100 : null;
+        let h = ph.get(norm(rec.nama)) || 0;
+        if (!h) ph.forEach((v, k) => { if (!h && sameName(k, rec.nama)) h = v; });
+        const tg = findTarget(rec.nama), pnr = tg && tg.hours && nP ? h / (tg.hours * nP) * 100 : null;
+        const sc = { ops, ems, pnr };
+        let wsum = 0, tot = 0, raw = 0;
+        Object.keys(PEER_W).forEach(t => { if (sc[t] === null) return; wsum += PEER_W[t]; tot += PEER_W[t] * Math.min(100, sc[t]); raw += PEER_W[t] * sc[t]; });
+        out.push({ key, rec, area: lgAreaOf(rec), type: rec.type || '', ops, ems, pnr, total: wsum ? tot / wsum : null, raw: wsum ? raw / wsum : 0 });
+      });
+      return out;
+    }
+    function peerRank(list, m) { // peringkat kompetisi (nilai sama = peringkat sama)
+      const v = list.filter(x => x[m] !== null).sort((a, b) => (b[m] - a[m]) || (b.raw - a.raw));
+      const rk = new Map(); let last = null, lr = 0;
+      v.forEach((x, i) => { if (last === null || Math.abs(x[m] - last) > 1e-9) { lr = i + 1; last = x[m]; } rk.set(x.key, lr); });
+      return { sorted: v, rk, n: v.length };
+    }
+    function peerHtml(rec, rm) {
+      const all = peerScores(rm), me = all.find(x => x.key === norm(rec.nama) + '|' + norm(rec.store));
+      if (!me) return '';
+      const grpName = { all: 'Semua Trainer', area: me.area ? 'Area ' + me.area : 'Area', type: me.type ? 'Type ' + me.type : 'Type Store' };
+      if (peerGroup === 'area' && !me.area) peerGroup = 'all';
+      if (peerGroup === 'type' && !me.type) peerGroup = 'all';
+      const pool = all.filter(x => peerGroup === 'all' || (peerGroup === 'area' ? x.area === me.area : x.type === me.type));
+      const R = { total: peerRank(pool, 'total'), ops: peerRank(pool, 'ops'), ems: peerRank(pool, 'ems'), pnr: peerRank(pool, 'pnr') };
+      const P = v => v === null ? '-' : Math.round(v) + '%';
+      const avg = m => { const v = pool.filter(x => x[m] !== null); return v.length ? v.reduce((a, x) => a + x[m], 0) / v.length : null; };
+      const card = (m, label) => {
+        const r = R[m], rk = r.rk.get(me.key), v = me[m];
+        if (v === null || !rk) return `<div class="peer-card"><div class="k">${label}</div><div class="v">-</div><div class="ln">Target belum terbaca</div></div>`;
+        const below = r.sorted.filter(x => x[m] < v - 1e-9).length, up = r.n > 1 ? Math.round(below / (r.n - 1) * 100) : null;
+        return `<div class="peer-card"><div class="k">${label}</div><div class="v">${P(v)}</div><div class="peer-bar"><i style="width:${Math.min(100, v)}%"></i></div>${GRADE(Math.round(v))}<div class="ln">Peringkat <b>#${rk}</b> dari ${r.n}${up === null ? '' : ` · lebih baik dari ${up}% trainer`}<br>Rata-rata ${escapeHtml(grpName[peerGroup])}: ${P(avg(m))}</div></div>`;
+      };
+      const tr = R.total, trk = tr.rk.get(me.key);
+      const nextUp = tr.sorted.find(x => x.total > me.total + 1e-9 && tr.rk.get(x.key) < trk);
+      const total = `<div class="peer-total"><div class="t"><div><div class="k" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px">Skor Gabungan · OPS ${PEER_W.ops}% + EMS ${PEER_W.ems}% + PNR ${PEER_W.pnr}%</div><div class="big">${P(me.total)}</div></div><div class="rk">${trk ? `Peringkat <b>#${trk}</b> dari ${tr.n} · ${escapeHtml(grpName[peerGroup])}` : ''}</div></div><div class="peer-bar" style="height:12px"><i style="width:${Math.min(100, me.total || 0)}%"></i></div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">${me.total === null ? '' : GRADE(Math.round(me.total))}<span class="rk">${nextUp ? `Selisih ke peringkat berikutnya: ${r1(nextUp.total - me.total)} poin` : (trk === 1 ? 'Kamu di posisi teratas 🎉' : '')}</span></div></div>`;
+      const meTag = AUTH && AUTH.role === 'trainer' ? ' (kamu)' : ' (dipilih)';
+      const lbMetric = peerMetric, L = R[lbMetric], myRk = L.rk.get(me.key);
+      const lbRow = (x, me2) => { const rk = L.rk.get(x.key); return `<div class="row${me2 ? ' me' : ''}"><div class="rn">${rk === 1 ? '🥇' : rk === 2 ? '🥈' : rk === 3 ? '🥉' : '#' + rk}</div><div class="nm"><b>${escapeHtml(x.rec.nama)}${me2 ? meTag : ''}</b><span>${escapeHtml(shortStore(x.rec.store))}${x.area ? ' · ' + escapeHtml(x.area) : ''}</span></div><div class="pc">${P(x[lbMetric])}</div></div>`; };
+      const top = L.sorted.filter(x => L.rk.get(x.key) <= 3).slice(0, 3);
+      const meIn = top.some(x => x.key === me.key);
+      const lb = `<div class="peer-lb">${top.map(x => lbRow(x, x.key === me.key)).join('') || '<div class="muted">Belum ada data.</div>'}${!meIn && myRk ? `<div class="gap">···</div>${lbRow(me, true)}` : ''}${L.n > 3 ? `<button class="peer-more" onclick="openDrill(${reg(() => ({ title: 'Peringkat Store Trainer · ' + ({ total: 'Skor Gabungan', ops: 'OPS', ems: 'EMS', pnr: 'PNR' })[lbMetric], sub: `${L.n} trainer · ${grpName[peerGroup]}${rm === 'all' ? '' : ' · ' + rm}`, heads: ['#', 'Store Trainer', 'Store', 'Area', lbMetric === 'total' ? 'Skor' : lbMetric.toUpperCase()], rows: L.sorted.map(x => { const b = x.key === me.key, w = c => b ? `<strong>${c}</strong>` : c; return [w(L.rk.get(x.key)), w(escapeHtml(x.rec.nama) + (b ? meTag : '')), escapeHtml(shortStore(x.rec.store)), escapeHtml(x.area || '-'), w(P(x[lbMetric]))]; }) }))})">Lihat semua posisi (${L.n} trainer) ›</button>` : ''}</div>`;
+      const chip = (fn, cur, k, label) => `<button class="chip${cur === k ? ' active' : ''}" onclick="${fn}('${k}')">${label}</button>`;
+      return `<div class="peer-wrap"><div class="sum-title">Posisi vs Trainer Lain · ${escapeHtml(rec.nama)}${rm === 'all' ? '' : ' · ' + escapeHtml(rm)}</div>
+        <div class="peer-chips">${chip('setPeerGroup', peerGroup, 'all', '👥 Semua Trainer')}${me.area ? chip('setPeerGroup', peerGroup, 'area', '👔 Area ' + escapeHtml(me.area)) : ''}${me.type ? chip('setPeerGroup', peerGroup, 'type', '🏬 Type ' + escapeHtml(me.type)) : ''}</div>
+        <div class="peer-scores">${total}${card('ops', 'OPS')}${card('ems', 'EMS')}${card('pnr', 'PNR')}</div>
+        <div class="peer-chips">${chip('setPeerMetric', peerMetric, 'total', 'Gabungan')}${chip('setPeerMetric', peerMetric, 'ops', 'OPS')}${chip('setPeerMetric', peerMetric, 'ems', 'EMS')}${chip('setPeerMetric', peerMetric, 'pnr', 'PNR')}</div>
+        ${lb}
+        <div class="muted" style="font-size:.72rem;margin-top:8px">Dibandingkan dalam persentase pencapaian target, bukan jumlah mentah. OPS &amp; EMS = pencapaian store; PNR = jam Delivered pribadi vs target. Skor gabungan membatasi tiap komponen maksimal 100%.</div></div>`;
+    }
     function renderRapor() {
       const sel = document.getElementById('raporSel'), body = document.getElementById('raporBody');
       if (!sel || !body) return;
@@ -2001,7 +2151,7 @@
       // OPS & EMS = data store trainer tersebut di Data Detail OPS / EMS (per store); PNR = aktivitas trainer itu sendiri
       const storeRows = t => (state[t] || []).filter(r => norm(getRowMeta(r).store) === norm(rec.store) && mOk(r));
       const mine = { ops: storeRows('ops'), ems: storeRows('ems'), pnr: (state.pnr || []).filter(r => sameName(getRowMeta(r).trainer, rec.nama) && mOk(r)) };
-      const prof = [['Store', rec.store], ['Type Store', rec.type || '-'], ['NIK', rec.nik || '-'], ['Work Experience', rec.exp && rec.exp !== 'Empty' ? rec.exp : '-'], ['Total Employee', idx ? idx.employees : '-']];
+      const prof = [['Store', rec.store], ['Type Store', rec.type || '-'], ['NIK', (!AUTH || AUTH.role === 'ho' || sameName(rec.nama, AUTH.name)) ? (rec.nik || '-') : '••••••'], ['Work Experience', rec.exp && rec.exp !== 'Empty' ? rec.exp : '-'], ['Total Employee', idx ? idx.employees : '-']];
       const keysOf = t => {
         if (rm !== 'all') { const k = monthKeyFromLabel(rm); return k ? [k] : []; }
         const ks = new Set(); (state[t] || []).forEach(r => { const k = getRowMeta(r).monthKey; if (k) ks.add(k); });
@@ -2026,6 +2176,7 @@
       body.innerHTML = `<div class="rapor-grid">${prof.map(([l, v]) => `<div class="cap"><div class="l">${l}</div><div class="v" style="font-size:${String(v).length > 14 ? '1rem' : '1.4rem'}">${escapeHtml(v)}</div></div>`).join('')}</div>
         <div class="sum-title">Pencapaian Aktivitas · ${escapeHtml(rec.nama)}${rm === 'all' ? '' : ' · ' + escapeHtml(rm)} <span class="muted" style="text-transform:none">(OPS &amp; EMS = data store ${escapeHtml(shortStore(rec.store))} seperti di Data Detail · klik kartu untuk detail)</span></div>
         <div class="rapor-grid">${act('ops', ops, 'entry store (Data Detail OPS)', [`${fmt(ops.reduce((a, r) => a + partOf(r), 0))} peserta · ${fmt(ops.reduce((a, r) => a + unitsOf(r), 0))} unit terjual`, slotLine(ops), `${monthsOf(ops)} bulan aktif`], bar(ops.length, tOps, 'sesi', 'Target store'))}${act('ems', ems, 'entry store (Data Detail EMS)', [`${monthsOf(ems)} bulan aktif`], bar(ems.length, tEms, 'sesi', 'Target store'))}${act('pnr', pnr, 'entry trainer', [`Delivered ${dv.length} · Planning ${pl.length}`], bar(dvH, tPnr, 'jam', 'Target trainer (Delivered)'))}</div>
+        ${peerHtml(rec, rm)}
         <div class="sum-title">Entry per Bulan</div>${miniTable(['Bulan', 'OPS', 'EMS', 'PNR', 'Total'], mrows, 260)}`;
     }
 
@@ -2335,7 +2486,95 @@
     });
     { const mb = document.getElementById('manualSyncBtn'); if (mb) mb.addEventListener('click', fetchLatestData); }
 
+
+    /* ---------- Login & role ---------- */
+    const HO_PASS = 'Trainerhebat';
+    let AUTH = null;
+    try { AUTH = JSON.parse(localStorage.getItem('aph_auth') || sessionStorage.getItem('aph_auth') || 'null'); } catch (e) {}
+    const lgEl = id => document.getElementById(id);
+    const lgNikOf = r => String(r.nik || '').replace(/\D/g, '');
+    function lgAreaOf(r) { const ix = storeIndex.get(norm(r.store)); return (ix && ix.ho) || r.trainerHO || ''; }
+    function lgFillAreas() {
+      const sel = lgEl('lgArea'); if (!sel) return;
+      const cur = sel.value;
+      const areas = Array.from(new Set(trainerRecs.map(lgAreaOf).filter(Boolean))).sort(byName);
+      sel.innerHTML = areas.length ? '<option value="">Pilih Area</option>' + areas.map(a => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('') : '<option value="">Memuat data…</option>';
+      sel.value = areas.includes(cur) ? cur : '';
+      lgFillTrainers();
+    }
+    function lgFillTrainers() {
+      const area = lgEl('lgArea').value, sel = lgEl('lgName'), cur = sel.value;
+      const seen = new Set();
+      const list = trainerRecs.filter(r => { if (!area || lgAreaOf(r) !== area) return false; const k = norm(r.nama) + '|' + norm(r.store); if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => byName(a.nama, b.nama));
+      sel.innerHTML = '<option value="">' + (area ? 'Pilih Store Trainer' : 'Pilih area dulu') + '</option>' + list.map(r => `<option value="${escapeHtml(r.nama + '@@' + r.store)}">${escapeHtml(r.nama)} · ${escapeHtml(shortStore(r.store))}</option>`).join('');
+      sel.value = cur; if (sel.value !== cur) sel.value = '';
+    }
+    function lgChange() {
+      const ho = lgEl('lgRole').value === 'ho';
+      lgEl('lgAreaRow').classList.toggle('hide', ho); lgEl('lgNameRow').classList.toggle('hide', ho);
+      lgEl('lgPassLbl').textContent = ho ? 'Password' : 'NIK';
+      lgEl('lgNote').textContent = ho ? 'Akses penuh sebagai Trainer HO.' : 'Password Store Trainer adalah NIK masing-masing.';
+      lgEl('lgErr').textContent = ''; lgEl('lgPass').value = '';
+    }
+    function lgFail(msg) {
+      lgEl('lgErr').textContent = msg;
+      const c = lgEl('lgCard'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
+    }
+    function lgSubmit() {
+      const role = lgEl('lgRole').value, pw = lgEl('lgPass').value.trim(), rem = lgEl('lgRem').checked;
+      if (role === 'ho') {
+        if (pw !== HO_PASS) return lgFail('Password salah.');
+        return lgEnter({ role: 'ho', name: 'Trainer HO' }, rem);
+      }
+      const v = lgEl('lgName').value;
+      if (!lgEl('lgArea').value) return lgFail('Pilih area terlebih dahulu.');
+      if (!v) return lgFail('Pilih nama Store Trainer.');
+      const rec = trainerRecs.find(r => r.nama + '@@' + r.store === v);
+      if (!rec) return lgFail('Data trainer tidak ditemukan.');
+      let nik = lgNikOf(rec);
+      if (!nik) { const alt = recapMasterData.find(r => sameName(r.nama, rec.nama) && lgNikOf(r)); nik = alt ? lgNikOf(alt) : ''; }
+      if (!nik) return lgFail('NIK trainer belum terisi di data master. Hubungi Trainer HO.');
+      if (pw.replace(/\D/g, '') !== nik || !pw) return lgFail('NIK salah.');
+      lgEnter({ role: 'trainer', name: rec.nama, store: rec.store, area: lgAreaOf(rec) }, rem);
+    }
+    function lgEnter(a, rem) {
+      AUTH = a;
+      try { localStorage.removeItem('aph_auth'); sessionStorage.removeItem('aph_auth'); (rem ? localStorage : sessionStorage).setItem('aph_auth', JSON.stringify(a)); } catch (e) {}
+      lgEl('lgPass').value = ''; lgEl('lgErr').textContent = '';
+      applyAuth(true);
+    }
+    function lgLogout() {
+      try { localStorage.removeItem('aph_auth'); sessionStorage.removeItem('aph_auth'); } catch (e) {}
+      AUTH = null; closeSettings(); applyAuth(false);
+    }
+    function applyAuth(fresh) {
+      const b = document.body;
+      b.classList.toggle('locked', !AUTH); b.classList.toggle('authed', !!AUTH);
+      b.classList.toggle('role-trainer', !!AUTH && AUTH.role === 'trainer');
+      const u = lgEl('lgUser');
+      if (!AUTH) { if (u) u.textContent = ''; lgFillAreas(); lgChange(); return; }
+      if (u) u.textContent = AUTH.role === 'ho' ? '👔 Trainer HO' : '👤 ' + AUTH.name;
+      if (AUTH.role === 'trainer' && fresh) {
+        // Store Trainer langsung diarahkan ke Rapor miliknya
+        const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+        const tb = tabs.find(x => /switchModule\('(roster|profile|trainer)'/.test(x.getAttribute('onclick') || '')) || tabs[tabs.length - 2];
+        if (tb) tb.click();
+        try {
+          const sel = lgEl('raporSel'), selA = lgEl('raporAreaSel');
+          if (selA) { selA.value = AUTH.area || 'all'; }
+          fillRaporOptions();
+          if (sel) { sel.value = AUTH.name + '@@' + AUTH.store; renderRapor(); }
+        } catch (e) {}
+      }
+      try { renderCurrentModule(); } catch (e) {}
+    }
+    function loginRefresh() { if (!AUTH) lgFillAreas(); }
+    (function () {
+      try { const c = JSON.parse(localStorage.getItem('recap_cache') || '[]'); if (c.length && !recapMasterData.length) { recapMasterData = c; buildStoreIndex(); } } catch (e) {}
+    })();
+
     document.addEventListener('DOMContentLoaded', () => {
+      applyAuth(false);
       initSummaryHosts();
       fetchLatestData();
       setInterval(fetchLatestData, AUTO_REFRESH_INTERVAL);
