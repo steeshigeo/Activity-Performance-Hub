@@ -356,107 +356,69 @@
       .roster.rost th:nth-child(1),.roster.rost td:nth-child(1){width:136px}
       .roster.rost th:nth-child(2),.roster.rost td:nth-child(2){width:54px}
     }
-  
-    .badge{white-space:nowrap}
-    .b-good{background:rgba(48,209,88,.18);color:#30d158}
-    .b-mid{background:rgba(255,159,10,.18);color:#ff9f0a}
-    .b-bad{background:rgba(255,69,58,.18);color:#ff453a}
-  
-    .tab-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px}
-    .ti{width:16px;height:16px;flex:none}
-    .rapor-sel{display:flex;gap:8px;flex-wrap:wrap}
-    .mod-card .ln strong{color:var(--text-main)}
-  
-    .rapor-grid{align-items:stretch}
-    .mod-card{display:flex;flex-direction:column}
-    .mod-card .prog{margin-top:auto;padding-top:12px}
 
-    /* ---------- Login ---------- */
-    body.locked{overflow:hidden}
-    body.locked .app-shell{display:none}
-    #loginOv{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:var(--bg-gradient);overflow:auto}
-    body.locked #loginOv{display:flex}
-    #loginOv:before,#loginOv:after{content:"";position:absolute;width:46vmax;height:46vmax;border-radius:50%;filter:blur(90px);opacity:.35;pointer-events:none}
-    #loginOv:before{background:#0a84ff;top:-18vmax;left:-14vmax}
-    #loginOv:after{background:#bf5af2;bottom:-20vmax;right:-14vmax}
-    .lg-card{position:relative;z-index:1;width:100%;max-width:400px;padding:34px 28px 26px;border-radius:28px;background:var(--glass-bg);border:1px solid var(--glass-border);backdrop-filter:blur(28px) saturate(1.6);-webkit-backdrop-filter:blur(28px) saturate(1.6);box-shadow:0 30px 70px rgba(0,0,0,.35);text-align:center}
-    .lg-logo{width:72px;height:72px;margin:0 auto 18px;border-radius:18px;background:linear-gradient(145deg,#0a84ff,#5e5ce6);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(10,132,255,.45)}
-    .lg-card h2{font-size:1.45rem;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
-    .lg-card .lg-sub{font-size:.85rem;color:var(--text-muted);margin-bottom:22px;line-height:1.45}
-    .lg-group{border-radius:14px;border:1px solid var(--glass-border);background:var(--input-bg);overflow:hidden;text-align:left}
-    .lg-row{position:relative;display:flex;align-items:center;gap:10px;padding:0 14px;min-height:50px}
-    .lg-row+.lg-row{border-top:1px solid var(--glass-border)}
-    .lg-row label{font-size:.78rem;color:var(--text-muted);font-weight:600;min-width:74px}
-    .lg-row select,.lg-row input{flex:1;min-width:0;height:50px;border:none;outline:none;background:transparent;color:var(--text-main);font-size:.95rem;font-family:inherit;-webkit-appearance:none;appearance:none}
-    .lg-row select{cursor:pointer;padding-right:18px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right center}
-    .lg-row select option{background:var(--opt-bg);color:var(--text-main)}
-    .lg-row.hide{display:none}
-    .lg-go{flex:none;width:34px;height:34px;border-radius:50%;border:none;background:var(--accent);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s,opacity .15s}
-    .lg-go:hover{transform:scale(1.08)}.lg-go:disabled{opacity:.4;cursor:default;transform:none}
-    .lg-err{min-height:20px;margin:12px 0 2px;font-size:.8rem;color:#ff453a;font-weight:500}
-    .lg-note{font-size:.72rem;color:var(--text-muted);margin-top:8px;line-height:1.5}
-    .lg-remember{display:flex;align-items:center;justify-content:center;gap:8px;font-size:.78rem;color:var(--text-muted);margin-top:14px;cursor:pointer}
-    .lg-remember input{accent-color:var(--accent);width:16px;height:16px}
-    .lg-card.shake{animation:lgshake .4s}
-    @keyframes lgshake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
-    .lg-user{display:none;font-size:.78rem;color:var(--text-muted);align-items:center;gap:6px;padding:6px 12px;border-radius:99px;border:1px solid var(--glass-border);background:rgba(255,255,255,.05);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
-    body.authed .lg-user{display:inline-flex}
-    body.role-trainer .btn-export,body.role-trainer #ghRunBtn{display:none!important}
-    @media(max-width:600px){.lg-user{display:none!important}.lg-card{padding:28px 20px 22px;border-radius:24px}}
-
-    /* ---------- Peer comparison ---------- */
-    .peer-wrap{margin:18px 0 6px}
-    .peer-scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
-    .peer-total{grid-column:1/-1;border-radius:18px;padding:16px 18px;border:1px solid var(--glass-border);background:linear-gradient(135deg,rgba(10,132,255,.18),rgba(94,92,230,.14))}
-    .peer-total .t{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
-    .peer-total .big{font-size:2rem;font-weight:800;letter-spacing:-.02em}
-    .peer-total .rk{font-size:.85rem;color:var(--text-muted)}
-    .peer-card{border-radius:16px;padding:14px;border:1px solid var(--glass-border);background:var(--card-bg)}
-    .peer-card .k{font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px}
-    .peer-card .v{font-size:1.5rem;font-weight:800;margin:2px 0}
-    .peer-card .ln{font-size:.76rem;color:var(--text-muted);margin-top:4px;line-height:1.4}
-    .peer-bar{height:8px;border-radius:99px;background:var(--input-bg);overflow:hidden;margin:8px 0}
-    .peer-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#0a84ff,#64d2ff)}
-    .peer-lb{border-radius:16px;border:1px solid var(--glass-border);background:var(--card-bg);padding:12px 14px}
-    .peer-lb .row{display:flex;align-items:center;gap:10px;padding:9px 6px;border-bottom:1px solid var(--glass-border)}
-    .peer-lb .row:last-of-type{border-bottom:none}
-    .peer-lb .rn{width:34px;font-weight:800;text-align:center;font-size:1.05rem}
-    .peer-lb .nm{flex:1;min-width:0}.peer-lb .nm b{display:block;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .peer-lb .nm span{font-size:.74rem;color:var(--text-muted)}
-    .peer-lb .pc{font-weight:800;font-size:.95rem}
-    .peer-lb .row.me{background:rgba(10,132,255,.14);border-radius:12px;border-bottom-color:transparent}
-    .peer-lb .gap{text-align:center;color:var(--text-muted);letter-spacing:4px;font-size:.8rem;line-height:1}
-    .peer-more{display:block;width:100%;margin-top:8px;padding:10px;border-radius:12px;border:1px solid var(--glass-border);background:transparent;color:var(--accent);font-weight:600;font-size:.85rem;cursor:pointer}
-    .peer-more:hover{background:var(--accent);color:#fff}
-    .peer-chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+    /* ===== ROLE / LOGIN ===== */
+    .login-ov{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%)}
+    .login-ov.hidden{display:none}
+    .login-card{width:min(420px,92vw);padding:32px 28px;border-radius:28px;background:var(--opt-bg);border:1px solid var(--glass-border);box-shadow:0 40px 100px rgba(0,0,0,.55);display:flex;flex-direction:column;gap:18px}
+    .login-card h2{font-size:1.55rem;font-weight:700;letter-spacing:-.03em;text-align:center}
+    .login-card .sub{text-align:center;color:var(--text-muted);font-size:.88rem;margin-top:-8px}
+    .role-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .role-btn{padding:18px 14px;border-radius:18px;border:1px solid var(--glass-border);background:var(--input-bg);color:var(--text-main);font-weight:600;font-size:.9rem;cursor:pointer;text-align:center;transition:border-color .15s,transform .15s,background .15s}
+    .role-btn:hover{border-color:var(--accent);transform:translateY(-2px)}
+    .role-btn.active{border-color:var(--accent);background:rgba(10,132,255,.15)}
+    .role-btn small{display:block;font-size:.72rem;font-weight:500;color:var(--text-muted);margin-top:4px}
+    .login-trainer-wrap{display:none;flex-direction:column;gap:10px}
+    .login-trainer-wrap.show{display:flex}
+    .login-card .btn-primary{width:100%;height:48px;justify-content:center;border-radius:14px}
+    .user-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:99px;background:var(--card-bg);border:1px solid var(--glass-border);font-size:.78rem;font-weight:600;color:var(--text-main)}
+    .user-badge .role-tag{font-size:.68rem;padding:2px 8px;border-radius:99px;background:var(--accent);color:#fff}
+    .btn-logout{height:34px;padding:0 14px;border:0;border-radius:99px;background:var(--input-bg);color:var(--text-muted);font-weight:600;font-size:.78rem;cursor:pointer}
+    .btn-logout:hover{background:#ff453a;color:#fff}
+    body.role-trainer .mgr-only{display:none!important}
+    body.role-trainer .nav-tabs .tab-btn[data-mgr]{display:none}
+    body.role-manager .tr-only{display:none!important}
+    .grade-pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:99px;font-size:.75rem;font-weight:700;letter-spacing:.02em;white-space:nowrap}
   </style>
 </head>
-<body class="locked">
-  <div id="loginOv" role="dialog" aria-modal="true" aria-label="Login">
-    <div class="lg-card" id="lgCard">
-      <div class="lg-logo"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+<body>
+  <!-- LOGIN SCREEN -->
+  <div class="login-ov" id="loginOv">
+    <div class="login-card">
       <h2>Activity Performance Hub</h2>
-      <div class="lg-sub">Masuk untuk melihat OPS, EMS &amp; PNR.</div>
-      <div class="lg-group">
-        <div class="lg-row"><label for="lgRole">Login as</label><select id="lgRole" onchange="lgChange()"><option value="trainer">Store Trainer</option><option value="ho">Trainer HO</option></select></div>
-        <div class="lg-row" id="lgAreaRow"><label for="lgArea">Area</label><select id="lgArea" onchange="lgFillTrainers()"></select></div>
-        <div class="lg-row" id="lgNameRow"><label for="lgName">Trainer</label><select id="lgName"></select></div>
-        <div class="lg-row"><label for="lgPass" id="lgPassLbl">NIK</label><input id="lgPass" type="password" autocomplete="off" placeholder="Password" onkeydown="if(event.key==='Enter')lgSubmit()"><button class="lg-go" id="lgGo" onclick="lgSubmit()" aria-label="Masuk"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+      <div class="sub">Pilih bagaimana kamu ingin masuk</div>
+      <div class="role-btns">
+        <button class="role-btn" id="roleManagerBtn" onclick="selectRole('manager')">
+          Manager
+          <small>Akses penuh semua data</small>
+        </button>
+        <button class="role-btn" id="roleTrainerBtn" onclick="selectRole('trainer')">
+          Store Trainer
+          <small>Lihat data pribadi saja</small>
+        </button>
       </div>
-      <div class="lg-err" id="lgErr"></div>
-      <label class="lg-remember"><input type="checkbox" id="lgRem" checked> Ingat saya di perangkat ini</label>
-      <div class="lg-note" id="lgNote">Password Store Trainer adalah NIK masing-masing.</div>
+      <div class="login-trainer-wrap" id="loginTrainerWrap">
+        <select id="loginTrainerSel" class="select-box" style="width:100%">
+          <option value="">👤 Pilih nama kamu…</option>
+        </select>
+      </div>
+      <button class="btn-primary" id="loginGoBtn" onclick="doLogin()" disabled>Masuk</button>
     </div>
   </div>
-  <div class="app-shell">
+
+  <div class="app-shell" id="appShell" style="display:none">
     <header>
-      <div class="brand"><h1>Activity Performance Hub</h1><p>OPS EMS PNR</p></div>
+      <div class="brand">
+        <h1>Activity Performance Hub</h1>
+        <p id="brandSub">OPS EMS PNR</p>
+      </div>
       <div class="header-actions">
-        <span class="lg-user" id="lgUser"></span>
+        <div id="userBadge" class="user-badge" style="display:none"></div>
         <div id="cloudStatusPill" class="status-pill loading"><span>Memuat data…</span></div>
-        <div class="settings-wrap">
+        <div class="settings-wrap mgr-only">
           <button class="btn-theme" id="settingsBtn" aria-label="Pengaturan" title="Pengaturan" onclick="toggleSettings(event)"><i class="fill"></i><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
         </div>
+        <button class="btn-logout" id="logoutBtn" onclick="doLogout()" style="display:none">Keluar</button>
         <button class="btn-theme" id="themeToggleBtn" aria-label="Ganti tema" title="Ganti tema">
           <svg class="i-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
           <svg class="i-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
@@ -464,14 +426,45 @@
       </div>
     </header>
 
-    <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchModule('ops',this)"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h20M4 3v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3M12 16v5M8 21h8M8 11l3-3 2 2 3-3"/></svg>Module OPS</button>
-      <button class="tab-btn" onclick="switchModule('ems',this)"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>Module EMS</button>
-      <button class="tab-btn" onclick="switchModule('pnr',this)"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg>Module PNR</button>
-      <button class="tab-btn" onclick="switchModule('roster',this)"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>Store Trainer Profile</button>
-      <button class="tab-btn" onclick="switchModule('all',this)"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 16v-5M12 16V7M17 16v-8"/></svg>Summary</button>
-      
-      
+    <div class="nav-tabs" id="navTabs">
+      <!-- Manager tabs -->
+      <button class="tab-btn active mgr-only" data-mgr onclick="switchModule('ops',this)">Module OPS</button>
+      <button class="tab-btn mgr-only" data-mgr onclick="switchModule('ems',this)">Module EMS</button>
+      <button class="tab-btn mgr-only" data-mgr onclick="switchModule('pnr',this)">Module PNR</button>
+      <button class="tab-btn mgr-only" data-mgr onclick="switchModule('roster',this)">Store Trainer Profile</button>
+      <button class="tab-btn mgr-only" data-mgr onclick="switchModule('all',this)">Summary</button>
+      <!-- Trainer tabs -->
+      <button class="tab-btn tr-only" onclick="switchModule('myperf',this)">My Performance</button>
+      <button class="tab-btn tr-only" onclick="switchModule('myroster',this)">My Roster</button>
+      <button class="tab-btn tr-only" onclick="switchModule('myentries',this)">My Entries</button>
+      <button class="tab-btn tr-only" onclick="switchModule('myrapor',this)">Rapor Saya</button>
+    </div>
+
+    <!-- Trainer View Panels -->
+    <div id="panel-myperf" class="module-panel">
+      <div id="myperfBody"></div>
+    </div>
+    <div id="panel-myroster" class="module-panel">
+      <div id="myrosterBody"></div>
+    </div>
+    <div id="panel-myentries" class="module-panel">
+      <div class="panel-card filter-bar">
+        <div class="controls-row">
+          <select id="myEntriesType" class="select-box" onchange="renderMyEntries()">
+            <option value="ops">OPS</option>
+            <option value="ems">EMS</option>
+            <option value="pnr">PNR</option>
+          </select>
+          <select id="myEntriesMonth" class="select-box" onchange="renderMyEntries()"></select>
+        </div>
+      </div>
+      <div class="panel-card">
+        <div class="table-container"><table><thead><tr id="myEntriesThead"></tr></thead><tbody id="myEntriesTbody"></tbody></table></div>
+        <div class="pagination-bar" id="myEntriesPagination"></div>
+      </div>
+    </div>
+    <div id="panel-myrapor" class="module-panel">
+      <div id="myraporBody"></div>
     </div>
 
     <div id="panel-ops" class="module-panel active">
@@ -535,7 +528,7 @@
     </div>
   </div>
 
-  <div class="modal-ov" id="settingsOv" onclick="if(event.target===this)closeSettings()"><div class="pop"><div class="pop-h"><div class="modal-t">Pengaturan</div><button class="btn-theme" onclick="closeSettings()" aria-label="Tutup">✕</button></div><div class="muted" style="font-size:.8rem;margin-bottom:6px">Muat ulang data dashboard atau jalankan update data dari GitHub.</div><button class="btn-primary" id="manualSyncBtn"><i class="fill"></i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg><span class="lbl">Refresh</span></button><button class="btn-run" id="ghRunBtn" onclick="runGithubAction()" title="Jalankan GitHub Action sync-data.yml"><i class="fill"></i><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Run Sync</span></button><button class="btn-run" style="background:rgba(255,69,58,.15);color:#ff453a;border:1px solid rgba(255,69,58,.35)" onclick="lgLogout()">Keluar (Logout)</button></div></div>
+  <div class="modal-ov" id="settingsOv" onclick="if(event.target===this)closeSettings()"><div class="pop"><div class="pop-h"><div class="modal-t">Pengaturan</div><button class="btn-theme" onclick="closeSettings()" aria-label="Tutup">✕</button></div><div class="muted" style="font-size:.8rem;margin-bottom:6px">Muat ulang data dashboard atau jalankan update data dari GitHub.</div><button class="btn-primary" id="manualSyncBtn"><i class="fill"></i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg><span class="lbl">Refresh</span></button><button class="btn-run" id="ghRunBtn" onclick="runGithubAction()" title="Jalankan GitHub Action sync-data.yml"><i class="fill"></i><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Run Sync</span></button></div></div>
   <div class="modal-ov" id="modalOv" onclick="if(event.target===this)closeModal()">
     <div class="modal">
       <div class="modal-h"><div><div class="modal-t" id="modalT"></div><div class="muted" id="modalS" style="font-size:.82rem;margin-top:2px"></div></div><button class="btn-theme" onclick="closeModal()" aria-label="Tutup">✕</button></div>
@@ -559,7 +552,7 @@
 
     let recapMasterData = [];
     const rowType = new WeakMap();
-    let metaCache = new WeakMap(), recapByEmail = new Map(), recapByName = new Map(), resolveCache = new Map(), storeCores = [], storeByCode = new Map(), trainerRecs = [], pnrTargets = new Map(), trLabelCache = new Map(), staffCache = new Map(), staffList = [];   // [{store, nama, email, position, trainerHO}]
+    let metaCache = new WeakMap(), recapByEmail = new Map(), recapByName = new Map(), resolveCache = new Map(), storeCores = [], storeByCode = new Map(), trainerRecs = [], pnrTargets = new Map(), trLabelCache = new Map();   // [{store, nama, email, position, trainerHO}]
     let storeIndex = new Map(); // norm(store) -> {name, ho}
     let state = {
       ops: [], ems: [], pnr: [], activeModule: 'ops',
@@ -570,6 +563,116 @@
       }
     };
     let chartInstances = {};
+
+    /* ---------- Auth / Role ---------- */
+    let auth = { role: null, name: null, store: null }; // role: 'manager' | 'trainer'
+    let pendingRole = null;
+
+    function loadAuth() {
+      try {
+        const raw = localStorage.getItem('aph_auth');
+        if (raw) {
+          const a = JSON.parse(raw);
+          if (a && (a.role === 'manager' || (a.role === 'trainer' && a.name))) {
+            auth = a;
+            return true;
+          }
+        }
+      } catch (e) {}
+      return false;
+    }
+    function saveAuth() {
+      try { localStorage.setItem('aph_auth', JSON.stringify(auth)); } catch (e) {}
+    }
+    function selectRole(role) {
+      pendingRole = role;
+      document.getElementById('roleManagerBtn').classList.toggle('active', role === 'manager');
+      document.getElementById('roleTrainerBtn').classList.toggle('active', role === 'trainer');
+      const wrap = document.getElementById('loginTrainerWrap');
+      wrap.classList.toggle('show', role === 'trainer');
+      document.getElementById('loginGoBtn').disabled = role === 'trainer' && !document.getElementById('loginTrainerSel').value;
+      if (role === 'manager') document.getElementById('loginGoBtn').disabled = false;
+    }
+    function fillLoginTrainers() {
+      const sel = document.getElementById('loginTrainerSel');
+      if (!sel) return;
+      const seen = new Set();
+      const list = (trainerRecs || []).filter(r => {
+        const k = norm(r.nama) + '|' + norm(r.store);
+        if (!r.nama || seen.has(k)) return false;
+        seen.add(k); return true;
+      }).sort((a, b) => byName(a.nama, b.nama));
+      sel.innerHTML = `<option value="">👤 Pilih nama kamu…</option>` +
+        list.map(r => `<option value="${escapeHtml(r.nama + '@@' + r.store)}">${escapeHtml(r.nama)} · ${escapeHtml(r.store)}</option>`).join('');
+      sel.onchange = () => {
+        document.getElementById('loginGoBtn').disabled = !sel.value;
+      };
+    }
+    function doLogin() {
+      if (pendingRole === 'manager') {
+        auth = { role: 'manager', name: null, store: null };
+      } else if (pendingRole === 'trainer') {
+        const v = document.getElementById('loginTrainerSel').value;
+        if (!v) return;
+        const [name, store] = v.split('@@');
+        auth = { role: 'trainer', name, store };
+      } else return;
+      saveAuth();
+      applyAuth();
+    }
+    function doLogout() {
+      auth = { role: null, name: null, store: null };
+      try { localStorage.removeItem('aph_auth'); } catch (e) {}
+      document.getElementById('loginOv').classList.remove('hidden');
+      document.getElementById('appShell').style.display = 'none';
+      document.body.classList.remove('role-manager', 'role-trainer');
+      pendingRole = null;
+      document.getElementById('roleManagerBtn').classList.remove('active');
+      document.getElementById('roleTrainerBtn').classList.remove('active');
+      document.getElementById('loginTrainerWrap').classList.remove('show');
+      document.getElementById('loginGoBtn').disabled = true;
+    }
+    function applyAuth() {
+      document.getElementById('loginOv').classList.add('hidden');
+      document.getElementById('appShell').style.display = '';
+      document.body.classList.remove('role-manager', 'role-trainer');
+      document.body.classList.add(auth.role === 'trainer' ? 'role-trainer' : 'role-manager');
+
+      const badge = document.getElementById('userBadge');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const brandSub = document.getElementById('brandSub');
+      if (auth.role === 'trainer') {
+        badge.style.display = '';
+        badge.innerHTML = `${escapeHtml(auth.name)} <span class="role-tag">Trainer</span>`;
+        logoutBtn.style.display = '';
+        brandSub.textContent = auth.store || 'Store Trainer View';
+        // default tab for trainer
+        state.activeModule = 'myperf';
+        document.querySelectorAll('.nav-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+        const firstTr = document.querySelector('.nav-tabs .tab-btn.tr-only');
+        if (firstTr) firstTr.classList.add('active');
+        document.querySelectorAll('.module-panel').forEach(p => p.classList.remove('active'));
+        const p = document.getElementById('panel-myperf');
+        if (p) p.classList.add('active');
+      } else {
+        badge.style.display = '';
+        badge.innerHTML = `Manager <span class="role-tag">Full Access</span>`;
+        logoutBtn.style.display = '';
+        brandSub.textContent = 'OPS EMS PNR · Manager';
+        state.activeModule = 'ops';
+        document.querySelectorAll('.nav-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+        const firstMgr = document.querySelector('.nav-tabs .tab-btn.mgr-only');
+        if (firstMgr) firstMgr.classList.add('active');
+        document.querySelectorAll('.module-panel').forEach(p => p.classList.remove('active'));
+        const p = document.getElementById('panel-ops');
+        if (p) p.classList.add('active');
+      }
+      renderCurrentModule();
+    }
+    function isTrainerView() { return auth.role === 'trainer' && auth.name; }
+    function trainerMatch(name) {
+      return isTrainerView() && sameName(name, auth.name);
+    }
 
     const norm = s => String(s == null ? '' : s).toLowerCase().replace(/[\u200b-\u200d\ufeff\u00a0]/g, ' ').replace(/\s+/g, ' ').trim();
     const NO_HO = 'Tanpa Area';
@@ -612,7 +715,7 @@
 
     /* ---------- Data master (sheet Recap) ---------- */
     function buildStoreIndex() {
-      metaCache = new WeakMap(); recapByEmail = new Map(); recapByName = new Map(); resolveCache = new Map(); trLabelCache = new Map(); staffCache = new Map(); staffList = [];
+      metaCache = new WeakMap(); recapByEmail = new Map(); recapByName = new Map(); resolveCache = new Map(); trLabelCache = new Map();
       storeIndex = new Map(); storeCores = []; storeByCode = new Map(); trainerRecs = [];
       recapMasterData.forEach(r => {
         const k = norm(r.store);
@@ -636,13 +739,6 @@
         const st = r.storeTrainer || (isTr ? r.nama : '');
         if (st && st !== '0') cur.trainers.add(st);
         if (isTr && r.nama) trainerRecs.push(r);
-      });
-      const seenS = new Set();
-      recapMasterData.forEach(r => {
-        if (!r.nama || r.nama === '0' || !r.store) return;
-        const st = (storeIndex.get(norm(r.store)) || {}).name || r.store, k = norm(r.nama) + '|' + norm(st);
-        if (seenS.has(k)) return;
-        seenS.add(k); staffList.push({ nama: r.nama, store: st, tokens: tokensOf(r.nama) });
       });
     }
 
@@ -691,7 +787,6 @@
         try { recapMasterData = JSON.parse(localStorage.getItem('recap_cache') || '[]'); } catch (e) { recapMasterData = []; }
       }
       buildStoreIndex();
-      try { loginRefresh(); } catch (e) {}
     }
 
     /* ---------- Metadata per baris aktivitas ---------- */
@@ -810,55 +905,6 @@
       return sm.every(t => lg.includes(t)) && (sm.length >= 2 || sm[0].length >= 4);
     }
     // Slot sesi Open Studio (13:00 / 15:00 / 18:00): dari kolom jam sesi, jika tidak ada dari jam pengisian form
-    // Pemadanan nama: nama di data OPS/EMS/PNR yang mirip / terkandung di sheet Recap otomatis diganti nama lengkap dari Recap
-    function nameScore(ta, tb) {
-      let total = 0;
-      for (const a of ta) {
-        let best = 0;
-        for (const b of tb) {
-          let sc = 0;
-          if (a === b) sc = 3;
-          else if (a.length >= 3 && b.startsWith(a)) sc = 2;
-          else if (a.length >= 4 && b.includes(a)) sc = 1.5;
-          else if (a.length >= 5 && b.length >= 5 && lev(a, b) <= 1) sc = 1;
-          if (sc > best) best = sc;
-        }
-        if (!best) return 0;
-        total += best;
-      }
-      return total;
-    }
-    function resolveStaff(raw, store) {
-      const s0 = String(raw == null ? '' : raw).trim();
-      if (!s0) return '';
-      const key = norm(s0) + '|' + norm(store);
-      if (staffCache.has(key)) return staffCache.get(key);
-      let out = s0;
-      const exact = recapByName.get(norm(s0));
-      if (exact && exact.nama) out = exact.nama;
-      else {
-        const ta = tokensOf(s0), scored = [];
-        if (ta.length) staffList.forEach(x => {
-          let sc = nameScore(ta, x.tokens);
-          if (!sc && x.tokens.length >= 2 && ta.length >= 2) sc = nameScore(x.tokens, ta) * 0.9; // nama di data lebih panjang dari Recap
-          if (sc > 0) scored.push({ x, sc });
-        });
-        const pick = list => {
-          if (!list.length) return null;
-          const top = Math.max.apply(null, list.map(e => e.sc)), best = list.filter(e => e.sc === top);
-          return new Set(best.map(e => norm(e.x.nama))).size === 1 ? best[0].x.nama : null;
-        };
-        const same = store ? scored.filter(e => norm(e.x.store) === norm(store)) : [];
-        out = pick(same) || pick(scored) || s0;
-      }
-      staffCache.set(key, out);
-      return out;
-    }
-    function canonNames(str, store) { // satu atau beberapa nama (dipisah koma / dan / &)
-      const s0 = String(str == null ? '' : str).trim();
-      if (!s0) return '';
-      return s0.split(/[,;\n]+|\s+dan\s+|\s*&\s*/i).map(x => x.trim()).filter(Boolean).map(x => resolveStaff(x, store)).join(', ');
-    }
     function participantName(row) { // EMS: nama staff diambil dari kolom participant name
       const keys = Object.keys(row), ok = k => row[k] != null && !['', '-', '0'].includes(String(row[k]).trim());
       let k = keys.find(k => /participant/i.test(k) && /name|nama/i.test(k) && ok(k));
@@ -878,7 +924,6 @@
     function _calcMeta(row) {
       const isEms = rowType.get(row) === 'ems';
       let store = getRowStore(row) || '', trainer = (isEms ? participantName(row) : getRowTrainer(row)) || '', rec = null;
-      trainer = canonNames(trainer, store);
       if (!store || !trainer) { // lengkapi lewat email / nama staff di sheet Recap
         const em = getFlexibleValue(row, ['email', 'e-mail']);
         rec = (em && recapByEmail.get(norm(em))) || (trainer && recapByName.get(norm(trainer))) || null;
@@ -980,22 +1025,6 @@
 
     // Opsi tiap dropdown hanya berisi nilai yang benar-benar ada di data aktivitas (sudah dipadankan dengan sheet Recap),
     // dan menyesuaikan pilihan dropdown lainnya, sehingga setiap pilihan pasti menghasilkan data.
-    // Pilihan dropdown juga memuat seluruh area / store / staff dari sheet Recap, walau belum ada aktivitas (count 0)
-    function mergeRecap(type, dim, arr, p, tname) {
-      const have = new Set(arr.map(e => norm(e.value))), isPNR = type === 'pnr';
-      const add = (value, group, label) => { const k = norm(value); if (!value || have.has(k)) return; have.add(k); arr.push({ value, count: 0, group, ord: 0, label }); };
-      const okArea = ix => p.trainerHO === 'all' || ix.ho === p.trainerHO;
-      if (dim === 'trainerHO') storeIndex.forEach(ix => add(ix.ho));
-      else if (dim === 'store') storeIndex.forEach(ix => { if (okArea(ix) && (!isPNR || !p.st || p.st === 'all' || ix.trainers.has(p.st))) add(ix.name, ix.ho || NO_HO); });
-      else if (dim === 'st') storeIndex.forEach(ix => { if (okArea(ix) && (p.store === 'all' || norm(ix.name) === norm(p.store))) ix.trainers.forEach(t => add(t, '', trLabel(t))); });
-      else if (dim === 'trainer') recapMasterData.forEach(r => {
-        if (!r.nama || r.nama === '0') return;
-        const ix = storeIndex.get(norm(r.store));
-        if (!ix || !okArea(ix) || (p.store !== 'all' && norm(ix.name) !== norm(p.store))) return;
-        add(tname.get(norm(r.nama)) || r.nama, ix.name);
-      });
-      arr.sort((a, b) => (a.ord || 0) - (b.ord || 0) || byName(a.value, b.value));
-    }
     function populateDropdowns(type) {
       const p = state.pages[type], isPNR = type === 'pnr';
       const metas = (state[type] || []).map(getRowMeta);
@@ -1007,7 +1036,6 @@
         let changed = false;
         dims.forEach(d => {
           res[d] = facet(type, d, metas.filter(m => rowOk(type, m, p, d)), tname);
-          mergeRecap(type, d, res[d], p, tname);
           if (p[d] !== 'all' && !res[d].some(e => e.value === p[d])) { p[d] = 'all'; changed = true; }
         });
         if (!changed) break;
@@ -1063,6 +1091,7 @@
     function refreshAll() {
       ['ops', 'ems', 'pnr'].forEach(t => { state[t] = (state[t] || []).filter(r => !isQRow(r)); state[t].forEach(r => rowType.set(r, t)); }); // abaikan store berkode Q
       ['ops', 'ems', 'pnr'].forEach(populateDropdowns);
+      fillLoginTrainers();
       renderCurrentModule();
     }
 
@@ -1072,6 +1101,10 @@
       if (state.activeModule === 'pnr') renderPNR();
       if (state.activeModule === 'all') renderAllSummary();
       if (state.activeModule === 'roster') renderRoster();
+      if (state.activeModule === 'myperf') renderMyPerf();
+      if (state.activeModule === 'myroster') renderMyRoster();
+      if (state.activeModule === 'myentries') renderMyEntries();
+      if (state.activeModule === 'myrapor') renderMyRapor();
     }
 
     function sortNewest(rows) {
@@ -1081,149 +1114,94 @@
     function getFilteredData(type) {
       const p = state.pages[type], q = (p.filter || '').toLowerCase();
       return sortNewest((state[type] || []).filter(row => {
+        if (isTrainerView() && !trainerMatch(getRowMeta(row).trainer)) return false;
         if (!rowOk(type, getRowMeta(row), p)) return false;
         return !q || Object.values(row).some(v => String(v || '').toLowerCase().includes(q));
       }));
     }
 
-    const STORE_TARGET = 85;
-    /* ---------- Target per bulan (otomatis mengikuti kalender) ---------- */
-    // OPS: Senin-Jumat 3 aktivitas, Sabtu-Minggu 2 aktivitas per hari | EMS: setiap hari 2 aktivitas
-    function monthTargetDays(type, key) {
-      const Y = Math.floor(key / 100), M = key % 100, dim = new Date(Y, M + 1, 0).getDate();
+    // Target OPS dinamis: Sen-Jum 3, Sab-Min 2 per hari. Target EMS: 2 per hari. Mengikuti kalender bulan berjalan / bulan filter.
+    function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
+    function calcOpsTarget(year, month) { // month 0-based
       let t = 0;
-      for (let d = 1; d <= dim; d++) { const w = new Date(Y, M, d).getDay(); t += type === 'ems' ? 2 : (w === 0 || w === 6 ? 2 : 3); }
+      const dim = daysInMonth(year, month);
+      for (let d = 1; d <= dim; d++) {
+        const wd = new Date(year, month, d).getDay(); // 0=Min, 6=Sab
+        t += (wd === 0 || wd === 6) ? 2 : 3;
+      }
       return t;
     }
-    function periodKeys(type) { // bulan terpilih, atau semua bulan yang ada di data
+    function calcEmsTarget(year, month) {
+      return daysInMonth(year, month) * 2;
+    }
+    function getActiveMonthKey(type) {
       const p = state.pages[type];
-      if (p.month !== 'all') { const k = monthKeyFromLabel(p.month); return k ? [k] : []; }
-      const ks = new Set();
-      (state[type] || []).forEach(r => { const m = getRowMeta(r); if (m.monthKey) ks.add(m.monthKey); });
-      if (!ks.size) { const n = new Date(); ks.add(n.getFullYear() * 100 + n.getMonth()); }
-      return Array.from(ks);
-    }
-    const storeTargetBase = type => periodKeys(type).reduce((a, k) => a + monthTargetDays(type, k), 0);
-    // store yang termasuk dalam filter aktif (area / store / store trainer)
-    function scopeStores(p) {
-      return Array.from(storeIndex.values()).filter(s => (!p.trainerHO || p.trainerHO === 'all' || s.ho === p.trainerHO)
-        && (!p.store || p.store === 'all' || norm(s.name) === norm(p.store)) && (!p.st || p.st === 'all' || s.trainers.has(p.st)));
-    }
-    let pnrStatusMode = 'delivered';
-    const modeOk = st => pnrStatusMode === 'all' || st === (pnrStatusMode === 'planning' ? 'Planning' : 'Delivered');
-    const modeRows = (type, rows) => type === 'pnr' && pnrStatusMode !== 'all' ? rows.filter(r => modeOk(getRowMeta(r).status)) : rows;
-    function setPnrStatus(m) {
-      pnrStatusMode = m;
-      document.querySelectorAll('#pnr-status-chips .chip').forEach(b => b.classList.toggle('active', b.dataset.m === m));
-      renderPNR();
-    }
-    function pnrTrainerSum(ix) { let t = 0; ix.trainers.forEach(tn => { const f = findTarget(tn); if (f && f.hours > t) t = f.hours; }); return t; } // dua store trainer: tidak dijumlah, pakai angka target dari sheet PnR
-    function pnrStoreTarget(name) { const ix = storeIndex.get(norm(name)); return ix ? pnrTrainerSum(ix) * periodKeys('pnr').length : 0; }
-    function collectStores(type, rows, p) {
-      const m = new Map();
-      const blank = name => ({ name, rows: [], actual: 0, planned: 0, s: { '13:00': 0, '15:00': 0, '18:00': 0 } });
-      rows.forEach(r => {
-        const x = getRowMeta(r), k = x.store || '(Tanpa Store)';
-        let e = m.get(k);
-        if (!e) { e = blank(k); m.set(k, e); }
-        if (type === 'pnr') { // hanya Delivered yang mengurangi target, Planning dicatat terpisah
-          if (x.status === 'Delivered') e.actual += x.hours; else if (x.status === 'Planning') e.planned += x.hours;
-          if (modeOk(x.status)) e.rows.push(r);
-        } else { e.rows.push(r); e.actual += 1; }
-        if (x.slot) e.s[x.slot]++;
-      });
-      if (!p.filter) scopeStores(p).forEach(v => { if (!m.has(v.name)) m.set(v.name, blank(v.name)); });
-      return m;
-    }
-    function targetStats(type, data) {
-      const p = state.pages[type], m = collectStores(type, data, p);
-      const base = type === 'pnr' ? 0 : storeTargetBase(type);
-      const list = Array.from(m.values()).map(e => { e.target = type === 'pnr' ? pnrStoreTarget(e.name) : base; e.pct = e.target ? Math.round(e.actual / e.target * 100) : null; return e; });
-      const sA = list.reduce((a, e) => a + e.actual, 0), sT = list.reduce((a, e) => a + e.target, 0), sP = list.reduce((a, e) => a + e.planned, 0);
-      return { list, sA, sT, sP, base, pct: sT ? Math.round(sA / sT * 100) : null };
-    }
-    // indikator: >=100% Good, 50-99% Need Attention, <50% Bad
-    const IND = pc => pc === null ? '-' : pc >= 100 ? '<span class="badge b-good">Good · Keep it up</span>' : pc >= 50 ? '<span class="badge b-mid">Need Attention</span>' : '<span class="badge b-bad">Bad · Pls improve</span>';
-    const INDT = pc => pc === null ? '-' : pc >= 100 ? 'Good · Keep it up' : pc >= 50 ? 'Need Attention' : 'Bad · Pls improve';
-    const pcCls = v => v >= 100 ? 'g' : v >= 50 ? 'a' : 'r';
-    const pcCell = v => v === null ? '-' : `<span class="pct ${pcCls(v)}">${v}%</span><span class="pbar"><i style="width:${Math.min(100, v)}%"></i></span>`;
-    function targetList(type, ts) {
-      const u = type === 'pnr' ? 'Jam' : 'Sesi', f = n => type === 'pnr' ? Number(r1(n)).toLocaleString('id-ID') : fmt(n);
-      const list = ts.list.slice().sort((a, b) => (a.pct === null) - (b.pct === null) || (a.pct - b.pct));
-      return { title: 'Pencapaian target per store', sub: `${list.length} store · urut dari pencapaian terendah`, heads: ['Store', `Aktual (${u})`, `Target (${u})`, '%', 'Status'],
-        rows: list.map(e => [escapeHtml(e.name), f(e.actual), f(e.target), e.pct === null ? '-' : e.pct + '%', INDT(e.pct)]) };
-    }
-    // Data Detail OPS / EMS / PNR: Komparasi Target vs Aktual per store, klik store untuk detail
-    function renderTargetTable(type, data) {
-      const p = state.pages[type], isOps = type === 'ops', isPNR = type === 'pnr', N = type.toUpperCase();
-      const ts = targetStats(type, data);
-      const list = ts.list.slice().sort((a, b) => b.actual - a.actual || b.planned - a.planned || byName(a.name, b.name));
-      const u = isPNR ? 'Jam' : 'Sesi', f = n => isPNR ? Number(r1(n)).toLocaleString('id-ID') : fmt(n);
-      const heads = isOps ? ['Store', '13:00', '15:00', '18:00', 'TOTAL', 'TARGET', '%', 'Status']
-        : isPNR ? ['Store', 'Store Trainer', `Target (${u})`, `Delivered (${u})`, `Planning (${u})`, '%', 'Status'] : ['Store', `Aktual (${u})`, `Target (${u})`, '%', 'Status'];
-      document.getElementById(`${type}Thead`).innerHTML = heads.map(h => `<th>${h}</th>`).join('');
-      const mode = { planning: 'Planning', delivered: 'Delivered', all: 'Semua status' }[pnrStatusMode];
-      const trainers = n => { const ix = storeIndex.get(norm(n)); return ix && ix.trainers.size ? Array.from(ix.trainers).join(', ') : '-'; };
-      const rowsHtml = list.map(e => {
-        const dr = reg(() => ({ title: e.name, sub: `${N} · ${isPNR ? 'delivered' : 'aktual'} ${f(e.actual)} / target ${f(e.target)} ${u.toLowerCase()} (${e.pct === null ? '-' : e.pct + '%'}) · ${INDT(e.pct)}${isPNR ? ` · planning ${f(e.planned)} · tampil: ${mode}` : ''}`, ...detailRows(type, e.rows) }));
-        const c = isOps ? [escapeHtml(e.name), e.s['13:00'], e.s['15:00'], e.s['18:00'], `<strong>${e.actual}</strong>`, e.target, pcCell(e.pct), IND(e.pct)]
-          : isPNR ? [escapeHtml(e.name), escapeHtml(trainers(e.name)), e.target ? f(e.target) : '-', `<strong>${f(e.actual)}</strong>`, f(e.planned), pcCell(e.pct), IND(e.pct)]
-          : [escapeHtml(e.name), `<strong>${f(e.actual)}</strong>`, f(e.target), pcCell(e.pct), IND(e.pct)];
-        return `<tr class="clickable" onclick="openDrill(${dr})">${c.map(x => `<td>${x}</td>`).join('')}</tr>`;
-      }).join('');
-      const sl = list.reduce((a, e) => { ['13:00', '15:00', '18:00'].forEach(k => { a[k] += e.s[k]; }); return a; }, { '13:00': 0, '15:00': 0, '18:00': 0 });
-      const label = `Semua Store (${list.length})`;
-      const tot = isOps ? [label, sl['13:00'], sl['15:00'], sl['18:00'], fmt(ts.sA), fmt(ts.sT), pcCell(ts.pct), IND(ts.pct)]
-        : isPNR ? [label, '', f(ts.sT), f(ts.sA), f(ts.sP), pcCell(ts.pct), IND(ts.pct)] : [label, f(ts.sA), f(ts.sT), pcCell(ts.pct), IND(ts.pct)];
-      document.getElementById(`${type}Tbody`).innerHTML = list.length ? `<tr class="totrow">${tot.map(x => `<td>${x}</td>`).join('')}</tr>` + rowsHtml
-        : `<tr><td colspan="${heads.length}" style="text-align:center;padding:24px">Data tidak ditemukan untuk kombinasi filter ini.</td></tr>`;
-      const period = p.month === 'all' ? 'semua bulan' : p.month;
-      const note = isPNR ? `target dari sheet PnR (${pnrTargets.size} store trainer terbaca) · ${period} · pencapaian hanya dari Delivered · detail: ${mode}`
-        : `target per store ${ts.base} sesi · ${period} · ${isOps ? 'Sen-Jum 3, Sab-Min 2 per hari' : 'setiap hari 2'}`;
-      document.getElementById(`${type}Pagination`).innerHTML = `<div>${list.length} store · ${note}</div><div>Klik store untuk detail</div>`;
-    }
-    // Grafik line target vs pencapaian (kumulatif per hari pada bulan terpilih / bulan terbaru)
-    function renderTargetChart(type) {
-      const el = document.getElementById(`${type}-tchart`);
-      if (!el) return;
-      if (chartInstances[type + 'T']) { try { chartInstances[type + 'T'].destroy(); } catch (e) {} delete chartInstances[type + 'T']; }
-      const p = state.pages[type], isPNR = type === 'pnr';
-      const items = (state[type] || []).map(r => ({ r, m: getRowMeta(r) })).filter(x => x.m.date && rowOk(type, x.m, p, 'month') && (!isPNR || x.m.status === 'Delivered'));
-      let label = p.month !== 'all' ? p.month : '', bk = -1;
-      if (!label) items.forEach(x => { if (x.m.month && x.m.monthKey > bk) { bk = x.m.monthKey; label = x.m.month; } });
-      const key = label ? monthKeyFromLabel(label) : 0;
-      if (!key) { el.innerHTML = '<div class="muted">Belum ada data bertanggal untuk periode ini.</div>'; return; }
-      const Y = Math.floor(key / 100), M = key % 100, dim = new Date(Y, M + 1, 0).getDate();
-      const scope = scopeStores(p), n = scope.length || new Set(items.map(x => x.m.store).filter(Boolean)).size;
-      const monthT = isPNR ? scope.reduce((a, s) => a + pnrTrainerSum(s), 0) : 0;
-      const dayT = d => isPNR ? monthT / dim : n * (type === 'ems' ? 2 : ([0, 6].includes(new Date(Y, M, d).getDay()) ? 2 : 3));
-      const sel = items.filter(x => x.m.month === label);
-      const now = new Date(), last = (now.getFullYear() === Y && now.getMonth() === M) ? now.getDate() : dim;
-      let cT = 0, cA = 0;
-      const days = [], tgt = [], act = [], perDay = {};
-      for (let d = 1; d <= dim; d++) {
-        const rows = sel.filter(x => x.m.date.getDate() === d); perDay[d] = rows;
-        cT += dayT(d); cA += rows.reduce((a, x) => a + (isPNR ? x.m.hours : 1), 0);
-        days.push(d); tgt.push(r1(cT)); act.push(d <= last ? r1(cA) : null);
+      if (p.month && p.month !== 'all') {
+        const mi = MONTH_NAMES_ID.findIndex(n => p.month.toLowerCase().includes(n.toLowerCase()));
+        const y = (p.month.match(/\b(19|20)\d{2}\b/) || [])[0];
+        if (mi >= 0 && y) return { y: +y, m: mi, label: p.month };
       }
-      const unit = isPNR ? 'jam' : 'sesi', fin = act[last - 1] == null ? 0 : act[last - 1], totT = tgt[dim - 1];
-      el.innerHTML = `<div class="muted" style="font-size:.8rem;margin-bottom:12px">${escapeHtml(label)} · ${n} store · target ${fmt(totT)} ${unit} · pencapaian ${fmt(fin)} ${unit} (${pct(fin, totT)}) · klik titik untuk detail</div><div class="chart-wrap" style="height:280px;flex:none;min-height:0"><canvas id="${type}TargetChart"></canvas></div>`;
+      const now = new Date();
+      return { y: now.getFullYear(), m: now.getMonth(), label: MONTH_NAMES_ID[now.getMonth()] + ' ' + now.getFullYear() };
+    }
+    function getStoreTarget(type) {
+      const mk = getActiveMonthKey(type);
+      if (type === 'ops') return calcOpsTarget(mk.y, mk.m);
+      if (type === 'ems') return calcEmsTarget(mk.y, mk.m);
+      return 0;
+    }
+    const STORE_TARGET = 85; // fallback lama, diganti dinamis di bawah
+    function renderTargetLine(type, data) {
+      const canvasId = type + 'LineChart';
+      if (chartInstances[canvasId]) { try { chartInstances[canvasId].destroy(); } catch(e) {} }
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const metas = data.map(getRowMeta);
+      const months = monthEntries(metas, true);
+      const labels = months.map(m => m[0]);
+      const actual = months.map(m => m[1]);
+      let targets = [];
+      if (type === 'ops' || type === 'ems') {
+        targets = labels.map(l => {
+          const mi = MONTH_NAMES_ID.findIndex(n => l.toLowerCase().includes(n.toLowerCase()));
+          const y = (l.match(/\b(19|20)\d{2}\b/) || [])[0];
+          if (mi < 0 || !y) return 0;
+          const perStore = type === 'ops' ? calcOpsTarget(+y, mi) : calcEmsTarget(+y, mi);
+          // Scope store
+          const p = state.pages[type];
+          let nStore = storeIndex.size;
+          if (p.trainerHO !== 'all') nStore = Array.from(storeIndex.values()).filter(s => s.ho === p.trainerHO).length;
+          if (p.store !== 'all') nStore = 1;
+          return perStore * nStore;
+        });
+      } else {
+        // PNR: sum of trainer targets (approx total hours)
+        let totalTargetHrs = 0;
+        pnrTargets.forEach(v => { totalTargetHrs += v.hours; });
+        targets = labels.map(() => totalTargetHrs);
+      }
       const root = getComputedStyle(document.documentElement);
       const tc = root.getPropertyValue('--text-main').trim(), mc = root.getPropertyValue('--text-muted').trim();
-      chartInstances[type + 'T'] = new Chart(document.getElementById(`${type}TargetChart`).getContext('2d'), {
+      chartInstances[canvasId] = new Chart(canvas.getContext('2d'), {
         type: 'line',
-        data: { labels: days, datasets: [
-          { label: `Target (${unit})`, data: tgt, borderColor: '#ff9f0a', borderDash: [6, 5], backgroundColor: 'transparent', tension: .25, pointRadius: 0, pointHoverRadius: 5, borderWidth: 2 },
-          { label: `Pencapaian (${unit})`, data: act, borderColor: '#0a84ff', backgroundColor: 'rgba(10,132,255,.18)', fill: true, tension: .25, pointRadius: 2.5, pointHoverRadius: 6, borderWidth: 2.5 }] },
-        options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-          onClick: (e, els) => { if (!els.length) return; const d = els[0].index + 1, rows = (perDay[d] || []).map(x => x.r); openModal({ title: `${d} ${label}`, sub: `${rows.length} entry`, ...detailRows(type, rows) }); },
-          scales: { x: { ticks: { color: mc }, grid: { display: false } }, y: { beginAtZero: true, ticks: { color: mc }, grid: { color: 'rgba(152,152,159,.15)' } } },
-          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, color: tc } } } }
+        data: {
+          labels,
+          datasets: [
+            { label: 'Pencapaian', data: actual, borderColor: '#0a84ff', backgroundColor: 'rgba(10,132,255,.15)', fill: true, tension: .35, pointRadius: 4, borderWidth: 2.5 },
+            { label: 'Target', data: targets, borderColor: '#ff9f0a', borderDash: [6, 4], tension: .35, pointRadius: 3, borderWidth: 2 }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          scales: { x: { ticks: { color: mc }, grid: { display: false } }, y: { beginAtZero: true, ticks: { color: mc, precision: 0 }, grid: { color: 'rgba(152,152,159,.15)' } } },
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, color: tc } } }
+        }
       });
     }
 
     function renderOPS() {
       const filteredData = getFilteredData('ops');
+      
       let totalParticipants = 0, totalUnits = 0;
       const topicCounts = {};
       filteredData.forEach(row => {
@@ -1231,32 +1209,150 @@
         const t = getFlexibleValue(row, ['topics', 'topik']) || 'Lainnya';
         topicCounts[t] = (topicCounts[t] || 0) + 1;
       });
-      renderTargetTable('ops', filteredData);
+      
+      
+      renderOpsStoreTable(filteredData);
       renderModuleSummary('ops', filteredData, [
-        ['Rata-rata Peserta Per Sesi', filteredData.length ? Math.round(totalParticipants / filteredData.length) : 0],
-        ['Unit Terjual Setelah OPS', totalUnits]
+        ['Rata-rata Peserta Per Sesi', filteredData.length ? (totalParticipants / filteredData.length).toFixed(1) : '0'],
+        ['Unit Terjual Setelah OPS', totalParticipants ? (totalUnits / totalParticipants).toFixed(2) : '0']
       ]);
-      renderTargetChart('ops');
+      renderTargetLine('ops', filteredData);
       renderChart('opsChart', topicCounts, k => openModal({ title: `Topik ${k}`, sub: 'OPS', ...detailRows('ops', filteredData.filter(r => getTopics('ops', r, 'all').includes(k))) }));
       renderCompare('ops'); renderMatrix('ops');
     }
 
+    // Data Detail OPS: Store x slot + Target dinamis (Sen-Jum 3, Sab-Min 2) + indikator Good/Need Attention/Bad
+    function statusBadge(pct) {
+      if (pct >= 100) return { cls: 'g', label: 'Good · Keep it up' };
+      if (pct >= 50) return { cls: 'a', label: 'Need Attention' };
+      return { cls: 'r', label: 'Bad · Pls improve' };
+    }
+    function renderOpsStoreTable(data) {
+      const p = state.pages.ops;
+      const TARGET = getStoreTarget('ops');
+      const blank = name => ({ name, s: { '13:00': 0, '15:00': 0, '18:00': 0 }, total: 0, rows: [] });
+      const agg = new Map();
+      data.forEach(r => {
+        const m = getRowMeta(r), k = m.store || '(Tanpa Store)';
+        let e = agg.get(k);
+        if (!e) { e = blank(k); agg.set(k, e); }
+        if (m.slot) e.s[m.slot]++;
+        e.total++; e.rows.push(r);
+      });
+      // Scope store mengikuti filter area
+      let scopeStores = Array.from(storeIndex.values());
+      if (p.trainerHO !== 'all') scopeStores = scopeStores.filter(s => s.ho === p.trainerHO);
+      if (p.store !== 'all') scopeStores = scopeStores.filter(s => norm(s.name) === norm(p.store));
+      if (!p.filter && p.store === 'all' && p.trainer === 'all') scopeStores.forEach(v => { if (!agg.has(v.name)) agg.set(v.name, blank(v.name)); });
+      const list = Array.from(agg.values()).sort((a, b) => b.total - a.total || byName(a.name, b.name));
+      const sum = list.reduce((a, e) => { a.t += e.total; ['13:00', '15:00', '18:00'].forEach(k => { a[k] += e.s[k]; }); return a; }, { t: 0, '13:00': 0, '15:00': 0, '18:00': 0 });
+      const cls = v => v >= 100 ? 'g' : v >= 50 ? 'a' : 'r';
+      const pc = n => TARGET ? Math.round(n / TARGET * 100) : 0;
+      document.getElementById('opsThead').innerHTML = ['Store', '13:00', '15:00', '18:00', 'TOTAL', 'TARGET', '%', 'Status'].map(h => `<th>${h}</th>`).join('');
+      const totTarget = TARGET * list.length, tp = totTarget ? Math.round(sum.t / totTarget * 100) : 0;
+      const rowsHtml = list.map(e => {
+        const v = pc(e.total);
+        const st = statusBadge(v);
+        const dr = reg(() => ({ title: e.name, sub: `OPS ${fmt(e.total)} entry · target ${TARGET} (${v}%) · ${st.label}`, ...detailRows('ops', e.rows) }));
+        return `<tr class="clickable" onclick="openDrill(${dr})"><td>${escapeHtml(e.name)}</td><td>${e.s['13:00']}</td><td>${e.s['15:00']}</td><td>${e.s['18:00']}</td><td><strong>${e.total}</strong></td><td>${TARGET}</td><td><span class="pct ${cls(v)}">${v}%</span><span class="pbar"><i style="width:${Math.min(100, v)}%"></i></span></td><td><span class="badge ${v >= 100 ? 'b-del' : v >= 50 ? 'b-plan' : 'b-man'}">${st.label}</span></td></tr>`;
+      }).join('');
+      document.getElementById('opsTbody').innerHTML = list.length
+        ? `<tr class="totrow"><td>Semua Store (${list.length})</td><td>${sum['13:00']}</td><td>${sum['15:00']}</td><td>${sum['18:00']}</td><td>${sum.t}</td><td>${fmt(totTarget)}</td><td><span class="pct ${cls(tp)}">${tp}%</span></td><td></td></tr>` + rowsHtml
+        : '<tr><td colspan="8" style="text-align:center;padding:24px">Data tidak ditemukan untuk kombinasi filter ini.</td></tr>';
+      const mk = getActiveMonthKey('ops');
+      document.getElementById('opsPagination').innerHTML = `<div>${list.length} store · target ${TARGET} entry/store (${mk.label}, Sen-Jum 3 · Sab-Min 2)</div><div>Klik store untuk melihat detail</div>`;
+    }
+
     function renderEMS() {
       const d = getFilteredData('ems');
-      renderTargetTable('ems', d);
+      renderEmsStoreTable(d);
       renderModuleSummary('ems', d);
-      renderTargetChart('ems');
+      renderTargetLine('ems', d);
       renderChart('emsChart', countTopics('ems', d), k => openModal({ title: `Topik ${k}`, sub: 'EMS', ...detailRows('ems', d.filter(r => getTopics('ems', r, 'all').includes(k))) }));
       renderCompare('ems'); renderMatrix('ems');
     }
 
+    function renderEmsStoreTable(data) {
+      const p = state.pages.ems;
+      const TARGET = getStoreTarget('ems');
+      const blank = name => ({ name, total: 0, rows: [] });
+      const agg = new Map();
+      data.forEach(r => {
+        const m = getRowMeta(r), k = m.store || '(Tanpa Store)';
+        let e = agg.get(k);
+        if (!e) { e = blank(k); agg.set(k, e); }
+        e.total++; e.rows.push(r);
+      });
+      let scopeStores = Array.from(storeIndex.values());
+      if (p.trainerHO !== 'all') scopeStores = scopeStores.filter(s => s.ho === p.trainerHO);
+      if (p.store !== 'all') scopeStores = scopeStores.filter(s => norm(s.name) === norm(p.store));
+      if (!p.filter && p.store === 'all' && p.trainer === 'all') scopeStores.forEach(v => { if (!agg.has(v.name)) agg.set(v.name, blank(v.name)); });
+      const list = Array.from(agg.values()).sort((a, b) => b.total - a.total || byName(a.name, b.name));
+      const sumT = list.reduce((a, e) => a + e.total, 0);
+      const cls = v => v >= 100 ? 'g' : v >= 50 ? 'a' : 'r';
+      const pc = n => TARGET ? Math.round(n / TARGET * 100) : 0;
+      document.getElementById('emsThead').innerHTML = ['Store', 'Aktual', 'TARGET', '%', 'Status'].map(h => `<th>${h}</th>`).join('');
+      const totTarget = TARGET * list.length, tp = totTarget ? Math.round(sumT / totTarget * 100) : 0;
+      const rowsHtml = list.map(e => {
+        const v = pc(e.total);
+        const st = statusBadge(v);
+        const dr = reg(() => ({ title: e.name, sub: `EMS ${fmt(e.total)} entry · target ${TARGET} (${v}%) · ${st.label}`, ...detailRows('ems', e.rows) }));
+        return `<tr class="clickable" onclick="openDrill(${dr})"><td>${escapeHtml(e.name)}</td><td><strong>${e.total}</strong></td><td>${TARGET}</td><td><span class="pct ${cls(v)}">${v}%</span><span class="pbar"><i style="width:${Math.min(100, v)}%"></i></span></td><td><span class="badge ${v >= 100 ? 'b-del' : v >= 50 ? 'b-plan' : 'b-man'}">${st.label}</span></td></tr>`;
+      }).join('');
+      document.getElementById('emsTbody').innerHTML = list.length
+        ? `<tr class="totrow"><td>Semua Store (${list.length})</td><td>${sumT}</td><td>${fmt(totTarget)}</td><td><span class="pct ${cls(tp)}">${tp}%</span></td><td></td></tr>` + rowsHtml
+        : '<tr><td colspan="5" style="text-align:center;padding:24px">Data tidak ditemukan untuk kombinasi filter ini.</td></tr>';
+      const mk = getActiveMonthKey('ems');
+      document.getElementById('emsPagination').innerHTML = `<div>${list.length} store · target ${TARGET} entry/store (${mk.label}, 2 aktivitas/hari)</div><div>Klik store untuk melihat detail</div>`;
+    }
+
     function renderPNR() {
       const d = getFilteredData('pnr');
-      renderTargetTable('pnr', d);
+      renderPnrStoreTable(d);
       renderModuleSummary('pnr', d);
-      renderTargetChart('pnr');
+      renderTargetLine('pnr', d);
       renderChart('pnrChart', countTopics('pnr', d), k => openModal({ title: `Topik ${k}`, sub: 'PNR', ...detailRows('pnr', d.filter(r => getTopics('pnr', r, topicMode).includes(k))) }));
       renderCompare('pnr'); renderMatrix('pnr');
+    }
+
+    function renderPnrStoreTable(data) {
+      const p = state.pages.pnr;
+      // Sort by status: Planning / Delivered / All (dari filter status atau chip)
+      const statusFilter = p.status || 'all';
+      const blank = name => ({ name, trainers: [], total: 0, hours: 0, target: 0, rows: [], delivered: 0, planning: 0 });
+      const agg = new Map();
+      data.forEach(r => {
+        const m = getRowMeta(r), k = m.store || '(Tanpa Store)';
+        let e = agg.get(k);
+        if (!e) { e = blank(k); const ix = storeIndex.get(norm(k)); if (ix) e.trainers = Array.from(ix.trainers); agg.set(k, e); }
+        e.total++; e.rows.push(r);
+        e.hours += m.hours || 0;
+        if (m.status === 'Delivered') e.delivered++;
+        if (m.status === 'Planning') e.planning++;
+      });
+      agg.forEach(e => {
+        e.trainers.forEach(t => { const f = findTarget(t); if (f) e.target += f.hours; });
+      });
+      let scopeStores = Array.from(storeIndex.values());
+      if (p.trainerHO !== 'all') scopeStores = scopeStores.filter(s => s.ho === p.trainerHO);
+      if (p.store !== 'all') scopeStores = scopeStores.filter(s => norm(s.name) === norm(p.store));
+      if (p.st && p.st !== 'all') scopeStores = scopeStores.filter(s => s.trainers.has(p.st));
+      if (!p.filter && p.store === 'all') scopeStores.forEach(v => { if (!agg.has(v.name)) { const e = blank(v.name); e.trainers = Array.from(v.trainers); e.trainers.forEach(t => { const f = findTarget(t); if (f) e.target += f.hours; }); agg.set(v.name, e); } });
+      const list = Array.from(agg.values()).sort((a, b) => b.total - a.total || byName(a.name, b.name));
+      const cls = v => v >= 100 ? 'g' : v >= 50 ? 'a' : 'r';
+      document.getElementById('pnrThead').innerHTML = ['Store', 'Store Trainer', 'Aktual Sesi', 'Hours', 'Min Target (jam)', '%', 'Status'].map(h => `<th>${h}</th>`).join('');
+      const sumT = list.reduce((a, e) => a + e.total, 0), sumH = list.reduce((a, e) => a + e.hours, 0), sumTg = list.reduce((a, e) => a + e.target, 0);
+      const rowsHtml = list.map(e => {
+        const v = e.target ? Math.round(e.hours / e.target * 100) : 0;
+        const st = statusBadge(v);
+        const dr = reg(() => ({ title: e.name, sub: `PNR ${fmt(e.total)} sesi · ${r1(e.hours)} jam / target ${r1(e.target)} jam (${v}%) · ${st.label}`, ...detailRows('pnr', e.rows) }));
+        return `<tr class="clickable" onclick="openDrill(${dr})"><td>${escapeHtml(e.name)}</td><td>${escapeHtml(e.trainers.join(', ') || '-')}</td><td><strong>${e.total}</strong></td><td>${r1(e.hours)}</td><td>${e.target ? r1(e.target) : '-'}</td><td><span class="pct ${cls(v)}">${v}%</span><span class="pbar"><i style="width:${Math.min(100, v)}%"></i></span></td><td><span class="badge ${v >= 100 ? 'b-del' : v >= 50 ? 'b-plan' : 'b-man'}">${st.label}</span></td></tr>`;
+      }).join('');
+      const tp = sumTg ? Math.round(sumH / sumTg * 100) : 0;
+      document.getElementById('pnrTbody').innerHTML = list.length
+        ? `<tr class="totrow"><td>Semua Store (${list.length})</td><td></td><td>${sumT}</td><td>${r1(sumH)}</td><td>${r1(sumTg)}</td><td><span class="pct ${cls(tp)}">${tp}%</span></td><td></td></tr>` + rowsHtml
+        : '<tr><td colspan="7" style="text-align:center;padding:24px">Data tidak ditemukan untuk kombinasi filter ini.</td></tr>';
+      document.getElementById('pnrPagination').innerHTML = `<div>${list.length} store · target dari sheet PNR (${pnrTargets.size} trainer terbaca)</div><div>Klik store untuk melihat detail · Sort status via filter</div>`;
     }
 
     function getAllHeaders(data) {
@@ -1284,7 +1380,7 @@
         return (tag ? `<span class="badge ${tag === 'Mandatory' ? 'b-man' : 'b-oth'}">${tag}</span> ` : '') + escapeHtml(t || '-');
       } },
       { h: 'Status', html: true, f: r => { const s = getRowMeta(r).status; return s ? `<span class="badge ${s === 'Delivered' ? 'b-del' : 'b-plan'}">${escapeHtml(s)}</span>` : '-'; } },
-      { h: 'Participant name', f: r => canonNames(inclKey(r, 'participant'), getRowMeta(r).store) },
+      { h: 'Participant name', f: r => inclKey(r, 'participant') },
       { h: 'Any Comment', f: r => inclKey(r, 'comment') }
     ];
     // Format Indonesia seperti di Google Sheet: dd/mm/yyyy HH:mm:ss (zona WIB)
@@ -1328,7 +1424,6 @@
         if (type === 'ops' && h === 'Tanggal Sesi') return;                     // OPS: tanggal sesi dihapus
         if (h === 'Waktu Input' || /timestamp/i.test(k)) cols.push({ h: 'Waktu Input', f: r => fmtStamp(r[k]) });
         else if (type === 'ems' && (h === 'Tanggal Sesi' || ['date', 'tanggal'].includes(norm(k)))) cols.push({ h: 'Date', f: r => emsDate(r, k) });
-        else if (h === 'Presenter' || h === 'Store Trainer' || (/participant|nama peserta/i.test(k) && !/total|jumlah|count|number|qty|berapa/i.test(k))) cols.push({ h, f: r => canonNames(r[k], getRowMeta(r).store) });
         else cols.push({ h, f: r => r[k] });
       });
       return cols;
@@ -1500,9 +1595,11 @@
       const mk = (id, cls) => { const d = document.createElement('div'); d.id = id; d.className = cls; return d; };
       ['ops', 'ems', 'pnr'].forEach(t => {
         state.pages[t].status = 'all'; state.pages[t].st = 'all';
-        const sum = mk(`${t}-summary`, 'panel-card sum-wrap'), tch = mk(`${t}-tchart`, 'panel-card sum-wrap'), cmp = mk(`${t}-compare`, 'panel-card sum-wrap');
+        const sum = mk(`${t}-summary`, 'panel-card sum-wrap'), cmp = mk(`${t}-compare`, 'panel-card sum-wrap');
+        const lineChart = mk(`${t}-linechart`, 'panel-card sum-wrap');
+        lineChart.innerHTML = `<div class="muted" style="font-size:.8rem;margin-bottom:10px">Target vs Pencapaian · ${t.toUpperCase()}</div><div class="chart-wrap" style="height:260px;flex:none;min-height:0"><canvas id="${t}LineChart"></canvas></div>`;
         const kg0 = document.querySelector(`#panel-${t} .kpi-grid`); kg0.after(sum); kg0.remove();
-        sum.after(tch); tch.after(cmp);
+        sum.after(lineChart); lineChart.after(cmp);
         if (t !== 'ops') { // tabel + diagram Topik Terpopuler berdampingan
           const tp = document.querySelector(`#panel-${t} > .panel-card:not(.sum-wrap)`);
           const grid = document.createElement('div'); grid.className = 'content-grid';
@@ -1510,9 +1607,7 @@
           const chips = t === 'pnr' ? `<div class="chips" id="pnr-chips">${[['all', 'Semua'], ['mandatory', 'Mandatory'], ['other', 'Other']].map(c => `<button class="chip${c[0] === 'all' ? ' active' : ''}" data-m="${c[0]}" onclick="setTopicMode('${c[0]}')">${c[1]}</button>`).join('')}</div>` : '';
           cp.innerHTML = `${chips ? `<div class="panel-header">${chips}</div>` : ''}<div class="chart-wrap"><canvas id="${t}Chart"></canvas></div>`;
           tp.before(grid); grid.append(tp, cp);
-          if (t === 'pnr') tp.insertAdjacentHTML('afterbegin', `<div class="panel-header"><div class="chips" id="pnr-status-chips">${[['planning', 'Planning'], ['delivered', 'Delivered'], ['all', 'All']].map(c => `<button class="chip${c[0] === 'delivered' ? ' active' : ''}" data-m="${c[0]}" onclick="setPnrStatus('${c[0]}')">${c[1]}</button>`).join('')}</div></div>`);
         }
-        
         document.getElementById(`panel-${t}`).appendChild(mk(`${t}-matrix`, 'panel-card sum-wrap'));
         const fb = mk(`${t}-filterbar`, 'panel-card filter-bar'); // semua sort by di paling atas tab
         const crow = document.querySelector(`#panel-${t} .controls-row`);
@@ -1521,20 +1616,27 @@
         fb.insertAdjacentHTML('beforeend', `<div class="export-row">${EXPORT_BTN(t)}${CS_BTN(t)}</div>`);
         document.getElementById(`panel-${t}`).prepend(fb);
       });
-      // urutan sort PNR: bulan, store, status, store trainer, staff
+      // urutan sort PNR: bulan, area, store, status, store trainer
       const row = document.querySelector('#panel-pnr .controls-row');
-      ['MonthFilter', 'TrainerHOFilter', 'StoreFilter', 'StFilter'].forEach(id => row.appendChild(document.getElementById('pnr' + id)));
-      document.getElementById('pnrStatusFilter').style.display = 'none';
-      document.getElementById('pnrTrainerFilter').style.display = 'none';
+      ['MonthFilter', 'TrainerHOFilter', 'StoreFilter', 'StatusFilter', 'StFilter'].forEach(id => {
+        const el = document.getElementById('pnr' + id);
+        if (el) row.appendChild(el);
+      });
+      const stf = document.getElementById('pnrTrainerFilter');
+      if (stf) stf.style.display = 'none';
+      // Pastikan status filter punya opsi
+      const statusEl = document.getElementById('pnrStatusFilter');
+      if (statusEl && !statusEl.options.length) {
+        statusEl.innerHTML = '<option value="all">📌 Semua Status</option><option value="Planning">Planning</option><option value="Delivered">Delivered</option>';
+      }
       ['all', 'roster'].forEach(id => document.querySelector('.app-shell').appendChild(mk(`panel-${id}`, 'module-panel')));
       ['ops', 'ems', 'pnr'].forEach(t => { // semua section di bawah filter: default collapsed
         const N = t.toUpperCase(), P = id => document.getElementById(id);
         csWrap(P(`${t}-summary`), `Summary ${N}`, t);
-        csWrap(P(`${t}-tchart`), 'Grafik Target vs Pencapaian', t);
+        csWrap(P(`${t}-linechart`), `Grafik Target vs Pencapaian · ${N}`, t);
         csWrap(P(`${t}-compare`), 'Comparison LFL', t);
         const cells = Array.from(document.querySelector(`#panel-${t} .content-grid`).children);
         csWrap(cells[0], `Data Detail ${N}`, t); csWrap(cells[1], 'Topik Terpopuler', t);
-        
         csWrap(P(`${t}-matrix`), `Matriks Partisipasi ${t === 'pnr' ? 'Trainer' : 'Staff'} Bulanan · ${N}`, t);
       });
     }
@@ -1595,8 +1697,8 @@
         rows: entries.map(([k, v]) => [escapeHtml(k), fmt(v)].concat(target ? [pct(v, target)] : [])) };
     }
     function mixedDetail(title, list) {
-      return { title, sub: `${fmt(list.length)} entry`, heads: ['Modul', 'Date', 'Store', 'Staff', 'Topik / Status'],
-        rows: list.slice().sort((a, b) => (b.m.date ? b.m.date.getTime() : 0) - (a.m.date ? a.m.date.getTime() : 0)).map(x => [x.t.toUpperCase(), escapeHtml(x.m.date ? fmtDate(x.m.date) : (x.m.month || '-')), escapeHtml(x.m.store || '-'), escapeHtml(x.m.trainer || '-'),
+      return { title, sub: `${fmt(list.length)} entry`, heads: ['Modul', 'Bulan', 'Store', 'Staff', 'Topik / Status'],
+        rows: list.slice().sort((a, b) => (b.m.date ? b.m.date.getTime() : 0) - (a.m.date ? a.m.date.getTime() : 0)).map(x => [x.t.toUpperCase(), escapeHtml(x.m.month || '-'), escapeHtml(x.m.store || '-'), escapeHtml(x.m.trainer || '-'),
           escapeHtml(x.t === 'pnr' ? [x.m.status].concat(getTopics('pnr', x.r, 'all')).filter(Boolean).join(' · ') : getTopics(x.t, x.r).join(', '))]) };
     }
     function miniTable(heads, rows, maxH, drills) {
@@ -1728,7 +1830,7 @@
       const act = new Set(data.map(r => getRowMeta(r).store).filter(Boolean));
       const stores = Array.from(storeIndex.values()).filter(s => !act.has(s.name) && (p.store === 'all' || norm(s.name) === norm(p.store)) && (p.trainerHO === 'all' || s.ho === p.trainerHO) && (!isPNR || !p.st || p.st === 'all' || s.trainers.has(p.st)));
       const { zero } = staffSplit(staffPool(type, p), data.map(r => getRowMeta(r).trainer));
-      return `<div class="sum-cols" style="margin-top:18px">${zeroBlock('Store Tanpa Aktivitas', stores, Z_STORE_HEADS, zStoreRow, 5)}${!isPNR && p.trainer !== 'all' ? '' : zeroBlock(isPNR ? 'Store Trainer Tanpa Aktivitas' : 'Staff Tanpa Aktivitas', zero, Z_STAFF_HEADS, zStaffRow, 5)}</div>`;
+      return `<div class="sum-cols" style="margin-top:18px">${zeroBlock('Store Tanpa Aktivitas', stores, Z_STORE_HEADS, zStoreRow, 5)}${zeroBlock(isPNR ? 'Store Trainer Tanpa Aktivitas' : 'Staff Tanpa Aktivitas', zero, Z_STAFF_HEADS, zStaffRow, 5)}</div>`;
     }
     function staffBlock(type, data) {
       const title = (type === 'pnr' ? 'Trainer' : 'Staff') + ' Paling Sedikit Aktivitas';
@@ -1738,56 +1840,70 @@
       });
     }
     function overallBottomStaff(sel) {
-      return bottomStaffBlock('Staff Paling Sedikit Aktivitas', staffPool('ops', { store: allStore, trainerHO: allArea }), sel.map(x => x.m.trainer), s => mixedDetail(s.nama, sel.filter(x => tokSame(tokensOf(x.m.trainer), tokensOf(s.nama)))));
+      return bottomStaffBlock('Staff Paling Sedikit Aktivitas', staffPool('ops', { store: 'all', trainerHO: 'all' }), sel.map(x => x.m.trainer), s => mixedDetail(s.nama, sel.filter(x => tokSame(tokensOf(x.m.trainer), tokensOf(s.nama)))));
     }
     function overallZero(sel) {
-      const names = sel.map(x => x.m.trainer), any = { store: allStore, trainerHO: allArea };
+      const names = sel.map(x => x.m.trainer), any = { store: 'all', trainerHO: 'all' };
       const staffZero = staffSplit(staffPool('ops', any), names).zero, trZero = staffSplit(staffPool('pnr', any), names).zero;
       return `<div class="panel-card sum-wrap"><div class="sum-cols">${zeroBlock('Staff Tanpa Aktivitas', staffZero, Z_STAFF_HEADS, zStaffRow)}${zeroBlock('Store Trainer Tanpa Aktivitas', trZero, Z_STAFF_HEADS, zStaffRow)}</div></div>`;
     }
     function renderModuleSummary(type, data, extras) {
       const el = document.getElementById(`${type}-summary`);
       if (!el) return;
-      const isPNR = type === 'pnr', p = state.pages[type], mm = data.map(getRowMeta);
+      const isPNR = type === 'pnr', mm = data.map(getRowMeta);
       const by = pred => data.filter((r, i) => pred(mm[i]));
       const D = (title, rows) => () => ({ title, sub: `${fmt(rows.length)} entry`, ...detailRows(type, rows) });
       const stores = new Set(mm.map(m => m.store).filter(Boolean)), staff = new Set(mm.map(m => norm(m.trainer)).filter(Boolean));
       const months = monthEntries(mm);
-      const storeCnt = countBy(mm, m => m.store), staffCnt = countBy(mm, m => m.trainer);
+      const storeCnt = countBy(mm, m => m.store), staffCnt = countBy(mm, m => m.trainer), cntMap = new Map(storeCnt);
+      const poolStores = storeIndex.size ? Array.from(storeIndex.values()).map(s => s.name) : storeCnt.map(e => e[0]);
+      const allStores = poolStores.map(n => [n, cntMap.get(n) || 0]).sort((a, b) => b[1] - a[1] || byName(a[0], b[0]));
       const bottomStores = storeCnt.slice().reverse();
-      const scopeN = scopeStores(p).length;
+      const matched = mm.filter(m => m.store && storeIndex.has(norm(m.store))).length;
+      const unm = countBy(mm.filter(m => m.store && !storeIndex.has(norm(m.store))), m => m.store);
       let trend = '';
       if (months.length > 1 && months[1][1]) { const d = Math.round((months[0][1] - months[1][1]) / months[1][1] * 100); trend = `${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% vs ${months[1][0]}`; }
       const topics = Object.entries(countTopics(type, data)).sort((a, b) => b[1] - a[1]);
       const who = isPNR ? 'Trainer' : type === 'ems' ? 'Participant' : 'Presenter';
-      const ts = targetStats(type, data);
-      const cnt = f => ts.list.filter(e => e.pct !== null && f(e.pct)).length;
+      const p = state.pages[type];
+      // Scope store mengikuti filter area
+      let scopeSize = storeIndex.size;
+      if (p.trainerHO !== 'all') {
+        scopeSize = Array.from(storeIndex.values()).filter(s => s.ho === p.trainerHO).length;
+      }
+      if (p.store !== 'all') scopeSize = 1;
+      const TARGET = !isPNR ? getStoreTarget(type) : 0;
       const kp = [
-        kpiCard('Store Aktif', stores.size, scopeN ? `${pct(stores.size, scopeN)} dari ${scopeN} store` : '', () => listDetail('Store aktif', storeCnt)),
+        kpiCard('Store Aktif', stores.size, scopeSize ? `${pct(stores.size, scopeSize)} dari ${scopeSize} store` : '', () => listDetail('Store aktif', storeCnt, isPNR ? 0 : TARGET)),
         kpiCard(`${who} Aktif`, staff.size, '', () => listDetail(`${who} aktif`, staffCnt)),
         kpiCard('Entry di bulan ini', months.length ? months[0][1] : 0, months.length ? months[0][0] + (trend ? ' · ' + trend : '') : '', D(months.length ? months[0][0] : '-', by(m => months.length && m.month === months[0][0]))),
-        kpiCard(`Rata-rata Entry ${who}`, staff.size ? Math.round(data.length / staff.size) : 0, '', () => listDetail(`Entry per ${who.toLowerCase()}`, staffCnt)),
-        kpiCard('Pencapaian Target Per Store', ts.pct === null ? '-' : ts.pct + '%', `${cnt(v => v >= 100)} Good · ${cnt(v => v >= 50 && v < 100)} Need Attention · ${cnt(v => v < 50)} Bad`, () => targetList(type, ts))
+        kpiCard(`Rata-rata Entry ${who}`, staff.size ? (data.length / staff.size).toFixed(1) : '0', '', () => listDetail(`Entry per ${who.toLowerCase()}`, staffCnt)),
       ];
-      if (isPNR) {
+      if (!isPNR) {
+        const hit = allStores.filter(e => e[1] >= TARGET).length;
+        kp.push(kpiCard('Pencapaian Target Per Store', scopeSize && TARGET ? Math.round(data.length / (TARGET * scopeSize) * 100) + '%' : '0%', `${hit} store ≥ ${TARGET}`, () => listDetail('Pencapaian per store', allStores, TARGET)));
+      } else {
         const dv = by(m => m.status === 'Delivered'), pl = by(m => m.status === 'Planning');
         const hrs = r1(dv.reduce((a, r) => a + getRowMeta(r).hours, 0));
         kp.push(kpiCard('Delivered', dv.length, pct(dv.length, data.length) + ' dari entry', D('Delivered', dv)), kpiCard('Planning', pl.length, pct(pl.length, data.length) + ' dari entry', D('Planning', pl)), kpiCard('Hours Delivered', hrs, 'total jam sesi delivered', D('Hours Delivered', dv)));
       }
       (extras || []).forEach(e => kp.push(kpiCard(e[0], e[1], '', D(e[0], data))));
-      // blok yang tidak relevan disembunyikan otomatis saat filter spesifik dipilih
-      const mSel = p.month !== 'all', sSel = p.store !== 'all', aSel = p.trainerHO !== 'all', tSel = isPNR && p.st && p.st !== 'all', pSel = !isPNR && p.trainer !== 'all';
-      const blocks = [
-        mSel ? '' : barList('Entry per Bulan', months, 6, k => D(`Entry ${k}`, by(m => m.month === k))()),
-        sSel ? '' : barList('Top Store', storeCnt, 5, k => D(k, by(m => m.store === k))()),
-        sSel ? '' : barList('Bottom Store', bottomStores, 5, k => D(k, by(m => m.store === k))()),
-        tSel || pSel || (isPNR && sSel) ? '' : barList(`Top ${who}`, staffCnt, 5, k => D(k, by(m => m.trainer === k))()),
-        (isPNR && sSel) || pSel ? '' : staffBlock(type, data),
-        isPNR ? barList('Entry per Status', countBy(mm, m => m.status), 5, k => D(`Status ${k}`, by(m => m.status === k))())
-              : (aSel || sSel || pSel ? '' : barList('Entry per Area', countBy(mm, m => m.ho), 5, k => D(`Area ${k}`, by(m => m.ho === k))())),
-        isPNR && !tSel && !sSel ? barList('Entry per Store Trainer', countBy(mm.flatMap(m => m.st), x => x), 5, k => D(`Store Trainer ${k}`, by(m => m.st.includes(k)))()) : '',
-        barList(isPNR ? 'Top Topik (Mandatory & Other)' : 'Top Topik', topics, 5, k => D(`Topik ${k}`, data.filter(r => getTopics(type, r, 'all').includes(k)))())
-      ];
+      // Auto-hide sections when specific filters are active
+      const hideMonthStore = (type === 'ops' || type === 'ems') && p.month !== 'all' && p.store !== 'all';
+      const hidePnr = type === 'pnr' && p.month !== 'all' && p.store !== 'all' && p.st && p.st !== 'all';
+      const blocks = [];
+      if (!hideMonthStore && !hidePnr) blocks.push(barList('Entry per Bulan', months, 6, k => D(`Entry ${k}`, by(m => m.month === k))()));
+      if (!hideMonthStore && !hidePnr) blocks.push(barList('Top Store', storeCnt, 5, k => D(k, by(m => m.store === k))()));
+      if (!hideMonthStore && !hidePnr) blocks.push(barList('Bottom Store', bottomStores, 5, k => D(k, by(m => m.store === k))()));
+      if (!hidePnr) blocks.push(barList(`Top ${who}`, staffCnt, 5, k => D(k, by(m => m.trainer === k))()));
+      blocks.push(staffBlock(type, data));
+      if (isPNR) {
+        blocks.push(barList('Entry per Status', countBy(mm, m => m.status), 5, k => D(`Status ${k}`, by(m => m.status === k))()));
+        if (!hidePnr) blocks.push(barList('Entry per Store Trainer', countBy(mm.flatMap(m => m.st), x => x), 5, k => D(`Store Trainer ${k}`, by(m => m.st.includes(k)))()));
+      } else if (!hideMonthStore) {
+        blocks.push(barList('Entry per Area', countBy(mm, m => m.ho), 5, k => D(`Area ${k}`, by(m => m.ho === k))()));
+      }
+      blocks.push(barList(isPNR ? 'Top Topik (Mandatory & Other)' : 'Top Topik', topics, 5, k => D(`Topik ${k}`, data.filter(r => getTopics(type, r, 'all').includes(k)))()));
       el.innerHTML = `<div class="kpi-grid">${kp.join('')}</div><div class="sum-cols">${blocks.join('')}</div>${zeroBlocks(type, data)}<div class="muted" style="font-size:.75rem;margin-top:10px">Klik kartu atau baris untuk melihat detailnya.</div>`;
     }
 
@@ -1967,14 +2083,7 @@
       if (!host.dataset.ready) {
         host.dataset.ready = '1';
         host.innerHTML = `
-          <div class="panel-card sum-wrap">
-            <div class="panel-header"><div><div class="muted" style="font-size:.8rem">Pilih Store Trainer untuk melihat profil dan ringkasan OPS, EMS, PNR</div></div>
-              <div class="rapor-sel"><select id="raporMonthSel" class="select-box" onchange="renderRapor()"></select><select id="raporAreaSel" class="select-box" onchange="fillRaporOptions();renderRapor()"></select><select id="raporSel" class="select-box" style="min-width:240px" onchange="renderRapor()"></select></div></div>
-            <div id="raporBody"></div>
-          </div>
-          <div class="panel-card sum-wrap">
-            <div class="muted" id="rosterTitle" style="font-size:.85rem;font-weight:600"></div>
-            <div class="muted" id="rosterLegend" style="font-size:.8rem;margin:2px 0 12px"></div>
+          <div class="panel-card filter-bar">
             <div class="controls-row">
               <input id="rosterSearch" class="search-box" placeholder="Cari toko / trainer / WhatsApp..." oninput="roster.search=this.value;renderRosterBody()">
               <select id="rosterMonthSel" class="select-box" onchange="rosterMonth=this.value;fetchRoster()">${ROSTER_MONTHS.map(n => `<option value="${n}">📅 ${n.charAt(0) + n.slice(1).toLowerCase()}</option>`).join('')}</select>
@@ -1983,13 +2092,22 @@
                 <option value="all">🕒 Semua Shift</option><option value="E">E · Early (Pagi)</option><option value="M">M · Middle</option><option value="L">L · Late (Siang)</option><option value="X">X · Off Day</option><option value="-">Belum diisi</option>
               </select>
             </div>
+            <div class="export-row">${CS_BTN('roster')}</div>
+          </div>
+          <div class="panel-card sum-wrap">
+            <div class="panel-header"><div><div class="muted" style="font-size:.8rem;margin-top:2px">Pilih Store Trainer untuk melihat profil dan ringkasan OPS, EMS, PNR</div></div>
+              <select id="raporSel" class="select-box" style="flex:none;min-width:300px" onchange="renderRapor()"></select></div>
+            <div id="raporBody"></div>
+          </div>
+          <div class="panel-card sum-wrap">
+            <div class="panel-header"><div><div class="muted" id="rosterTitle" style="font-size:.85rem;font-weight:600"></div><div class="muted" id="rosterLegend" style="font-size:.8rem;margin-top:2px"></div></div></div>
             <div class="cap-grid" id="rosterKpi"></div>
             <div class="sortbar" id="rosterSort"></div>
             <div class="table-container" style="max-height:640px"><table class="roster rost" id="rosterTable"></table></div>
             <div class="pagination-bar" id="rosterCount"></div>
           </div>`;
         const kids = Array.from(host.children);
-        csWrap(kids[0], 'Rapor Trainer', 'roster'); csWrap(kids[1], 'Roster Trainer', 'roster');
+        csWrap(kids[1], 'Rapor Trainer', 'roster'); csWrap(kids[2], 'Roster Trainer', 'roster');
       }
       renderRosterBody(); fillRaporOptions(); renderRapor();
     }
@@ -1997,7 +2115,7 @@
     function renderRosterBody() {
       const $ = id => document.getElementById(id);
       if (!$('rosterTable')) return;
-      $('rosterTitle').textContent = roster.title || 'Store Trainer Profile';
+      $('rosterTitle').textContent = roster.title || 'Store Trainer Roster';
       $('rosterLegend').textContent = roster.legend || '';
       $('rosterMonthSel').value = rosterMonth;
       $('rosterDaySel').innerHTML = roster.days.map((d, i) => `<option value="${i}">📆 Shift hari ${escapeHtml(d.wd + ' ' + d.day)}</option>`).join('');
@@ -2025,7 +2143,7 @@
         if (roster.shift !== 'all' && (r.shifts[di] || '-') !== roster.shift) return false;
         return !q || `${r.store} ${r.trainer} ${r.wa}`.toLowerCase().includes(q);
       });
-      const rsk = roster.sort || 'fb', filled = r => (r.shifts[di] || '') ? 1 : 0;
+      const rsk = roster.sort || 'store', filled = r => (r.shifts[di] || '') ? 1 : 0;
       shown.sort({ az: (a, b) => byName(a.trainer || '~', b.trainer || '~') || byName(a.store, b.store), za: (a, b) => byName(b.trainer || '', a.trainer || '') || byName(a.store, b.store),
         store: (a, b) => byName(a.store, b.store) || byName(a.trainer, b.trainer), fb: (a, b) => filled(b) - filled(a) || byName(a.store, b.store) }[rsk]);
       $('rosterSort').innerHTML = `<span class="muted" style="font-size:.76rem;font-weight:600">Toko · Trainer</span>${[['az', 'A-Z'], ['za', 'Z-A'], ['store', 'Store'], ['fb', 'Filled-Blank']].map(([k, l]) => `<button class="chip${rsk === k ? ' active' : ''}" onclick="roster.sort='${k}';renderRosterBody()">${l}</button>`).join('')}`;
@@ -2038,145 +2156,41 @@
 
     /* ---------- Rapor Trainer ---------- */
     function fillRaporOptions() {
-      const selM = document.getElementById('raporMonthSel'), selA = document.getElementById('raporAreaSel'), sel = document.getElementById('raporSel');
-      if (!sel || !selA || !selM) return;
-      const curM = selM.value, curA = selA.value, cur = sel.value;
-      const esc = escapeHtml, items = [];
-      ['ops', 'ems', 'pnr'].forEach(t => (state[t] || []).forEach(r => items.push(getRowMeta(r))));
-      const hoOf = r => { const ix = storeIndex.get(norm(r.store)); return ix ? ix.ho : ''; };
-      // seperti sort by di module PNR: pilihan memuat seluruh data Recap + jumlah entry; Area -> Bulan -> Store Trainer saling menyesuaikan
-      const hos = Array.from(new Set(Array.from(storeIndex.values()).map(x => x.ho).filter(Boolean))).sort(byName);
-      const area = hos.includes(curA) ? curA : 'all', inArea = m => area === 'all' || m.ho === area;
-      const mm = new Map();
-      items.forEach(m => { if (!m.month || !inArea(m)) return; const e = mm.get(m.month) || { k: m.monthKey, n: 0 }; e.n++; mm.set(m.month, e); });
-      const month = curM !== 'all' && mm.has(curM) ? curM : 'all', inMonth = m => month === 'all' || m.month === month;
-      const ac = new Map(), tc = new Map();
-      items.forEach(m => {
-        if (m.ho && inMonth(m)) ac.set(m.ho, (ac.get(m.ho) || 0) + 1);
-        const k = norm(m.trainer); if (k && inMonth(m) && inArea(m)) tc.set(k, (tc.get(k) || 0) + 1);
-      });
-      const total = items.filter(m => inArea(m) && m.month).length;
-      selM.innerHTML = `<option value="all">📅 Semua Bulan (${total})</option>` + Array.from(mm.entries()).sort((a, b) => b[1].k - a[1].k).map(([l, e]) => `<option value="${esc(l)}">${esc(l)} (${e.n})</option>`).join('');
-      selM.value = month;
-      selA.innerHTML = '<option value="all">👔 Semua Area</option>' + hos.map(a => `<option value="${esc(a)}">${esc(a)} (${ac.get(a) || 0})</option>`).join('');
-      selA.value = area;
-      const seen = new Set();
-      const list = trainerRecs.filter(r => { if (area !== 'all' && hoOf(r) !== area) return false; const k = norm(r.nama) + '|' + norm(r.store); if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => byName(a.nama, b.nama));
-      sel.innerHTML = '<option value="">👤 Pilih Store Trainer</option>' + list.map(r => `<option value="${esc(r.nama + '@@' + r.store)}">${esc(r.nama)} · ${esc(shortStore(r.store))} (${tc.get(norm(r.nama)) || 0})</option>`).join('');
-      sel.value = cur; if (sel.value !== cur) sel.value = '';
-    }
-    // grading pencapaian: >=100% Good, 50-99% Lack, <50% Bad
-    const GRADE = pc => pc === null ? '' : pc >= 100 ? '<span class="badge b-good">Good · Keep it up</span>' : pc >= 50 ? '<span class="badge b-mid">Lack · Need improvement</span>' : '<span class="badge b-bad">Bad · Need attention</span>';
-
-    /* ---------- Posisi vs trainer lain ---------- */
-    const PEER_W = { ops: 30, ems: 30, pnr: 40 };   // bobot skor gabungan (%); jika PNR tidak punya target, bobot dibagi ulang
-    let peerGroup = 'all', peerMetric = 'total';
-    function setPeerGroup(g) { peerGroup = g; renderRapor(); }
-    function setPeerMetric(m) { peerMetric = m; renderRapor(); }
-    function peerKeys(t, rm) {
-      if (rm !== 'all') { const k = monthKeyFromLabel(rm); return k ? [k] : []; }
-      const ks = new Set(); (state[t] || []).forEach(r => { const k = getRowMeta(r).monthKey; if (k) ks.add(k); });
-      if (!ks.size) { const n = new Date(); ks.add(n.getFullYear() * 100 + n.getMonth()); }
-      return Array.from(ks);
-    }
-    function peerScores(rm) {
-      const mOk = r => rm === 'all' || getRowMeta(r).month === rm;
-      const cnt = { ops: new Map(), ems: new Map() };
-      ['ops', 'ems'].forEach(t => (state[t] || []).forEach(r => { if (!mOk(r)) return; const k = norm(getRowMeta(r).store); cnt[t].set(k, (cnt[t].get(k) || 0) + 1); }));
-      const ph = new Map();
-      (state.pnr || []).forEach(r => { const m = getRowMeta(r); if (m.status !== 'Delivered' || !mOk(r)) return; const k = norm(m.trainer); if (k) ph.set(k, (ph.get(k) || 0) + (m.hours || 0)); });
-      const tOps = peerKeys('ops', rm).reduce((a, k) => a + monthTargetDays('ops', k), 0), tEms = peerKeys('ems', rm).reduce((a, k) => a + monthTargetDays('ems', k), 0), nP = peerKeys('pnr', rm).length;
-      const seen = new Set(), out = [];
-      trainerRecs.forEach(rec => {
-        const key = norm(rec.nama) + '|' + norm(rec.store);
-        if (!rec.nama || seen.has(key)) return; seen.add(key);
-        const ops = tOps ? (cnt.ops.get(norm(rec.store)) || 0) / tOps * 100 : null, ems = tEms ? (cnt.ems.get(norm(rec.store)) || 0) / tEms * 100 : null;
-        let h = ph.get(norm(rec.nama)) || 0;
-        if (!h) ph.forEach((v, k) => { if (!h && sameName(k, rec.nama)) h = v; });
-        const tg = findTarget(rec.nama), pnr = tg && tg.hours && nP ? h / (tg.hours * nP) * 100 : null;
-        const sc = { ops, ems, pnr };
-        let wsum = 0, tot = 0, raw = 0;
-        Object.keys(PEER_W).forEach(t => { if (sc[t] === null) return; wsum += PEER_W[t]; tot += PEER_W[t] * Math.min(100, sc[t]); raw += PEER_W[t] * sc[t]; });
-        out.push({ key, rec, area: lgAreaOf(rec), type: rec.type || '', ops, ems, pnr, total: wsum ? tot / wsum : null, raw: wsum ? raw / wsum : 0 });
-      });
-      return out;
-    }
-    function peerRank(list, m) { // peringkat kompetisi (nilai sama = peringkat sama)
-      const v = list.filter(x => x[m] !== null).sort((a, b) => (b[m] - a[m]) || (b.raw - a.raw));
-      const rk = new Map(); let last = null, lr = 0;
-      v.forEach((x, i) => { if (last === null || Math.abs(x[m] - last) > 1e-9) { lr = i + 1; last = x[m]; } rk.set(x.key, lr); });
-      return { sorted: v, rk, n: v.length };
-    }
-    function peerHtml(rec, rm) {
-      const all = peerScores(rm), me = all.find(x => x.key === norm(rec.nama) + '|' + norm(rec.store));
-      if (!me) return '';
-      const grpName = { all: 'Semua Trainer', area: me.area ? 'Area ' + me.area : 'Area', type: me.type ? 'Type ' + me.type : 'Type Store' };
-      if (peerGroup === 'area' && !me.area) peerGroup = 'all';
-      if (peerGroup === 'type' && !me.type) peerGroup = 'all';
-      const pool = all.filter(x => peerGroup === 'all' || (peerGroup === 'area' ? x.area === me.area : x.type === me.type));
-      const R = { total: peerRank(pool, 'total'), ops: peerRank(pool, 'ops'), ems: peerRank(pool, 'ems'), pnr: peerRank(pool, 'pnr') };
-      const P = v => v === null ? '-' : Math.round(v) + '%';
-      const avg = m => { const v = pool.filter(x => x[m] !== null); return v.length ? v.reduce((a, x) => a + x[m], 0) / v.length : null; };
-      const card = (m, label) => {
-        const r = R[m], rk = r.rk.get(me.key), v = me[m];
-        if (v === null || !rk) return `<div class="peer-card"><div class="k">${label}</div><div class="v">-</div><div class="ln">Target belum terbaca</div></div>`;
-        const below = r.sorted.filter(x => x[m] < v - 1e-9).length, up = r.n > 1 ? Math.round(below / (r.n - 1) * 100) : null;
-        return `<div class="peer-card"><div class="k">${label}</div><div class="v">${P(v)}</div><div class="peer-bar"><i style="width:${Math.min(100, v)}%"></i></div>${GRADE(Math.round(v))}<div class="ln">Peringkat <b>#${rk}</b> dari ${r.n}${up === null ? '' : ` · lebih baik dari ${up}% trainer`}<br>Rata-rata ${escapeHtml(grpName[peerGroup])}: ${P(avg(m))}</div></div>`;
-      };
-      const tr = R.total, trk = tr.rk.get(me.key);
-      const nextUp = tr.sorted.find(x => x.total > me.total + 1e-9 && tr.rk.get(x.key) < trk);
-      const total = `<div class="peer-total"><div class="t"><div><div class="k" style="font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px">Skor Gabungan · OPS ${PEER_W.ops}% + EMS ${PEER_W.ems}% + PNR ${PEER_W.pnr}%</div><div class="big">${P(me.total)}</div></div><div class="rk">${trk ? `Peringkat <b>#${trk}</b> dari ${tr.n} · ${escapeHtml(grpName[peerGroup])}` : ''}</div></div><div class="peer-bar" style="height:12px"><i style="width:${Math.min(100, me.total || 0)}%"></i></div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">${me.total === null ? '' : GRADE(Math.round(me.total))}<span class="rk">${nextUp ? `Selisih ke peringkat berikutnya: ${r1(nextUp.total - me.total)} poin` : (trk === 1 ? 'Kamu di posisi teratas 🎉' : '')}</span></div></div>`;
-      const meTag = AUTH && AUTH.role === 'trainer' ? ' (kamu)' : ' (dipilih)';
-      const lbMetric = peerMetric, L = R[lbMetric], myRk = L.rk.get(me.key);
-      const lbRow = (x, me2) => { const rk = L.rk.get(x.key); return `<div class="row${me2 ? ' me' : ''}"><div class="rn">${rk === 1 ? '🥇' : rk === 2 ? '🥈' : rk === 3 ? '🥉' : '#' + rk}</div><div class="nm"><b>${escapeHtml(x.rec.nama)}${me2 ? meTag : ''}</b><span>${escapeHtml(shortStore(x.rec.store))}${x.area ? ' · ' + escapeHtml(x.area) : ''}</span></div><div class="pc">${P(x[lbMetric])}</div></div>`; };
-      const top = L.sorted.filter(x => L.rk.get(x.key) <= 3).slice(0, 3);
-      const meIn = top.some(x => x.key === me.key);
-      const lb = `<div class="peer-lb">${top.map(x => lbRow(x, x.key === me.key)).join('') || '<div class="muted">Belum ada data.</div>'}${!meIn && myRk ? `<div class="gap">···</div>${lbRow(me, true)}` : ''}${L.n > 3 ? `<button class="peer-more" onclick="openDrill(${reg(() => ({ title: 'Peringkat Store Trainer · ' + ({ total: 'Skor Gabungan', ops: 'OPS', ems: 'EMS', pnr: 'PNR' })[lbMetric], sub: `${L.n} trainer · ${grpName[peerGroup]}${rm === 'all' ? '' : ' · ' + rm}`, heads: ['#', 'Store Trainer', 'Store', 'Area', lbMetric === 'total' ? 'Skor' : lbMetric.toUpperCase()], rows: L.sorted.map(x => { const b = x.key === me.key, w = c => b ? `<strong>${c}</strong>` : c; return [w(L.rk.get(x.key)), w(escapeHtml(x.rec.nama) + (b ? meTag : '')), escapeHtml(shortStore(x.rec.store)), escapeHtml(x.area || '-'), w(P(x[lbMetric]))]; }) }))})">Lihat semua posisi (${L.n} trainer) ›</button>` : ''}</div>`;
-      const chip = (fn, cur, k, label) => `<button class="chip${cur === k ? ' active' : ''}" onclick="${fn}('${k}')">${label}</button>`;
-      return `<div class="peer-wrap"><div class="sum-title">Posisi vs Trainer Lain · ${escapeHtml(rec.nama)}${rm === 'all' ? '' : ' · ' + escapeHtml(rm)}</div>
-        <div class="peer-chips">${chip('setPeerGroup', peerGroup, 'all', '👥 Semua Trainer')}${me.area ? chip('setPeerGroup', peerGroup, 'area', '👔 Area ' + escapeHtml(me.area)) : ''}${me.type ? chip('setPeerGroup', peerGroup, 'type', '🏬 Type ' + escapeHtml(me.type)) : ''}</div>
-        <div class="peer-scores">${total}${card('ops', 'OPS')}${card('ems', 'EMS')}${card('pnr', 'PNR')}</div>
-        <div class="peer-chips">${chip('setPeerMetric', peerMetric, 'total', 'Gabungan')}${chip('setPeerMetric', peerMetric, 'ops', 'OPS')}${chip('setPeerMetric', peerMetric, 'ems', 'EMS')}${chip('setPeerMetric', peerMetric, 'pnr', 'PNR')}</div>
-        ${lb}
-        <div class="muted" style="font-size:.72rem;margin-top:8px">Dibandingkan dalam persentase pencapaian target, bukan jumlah mentah. OPS &amp; EMS = pencapaian store; PNR = jam Delivered pribadi vs target. Skor gabungan membatasi tiap komponen maksimal 100%.</div></div>`;
+      const sel = document.getElementById('raporSel');
+      if (!sel) return;
+      const cur = sel.value, seen = new Set();
+      const list = trainerRecs.filter(r => { const k = norm(r.nama) + '|' + norm(r.store); if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => byName(a.nama, b.nama));
+      sel.innerHTML = `<option value="">👤 Pilih Store Trainer (${list.length})</option>` + list.map(r => `<option value="${escapeHtml(r.nama + '@@' + r.store)}">${escapeHtml(r.nama)} · ${escapeHtml(r.store)}</option>`).join('');
+      sel.value = cur;
+      if (sel.value !== cur) sel.value = '';
     }
     function renderRapor() {
       const sel = document.getElementById('raporSel'), body = document.getElementById('raporBody');
       if (!sel || !body) return;
-      const rm = (document.getElementById('raporMonthSel') || {}).value || 'all';
       const rec = sel.value ? trainerRecs.find(r => r.nama + '@@' + r.store === sel.value) : null;
       if (!rec) { body.innerHTML = '<div class="muted">Pilih nama Store Trainer untuk menampilkan rapor.</div>'; return; }
       const idx = storeIndex.get(norm(rec.store));
-      const mOk = r => rm === 'all' || getRowMeta(r).month === rm;
-      // OPS & EMS = data store trainer tersebut di Data Detail OPS / EMS (per store); PNR = aktivitas trainer itu sendiri
-      const storeRows = t => (state[t] || []).filter(r => norm(getRowMeta(r).store) === norm(rec.store) && mOk(r));
-      const mine = { ops: storeRows('ops'), ems: storeRows('ems'), pnr: (state.pnr || []).filter(r => sameName(getRowMeta(r).trainer, rec.nama) && mOk(r)) };
-      const prof = [['Store', rec.store], ['Type Store', rec.type || '-'], ['NIK', (!AUTH || AUTH.role === 'ho' || sameName(rec.nama, AUTH.name)) ? (rec.nik || '-') : '••••••'], ['Work Experience', rec.exp && rec.exp !== 'Empty' ? rec.exp : '-'], ['Total Employee', idx ? idx.employees : '-']];
-      const keysOf = t => {
-        if (rm !== 'all') { const k = monthKeyFromLabel(rm); return k ? [k] : []; }
-        const ks = new Set(); (state[t] || []).forEach(r => { const k = getRowMeta(r).monthKey; if (k) ks.add(k); });
-        if (!ks.size) { const n = new Date(); ks.add(n.getFullYear() * 100 + n.getMonth()); }
-        return Array.from(ks);
-      };
-      const bar = (a, tg, unit, note) => {
-        const pc = tg ? Math.round(a / tg * 100) : null;
-        return '<div class="prog">' + (pc === null ? `<div class="ln">${note}: target belum terbaca</div>` : `<div class="ln">${note}: ${fmt(r1(a))} / ${fmt(r1(tg))} ${unit} · <strong>${pc}%</strong></div><div class="pbar" style="display:block;width:100%;margin:6px 0"><i style="width:${Math.min(100, pc)}%"></i></div>${GRADE(pc)}`) + '</div>';
-      };
-      const act = (t, rows, sub, lines, extra) => `<div class="mod-card" onclick="openDrill(${reg(() => ({ title: `${t.toUpperCase()} · ${rec.nama}`, sub: `${rows.length} entry`, ...detailRows(t, rows) }))})"><div class="kpi-title">${t.toUpperCase()}</div><div class="v">${fmt(rows.length)}</div>${lines.map(l => `<div class="ln">${l}</div>`).join('')}${extra}</div>`;
+      const prof = [['Store', rec.store], ['Type Store', rec.type || '-'], ['NIK', rec.nik || '-'], ['Work Experience', rec.exp && rec.exp !== 'Empty' ? rec.exp : '-'], ['Total Employee', idx ? idx.employees : '-']];
+      const mine = {};
+      ['ops', 'ems', 'pnr'].forEach(t => { mine[t] = (state[t] || []).filter(r => sameName(getRowMeta(r).trainer, rec.nama)); });
+      const act = (t, rows, lines) => `<div class="mod-card" onclick="openDrill(${reg(() => ({ title: `${t.toUpperCase()} · ${rec.nama}`, sub: `${rows.length} entry`, ...detailRows(t, rows) }))})"><div class="kpi-title">${t.toUpperCase()}</div><div class="v">${fmt(rows.length)}</div><div class="muted" style="font-size:.72rem">entry</div>${lines.map(l => `<div class="ln">${l}</div>`).join('')}</div>`;
       const monthsOf = rows => new Set(rows.map(r => getRowMeta(r).month).filter(Boolean)).size;
-      const slotLine = rows => ['13:00', '15:00', '18:00'].map(k => `${k} · ${rows.filter(r => getRowMeta(r).slot === k).length}`).join('  |  ');
-      const tOps = keysOf('ops').reduce((a, k) => a + monthTargetDays('ops', k), 0), tEms = keysOf('ems').reduce((a, k) => a + monthTargetDays('ems', k), 0);
-      const ops = mine.ops, ems = mine.ems, pnr = mine.pnr;
+      const ops = mine.ops, pnr = mine.pnr;
       const dv = pnr.filter(r => getRowMeta(r).status === 'Delivered'), pl = pnr.filter(r => getRowMeta(r).status === 'Planning');
-      const dvH = r1(dv.reduce((a, r) => a + getRowMeta(r).hours, 0)), tg = findTarget(rec.nama);
-      const tPnr = tg ? tg.hours * keysOf('pnr').length : 0;
+      const tg = findTarget(rec.nama);
+      let tgLine = 'Min target: belum terbaca';
+      if (tg) {
+        let lk = -1, lb = '';
+        pnr.forEach(r => { const m = getRowMeta(r); if (m.month && m.monthKey > lk) { lk = m.monthKey; lb = m.month; } });
+        const hrs = r1(dv.filter(r => getRowMeta(r).month === lb).reduce((a, r) => a + getRowMeta(r).hours, 0));
+        tgLine = `Min target ${r1(tg.hours)} jam/bulan · ${lb || '-'}: ${hrs} jam (${pct(hrs, tg.hours)})`;
+      }
       const mt = new Map();
       ['ops', 'ems', 'pnr'].forEach(t => mine[t].forEach(r => { const m = getRowMeta(r); if (!m.month) return; const e = mt.get(m.month) || { k: m.monthKey, ops: 0, ems: 0, pnr: 0 }; e[t]++; mt.set(m.month, e); }));
       const mrows = Array.from(mt.entries()).sort((a, b) => b[1].k - a[1].k).map(([l, e]) => [escapeHtml(l), e.ops, e.ems, e.pnr, `<strong>${e.ops + e.ems + e.pnr}</strong>`]);
       body.innerHTML = `<div class="rapor-grid">${prof.map(([l, v]) => `<div class="cap"><div class="l">${l}</div><div class="v" style="font-size:${String(v).length > 14 ? '1rem' : '1.4rem'}">${escapeHtml(v)}</div></div>`).join('')}</div>
-        <div class="sum-title">Pencapaian Aktivitas · ${escapeHtml(rec.nama)}${rm === 'all' ? '' : ' · ' + escapeHtml(rm)} <span class="muted" style="text-transform:none">(OPS &amp; EMS = data store ${escapeHtml(shortStore(rec.store))} seperti di Data Detail · klik kartu untuk detail)</span></div>
-        <div class="rapor-grid">${act('ops', ops, 'entry store (Data Detail OPS)', [`${fmt(ops.reduce((a, r) => a + partOf(r), 0))} peserta · ${fmt(ops.reduce((a, r) => a + unitsOf(r), 0))} unit terjual`, slotLine(ops), `${monthsOf(ops)} bulan aktif`], bar(ops.length, tOps, 'sesi', 'Target store'))}${act('ems', ems, 'entry store (Data Detail EMS)', [`${monthsOf(ems)} bulan aktif`], bar(ems.length, tEms, 'sesi', 'Target store'))}${act('pnr', pnr, 'entry trainer', [`Delivered ${dv.length} · Planning ${pl.length}`], bar(dvH, tPnr, 'jam', 'Target trainer (Delivered)'))}</div>
-        ${peerHtml(rec, rm)}
+        <div class="sum-title">Summary Aktivitas · ${escapeHtml(rec.nama)} <span class="muted" style="text-transform:none">(klik kartu untuk detail)</span></div>
+        <div class="rapor-grid">${act('ops', ops, [`${fmt(ops.reduce((a, r) => a + partOf(r), 0))} peserta · ${fmt(ops.reduce((a, r) => a + unitsOf(r), 0))} unit terjual`, `${monthsOf(ops)} bulan aktif`])}${act('ems', mine.ems, [`${monthsOf(mine.ems)} bulan aktif`])}${act('pnr', pnr, [`Delivered ${dv.length} · Planning ${pl.length}`, tgLine])}</div>
         <div class="sum-title">Entry per Bulan</div>${miniTable(['Bulan', 'OPS', 'EMS', 'PNR', 'Total'], mrows, 260)}`;
     }
 
@@ -2188,15 +2202,17 @@
       ['allTrend', 'allLine', 'allDay'].forEach(k => { if (chartInstances[k]) { chartInstances[k].destroy(); delete chartInstances[k]; } });
       const mods = ['ops', 'ems', 'pnr'];
       const per = mods.map(t => (state[t] || []).map(r => ({ t, r, m: getRowMeta(r), part: t === 'ops' ? partOf(r) : 0, units: t === 'ops' ? unitsOf(r) : 0 })));
-      const flat = [].concat(...per);
+      let flat = [].concat(...per);
       const monthLabels = monthEntries(flat.map(x => x.m)).map(e => e[0]);
       if (allMonth !== 'all' && !monthLabels.includes(allMonth)) allMonth = 'all';
-      const areas = Array.from(new Set(flat.map(x => x.m.ho).concat(Array.from(storeIndex.values()).map(s => s.ho)).filter(Boolean))).sort(byName);
-      if (allArea !== 'all' && !areas.includes(allArea)) allArea = 'all';
-      const storeOpts = Array.from(new Set(flat.filter(x => allArea === 'all' || x.m.ho === allArea).map(x => x.m.store).concat(Array.from(storeIndex.values()).filter(s => allArea === 'all' || s.ho === allArea).map(s => s.name)).filter(Boolean))).sort(byName);
-      if (allStore !== 'all' && !storeOpts.includes(allStore)) allStore = 'all';
-      const sel = flat.filter(x => (allMonth === 'all' || x.m.month === allMonth) && (allArea === 'all' || x.m.ho === allArea) && (allStore === 'all' || x.m.store === allStore));
-      const scopeAll = scopeStores({ trainerHO: allArea, store: allStore });
+      if (allMonth !== 'all') flat = flat.filter(x => x.m.month === allMonth);
+      const areaLabels = Array.from(new Set(flat.map(x => x.m.ho).filter(Boolean))).sort(byName);
+      if (allArea !== 'all' && !areaLabels.includes(allArea)) allArea = 'all';
+      if (allArea !== 'all') flat = flat.filter(x => x.m.ho === allArea);
+      const storeLabels = Array.from(new Set(flat.map(x => x.m.store).filter(Boolean))).sort(byName);
+      if (allStore !== 'all' && !storeLabels.includes(allStore)) allStore = 'all';
+      if (allStore !== 'all') flat = flat.filter(x => x.m.store === allStore);
+      const sel = flat;
       const mix = (title, list) => () => mixedDetail(title, list);
       const stores = new Set(sel.map(x => x.m.store).filter(Boolean)), staff = new Set(sel.map(x => norm(x.m.trainer)).filter(Boolean));
       const part = sel.reduce((a, x) => a + x.part, 0), units = sel.reduce((a, x) => a + x.units, 0);
@@ -2205,7 +2221,7 @@
       const matched = sel.filter(x => x.m.store && storeIndex.has(norm(x.m.store))).length;
       const unmatched = countBy(sel.filter(x => x.m.store && !storeIndex.has(norm(x.m.store))), x => x.m.store);
       const noHO = sel.filter(x => !x.m.ho);
-      const idle = scopeAll.filter(s => !stores.has(s.name)).map(s => s.name).sort(byName);
+      const idle = Array.from(storeIndex.values()).filter(s => !stores.has(s.name)).map(s => s.name).sort(byName);
       const listTxt = (arr, n) => arr.length ? escapeHtml(arr.slice(0, n).join(', ')) + (arr.length > n ? ` +${arr.length - n} lainnya` : '') : '-';
       const topicOf = t => Object.entries(countTopics(t, of(t).map(x => x.r), 'all')).sort((a, b) => b[1] - a[1]);
       const topicD = t => k => mixedDetail(`Topik ${k}`, of(t).filter(x => getTopics(t, x.r, 'all').includes(k)));
@@ -2225,18 +2241,28 @@
       const storeDr = stE.map(([k]) => mix(k, sel.filter(x => x.m.store === k)));
 
       host.innerHTML = `
-        <div class="panel-card filter-bar"><div class="controls-row"><select class="select-box" style="flex:none;min-width:200px" onchange="allMonth=this.value;renderAllSummary()">
+        <div class="panel-card filter-bar"><div class="controls-row">
+            <select class="select-box" style="flex:none;min-width:160px" onchange="allMonth=this.value;allArea='all';allStore='all';renderAllSummary()">
               <option value="all">📅 Semua Bulan</option>
               ${monthLabels.map(l => `<option value="${escapeHtml(l)}" ${l === allMonth ? 'selected' : ''}>${escapeHtml(l)}</option>`).join('')}
-            </select><select class="select-box" onchange="allArea=this.value;allStore='all';renderAllSummary()"><option value="all">👔 Semua Area</option>${areas.map(a => `<option value="${escapeHtml(a)}" ${a === allArea ? 'selected' : ''}>${escapeHtml(a)}</option>`).join('')}</select><select class="select-box" onchange="allStore=this.value;renderAllSummary()"><option value="all">🏪 Semua Store</option>${storeOpts.map(a => `<option value="${escapeHtml(a)}" ${a === allStore ? 'selected' : ''}>${escapeHtml(a)}</option>`).join('')}</select></div></div>
+            </select>
+            <select class="select-box" style="flex:none;min-width:160px" onchange="allArea=this.value;allStore='all';renderAllSummary()">
+              <option value="all">👔 Semua Area</option>
+              ${areaLabels.map(l => `<option value="${escapeHtml(l)}" ${l === allArea ? 'selected' : ''}>${escapeHtml(l)}</option>`).join('')}
+            </select>
+            <select class="select-box" style="flex:none;min-width:180px" onchange="allStore=this.value;renderAllSummary()">
+              <option value="all">🏪 Semua Store</option>
+              ${storeLabels.map(l => `<option value="${escapeHtml(l)}" ${l === allStore ? 'selected' : ''}>${escapeHtml(l)}</option>`).join('')}
+            </select>
+          </div></div>
         <div class="panel-card sum-wrap" data-title="Summary Keseluruhan">
           <div class="kpi-grid" style="margin-bottom:0">
             ${kpiCard('Total Entry', sel.length, '', mix('Semua entry', sel))}${kpiCard('Entry OPS', of('ops').length, '', mix('Entry OPS', of('ops')))}${kpiCard('Entry EMS', of('ems').length, '', mix('Entry EMS', of('ems')))}${kpiCard('Entry PNR', pnrRows.length, '', mix('Entry PNR', pnrRows))}
-            ${kpiCard('Store Aktif', stores.size, scopeAll.length ? `${pct(stores.size, scopeAll.length)} dari ${scopeAll.length} store` : '', () => listDetail('Store aktif', countBy(sel, x => x.m.store)))}
+            ${kpiCard('Store Aktif', stores.size, storeIndex.size ? `${pct(stores.size, storeIndex.size)} dari ${storeIndex.size} store` : '', () => listDetail('Store aktif', countBy(sel, x => x.m.store)))}
             ${kpiCard('Staff Aktif', staff.size, '', () => listDetail('Staff aktif', countBy(sel, x => x.m.trainer)))}
             ${kpiCard('Peserta Open Studio', part, '', mix('Entry OPS', of('ops')))}${kpiCard('Unit Terjual Setelah OPS', units, '', mix('Entry OPS', of('ops')))}
-            ${kpiCard('Rata-rata Peserta Per Sesi', of('ops').length ? Math.round(part / of('ops').length) : 0, '', mix('Entry OPS', of('ops')))}
-            
+            ${kpiCard('Rata-rata Peserta / Sesi', of('ops').length ? num1(part / of('ops').length) : '0', '', mix('Entry OPS', of('ops')))}
+            ${kpiCard('Unit Terjual Setelah OPS / Peserta', part ? (units / part).toFixed(2).replace('.', ',') : '0', '', mix('Entry OPS', of('ops')))}
             ${kpiCard('PNR Delivered', dvRows.length, `${pct(dvRows.length, pnrRows.length)} · Planning ${plN}`, mix('PNR Delivered', dvRows))}
             ${kpiCard('Cocok dengan Recap', pct(matched, sel.length), `${fmt(matched)} dari ${fmt(sel.length)} entry`, () => listDetail('Nama store belum cocok dengan Recap', unmatched))}
           </div>
@@ -2253,8 +2279,8 @@
         </div>
         <div class="panel-card sum-wrap">
           <div class="sum-cols">
-            ${barList('Top Store', countBy(sel, x => x.m.store), 5, k => mixedDetail(k, sel.filter(x => x.m.store === k)))}
-            ${barList('Top Staff', countBy(sel, x => x.m.trainer), 5, k => mixedDetail(k, sel.filter(x => x.m.trainer === k)))}
+            ${barList('Top 5 Store', countBy(sel, x => x.m.store), 5, k => mixedDetail(k, sel.filter(x => x.m.store === k)))}
+            ${barList('Top 5 Staff', countBy(sel, x => x.m.trainer), 5, k => mixedDetail(k, sel.filter(x => x.m.trainer === k)))}
             ${overallBottomStaff(sel)}
             ${barList('Status PNR', countBy(pnrRows, x => x.m.status), 5, k => mixedDetail(`Status ${k}`, pnrRows.filter(x => x.m.status === k)))}
             ${barList('Top Topik OPS', topicOf('ops'), 5, topicD('ops'))}
@@ -2324,23 +2350,23 @@
     }
 
     /* ---------- Section expand / collapse ---------- */
-    const csShut = new Set(); // section yang dilipat (default semua terbuka)
+    const csOpen = new Set();
     const resizeCharts = () => setTimeout(() => Object.values(chartInstances).forEach(c => { try { c.resize(); } catch (e) {} }), 80);
     function csWrap(el, title, tab) {
       if (!el || (el.parentNode && el.parentNode.classList && el.parentNode.classList.contains('cs'))) return;
       const k = tab + '|' + title, w = document.createElement('div');
-      w.className = 'cs' + (csShut.has(k) ? ' collapsed' : ''); w.dataset.k = k;
+      w.className = 'cs' + (csOpen.has(k) ? '' : ' collapsed'); w.dataset.k = k;
       w.innerHTML = `<button class="cs-head" onclick="toggleCs(this)"><span class="cs-title">${escapeHtml(title)}</span><span class="cs-act"><span class="cs-x">Expand</span><span class="cs-c">Collapse</span><i class="cs-chev"></i></span></button>`;
       el.before(w); w.appendChild(el);
     }
     function toggleCs(btn) {
       const w = btn.closest('.cs'), c = w.classList.toggle('collapsed');
-      if (c) csShut.add(w.dataset.k); else csShut.delete(w.dataset.k);
+      if (c) csOpen.delete(w.dataset.k); else csOpen.add(w.dataset.k);
       resizeCharts();
     }
     function csAll(tab, btn) {
       const ws = Array.from(document.querySelectorAll(`#panel-${tab} .cs`)), open = ws.some(w => w.classList.contains('collapsed'));
-      ws.forEach(w => { w.classList.toggle('collapsed', !open); if (open) csShut.delete(w.dataset.k); else csShut.add(w.dataset.k); });
+      ws.forEach(w => { w.classList.toggle('collapsed', !open); if (open) csOpen.add(w.dataset.k); else csOpen.delete(w.dataset.k); });
       if (btn) btn.textContent = open ? 'Collapse semua' : 'Expand semua';
       resizeCharts();
     }
@@ -2361,7 +2387,7 @@
 
     /* ---------- Export .xls ---------- */
     const EXPORT_BTN = t => `<button class="btn-export" onclick="openExport('${t}')" title="Export data"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Export</button>`;
-    const CS_BTN = t => `<button class="btn-ghost" onclick="csAll('${t}',this)">Collapse semua</button>`;
+    const CS_BTN = t => `<button class="btn-ghost" onclick="csAll('${t}',this)">Expand semua</button>`;
     let lastAllSel = [];
     const plain = c => String(c == null ? '' : c).replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&').trim();
     const detailPlain = (type, rows) => { const d = detailRows(type, rows); return { heads: d.heads, rows: d.rows.map(r => r.map(plain)) }; };
@@ -2372,14 +2398,17 @@
     }
     function buildExport(tab) {
       const secs = [];
-      if (tab === 'ops' || tab === 'ems' || tab === 'pnr') {
-        const th = document.getElementById(`${tab}Thead`);
-        secs.push(domSection(th && th.closest('table'), `Komparasi Target vs Aktual ${tab.toUpperCase()}`));
-        secs.push({ title: `Data Entry ${tab.toUpperCase()}`, ...detailPlain(tab, getFilteredData(tab)) });
+      if (tab === 'ops') {
+        secs.push(domSection(document.getElementById('opsThead').closest('table'), 'Data Detail OPS per Store'));
+        secs.push({ title: 'Data Entry OPS', ...detailPlain('ops', getFilteredData('ops')) });
+      } else if (tab === 'ems') {
+        secs.push({ title: 'Data Detail EMS', ...detailPlain('ems', getFilteredData('ems')) });
+      } else if (tab === 'pnr') {
+        secs.push({ title: 'Data Detail PNR', ...detailPlain('pnr', getFilteredData('pnr')) });
       } else {
         document.querySelectorAll('#panel-all .table-container table').forEach(t => {
-          const c = t.closest('.panel-card');
-          secs.push(domSection(t, (c && c.dataset && c.dataset.title) || 'Tabel'));
+          const c = t.closest('.panel-card'), ttl = c && c.querySelector('.sum-title');
+          secs.push(domSection(t, ttl ? ttl.textContent.trim() : 'Tabel'));
         });
         const m = mixedDetail('Semua Entry', lastAllSel);
         secs.push({ title: 'Semua Entry', heads: m.heads, rows: m.rows.map(r => r.map(plain)) });
@@ -2486,97 +2515,249 @@
     });
     { const mb = document.getElementById('manualSyncBtn'); if (mb) mb.addEventListener('click', fetchLatestData); }
 
+    /* ---------- Trainer View renderers ---------- */
+    function myData(type) {
+      return (state[type] || []).filter(r => trainerMatch(getRowMeta(r).trainer));
+    }
+    // Target pribadi bulanan (bisa disesuaikan). OPS & EMS belum ada target resmi di sheet → pakai soft target.
+    const PERSONAL_OPS_TARGET = 20;  // entry OPS / bulan
+    const PERSONAL_EMS_TARGET = 12;  // entry EMS / bulan
 
-    /* ---------- Login & role ---------- */
-    const HO_PASS = 'Trainerhebat';
-    let AUTH = null;
-    try { AUTH = JSON.parse(localStorage.getItem('aph_auth') || sessionStorage.getItem('aph_auth') || 'null'); } catch (e) {}
-    const lgEl = id => document.getElementById(id);
-    const lgNikOf = r => String(r.nik || '').replace(/\D/g, '');
-    function lgAreaOf(r) { const ix = storeIndex.get(norm(r.store)); return (ix && ix.ho) || r.trainerHO || ''; }
-    function lgFillAreas() {
-      const sel = lgEl('lgArea'); if (!sel) return;
-      const cur = sel.value;
-      const areas = Array.from(new Set(trainerRecs.map(lgAreaOf).filter(Boolean))).sort(byName);
-      sel.innerHTML = areas.length ? '<option value="">Pilih Area</option>' + areas.map(a => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('') : '<option value="">Memuat data…</option>';
-      sel.value = areas.includes(cur) ? cur : '';
-      lgFillTrainers();
+    function gradeOf(pct) {
+      if (pct == null || isNaN(pct)) return { letter: '–', label: 'Belum ada data', cls: 'grade-na', color: 'var(--text-muted)' };
+      if (pct >= 100) return { letter: 'A', label: 'Excellent', cls: 'grade-a', color: '#30d158' };
+      if (pct >= 80)  return { letter: 'B', label: 'Good', cls: 'grade-b', color: '#64d2ff' };
+      if (pct >= 60)  return { letter: 'C', label: 'Fair', cls: 'grade-c', color: '#ffd60a' };
+      if (pct >= 40)  return { letter: 'D', label: 'Needs Improvement', cls: 'grade-d', color: '#ff9f0a' };
+      return { letter: 'E', label: 'Critical', cls: 'grade-e', color: '#ff453a' };
     }
-    function lgFillTrainers() {
-      const area = lgEl('lgArea').value, sel = lgEl('lgName'), cur = sel.value;
-      const seen = new Set();
-      const list = trainerRecs.filter(r => { if (!area || lgAreaOf(r) !== area) return false; const k = norm(r.nama) + '|' + norm(r.store); if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => byName(a.nama, b.nama));
-      sel.innerHTML = '<option value="">' + (area ? 'Pilih Store Trainer' : 'Pilih area dulu') + '</option>' + list.map(r => `<option value="${escapeHtml(r.nama + '@@' + r.store)}">${escapeHtml(r.nama)} · ${escapeHtml(shortStore(r.store))}</option>`).join('');
-      sel.value = cur; if (sel.value !== cur) sel.value = '';
+    function progressBlock(title, current, target, unit, extra) {
+      const hasTarget = target > 0;
+      const pct = hasTarget ? Math.round(current / target * 100) : null;
+      const g = gradeOf(pct);
+      const barW = pct == null ? 0 : Math.min(100, pct);
+      const barColor = g.color;
+      return `<div class="sum-block" style="margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+          <div class="sum-title" style="margin:0">${escapeHtml(title)}</div>
+          <span class="grade-pill ${g.cls}" style="background:${g.color}22;color:${g.color};border:1px solid ${g.color}55">${g.letter} · ${g.label}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="bar-track" style="flex:1;height:12px"><div class="bar-fill" style="width:${barW}%;background:${barColor}"></div></div>
+          <span class="pct" style="color:${g.color};min-width:48px;text-align:right">${pct == null ? '–' : pct + '%'}</span>
+        </div>
+        <div class="muted" style="font-size:.78rem;margin-top:6px">
+          ${hasTarget ? `${typeof current === 'number' && current % 1 ? r1(current) : fmt(current)} / ${typeof target === 'number' && target % 1 ? r1(target) : fmt(target)} ${unit}` : `${fmt(current)} ${unit} · target belum diatur`}
+          ${extra ? ' · ' + extra : ''}
+        </div>
+      </div>`;
     }
-    function lgChange() {
-      const ho = lgEl('lgRole').value === 'ho';
-      lgEl('lgAreaRow').classList.toggle('hide', ho); lgEl('lgNameRow').classList.toggle('hide', ho);
-      lgEl('lgPassLbl').textContent = ho ? 'Password' : 'NIK';
-      lgEl('lgNote').textContent = ho ? 'Akses penuh sebagai Trainer HO.' : 'Password Store Trainer adalah NIK masing-masing.';
-      lgEl('lgErr').textContent = ''; lgEl('lgPass').value = '';
-    }
-    function lgFail(msg) {
-      lgEl('lgErr').textContent = msg;
-      const c = lgEl('lgCard'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
-    }
-    function lgSubmit() {
-      const role = lgEl('lgRole').value, pw = lgEl('lgPass').value.trim(), rem = lgEl('lgRem').checked;
-      if (role === 'ho') {
-        if (pw !== HO_PASS) return lgFail('Password salah.');
-        return lgEnter({ role: 'ho', name: 'Trainer HO' }, rem);
+
+    function renderMyPerf() {
+      const el = document.getElementById('myperfBody');
+      if (!el || !isTrainerView()) return;
+      const opsAll = myData('ops'), emsAll = myData('ems'), pnrAll = myData('pnr');
+
+      // Tentukan bulan berjalan (bulan terbaru yang punya data, atau bulan kalender sekarang)
+      let monthLabel = '', monthKey = -1;
+      [...opsAll, ...emsAll, ...pnrAll].forEach(r => {
+        const m = getRowMeta(r);
+        if (m.month && m.monthKey > monthKey) { monthKey = m.monthKey; monthLabel = m.month; }
+      });
+      if (!monthLabel) {
+        const now = new Date();
+        monthLabel = `${MONTH_NAMES_ID[now.getMonth()]} ${now.getFullYear()}`;
       }
-      const v = lgEl('lgName').value;
-      if (!lgEl('lgArea').value) return lgFail('Pilih area terlebih dahulu.');
-      if (!v) return lgFail('Pilih nama Store Trainer.');
-      const rec = trainerRecs.find(r => r.nama + '@@' + r.store === v);
-      if (!rec) return lgFail('Data trainer tidak ditemukan.');
-      let nik = lgNikOf(rec);
-      if (!nik) { const alt = recapMasterData.find(r => sameName(r.nama, rec.nama) && lgNikOf(r)); nik = alt ? lgNikOf(alt) : ''; }
-      if (!nik) return lgFail('NIK trainer belum terisi di data master. Hubungi Trainer HO.');
-      if (pw.replace(/\D/g, '') !== nik || !pw) return lgFail('NIK salah.');
-      lgEnter({ role: 'trainer', name: rec.nama, store: rec.store, area: lgAreaOf(rec) }, rem);
+      const inMonth = rows => rows.filter(r => getRowMeta(r).month === monthLabel);
+
+      const ops = inMonth(opsAll), ems = inMonth(emsAll), pnr = inMonth(pnrAll);
+      const dv = pnr.filter(r => getRowMeta(r).status === 'Delivered');
+      const pl = pnr.filter(r => getRowMeta(r).status === 'Planning');
+      const part = ops.reduce((a, r) => a + partOf(r), 0);
+      const units = ops.reduce((a, r) => a + unitsOf(r), 0);
+
+      const tg = findTarget(auth.name);
+      const hrs = r1(dv.reduce((a, r) => a + getRowMeta(r).hours, 0));
+      const pnrTarget = tg ? tg.hours : 0;
+
+      const opsPct = PERSONAL_OPS_TARGET ? Math.round(ops.length / PERSONAL_OPS_TARGET * 100) : null;
+      const emsPct = PERSONAL_EMS_TARGET ? Math.round(ems.length / PERSONAL_EMS_TARGET * 100) : null;
+      const pnrPct = pnrTarget ? Math.round(hrs / pnrTarget * 100) : null;
+
+      // Overall grade = rata-rata dari modul yang punya target
+      const pcts = [opsPct, emsPct, pnrPct].filter(p => p != null);
+      const overallPct = pcts.length ? Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length) : null;
+      const overall = gradeOf(overallPct);
+
+      const recent = sortNewest([].concat(
+        opsAll.map(r => ({ r, t: 'OPS', m: getRowMeta(r) })),
+        emsAll.map(r => ({ r, t: 'EMS', m: getRowMeta(r) })),
+        pnrAll.map(r => ({ r, t: 'PNR', m: getRowMeta(r) }))
+      )).slice(0, 8);
+
+      el.innerHTML = `
+        <div class="panel-card sum-wrap">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+            <div>
+              <div class="muted" style="font-size:.85rem">Halo, <strong style="color:var(--text-main)">${escapeHtml(auth.name)}</strong>${auth.store ? ' · ' + escapeHtml(auth.store) : ''}</div>
+              <div class="muted" style="font-size:.78rem;margin-top:2px">Periode: <strong style="color:var(--text-main)">${escapeHtml(monthLabel)}</strong></div>
+            </div>
+            <div style="text-align:center;padding:10px 18px;border-radius:16px;background:${overall.color}18;border:1px solid ${overall.color}44">
+              <div style="font-size:1.8rem;font-weight:800;color:${overall.color};line-height:1">${overall.letter}</div>
+              <div style="font-size:.72rem;font-weight:600;color:${overall.color};margin-top:2px">${overall.label}</div>
+              <div class="muted" style="font-size:.68rem;margin-top:2px">${overallPct != null ? overallPct + '% avg' : '–'}</div>
+            </div>
+          </div>
+          <div class="kpi-grid">
+            ${kpiCard('Entry OPS', ops.length, part ? `${fmt(part)} peserta · ${fmt(units)} unit` : `target ${PERSONAL_OPS_TARGET}/bulan`)}
+            ${kpiCard('Entry EMS', ems.length, `target ${PERSONAL_EMS_TARGET}/bulan`)}
+            ${kpiCard('PNR Delivered', dv.length, pl.length ? `Planning ${pl.length}` : '')}
+            ${kpiCard('Hours Delivered', hrs, pnrTarget ? `target ${r1(pnrTarget)} jam` : 'target belum terbaca')}
+          </div>
+        </div>
+
+        <div class="panel-card sum-wrap">
+          <div class="sum-title" style="margin-bottom:14px">Progress Target · ${escapeHtml(monthLabel)}</div>
+          ${progressBlock('OPS · Open Studio', ops.length, PERSONAL_OPS_TARGET, 'entry', part ? `${fmt(part)} peserta` : '')}
+          ${progressBlock('EMS · Education', ems.length, PERSONAL_EMS_TARGET, 'entry', '')}
+          ${progressBlock('PNR · Training & Roleplay', hrs, pnrTarget, 'jam', dv.length ? `${dv.length} delivered` : '')}
+          <div class="muted" style="font-size:.72rem;margin-top:4px">
+            Grade: <strong>A</strong> ≥100% · <strong>B</strong> 80–99% · <strong>C</strong> 60–79% · <strong>D</strong> 40–59% · <strong>E</strong> &lt;40%
+            ${!pnrTarget ? ' · Target PNR belum terbaca dari sheet.' : ''}
+            · Target OPS/EMS bersifat soft target pribadi (${PERSONAL_OPS_TARGET}/${PERSONAL_EMS_TARGET} entry per bulan).
+          </div>
+        </div>
+
+        <div class="panel-card sum-wrap">
+          <div class="sum-title">Aktivitas Terakhir</div>
+          ${recent.length ? `<div class="table-container" style="max-height:none"><table><thead><tr><th>Tanggal</th><th>Modul</th><th>Store</th><th>Detail</th></tr></thead><tbody>
+            ${recent.map(x => {
+              const d = x.m.date ? fmtDate(x.m.date) : (x.m.month || '-');
+              const detail = x.t === 'PNR'
+                ? [x.m.status].concat(getTopics('pnr', x.r, 'all')).filter(Boolean).join(' · ')
+                : getTopics(x.t.toLowerCase(), x.r).join(', ');
+              return `<tr><td>${escapeHtml(d)}</td><td><span class="badge ${x.t === 'OPS' ? 'b-oth' : x.t === 'EMS' ? 'b-plan' : 'b-del'}">${x.t}</span></td><td>${escapeHtml(x.m.store || '-')}</td><td>${escapeHtml(detail || '-')}</td></tr>`;
+            }).join('')}
+          </tbody></table></div>` : '<div class="muted">Belum ada aktivitas.</div>'}
+        </div>`;
     }
-    function lgEnter(a, rem) {
-      AUTH = a;
-      try { localStorage.removeItem('aph_auth'); sessionStorage.removeItem('aph_auth'); (rem ? localStorage : sessionStorage).setItem('aph_auth', JSON.stringify(a)); } catch (e) {}
-      lgEl('lgPass').value = ''; lgEl('lgErr').textContent = '';
-      applyAuth(true);
-    }
-    function lgLogout() {
-      try { localStorage.removeItem('aph_auth'); sessionStorage.removeItem('aph_auth'); } catch (e) {}
-      AUTH = null; closeSettings(); applyAuth(false);
-    }
-    function applyAuth(fresh) {
-      const b = document.body;
-      b.classList.toggle('locked', !AUTH); b.classList.toggle('authed', !!AUTH);
-      b.classList.toggle('role-trainer', !!AUTH && AUTH.role === 'trainer');
-      const u = lgEl('lgUser');
-      if (!AUTH) { if (u) u.textContent = ''; lgFillAreas(); lgChange(); return; }
-      if (u) u.textContent = AUTH.role === 'ho' ? '👔 Trainer HO' : '👤 ' + AUTH.name;
-      if (AUTH.role === 'trainer' && fresh) {
-        // Store Trainer langsung diarahkan ke Rapor miliknya
-        const tabs = Array.from(document.querySelectorAll('.tab-btn'));
-        const tb = tabs.find(x => /switchModule\('(roster|profile|trainer)'/.test(x.getAttribute('onclick') || '')) || tabs[tabs.length - 2];
-        if (tb) tb.click();
-        try {
-          const sel = lgEl('raporSel'), selA = lgEl('raporAreaSel');
-          if (selA) { selA.value = AUTH.area || 'all'; }
-          fillRaporOptions();
-          if (sel) { sel.value = AUTH.name + '@@' + AUTH.store; renderRapor(); }
-        } catch (e) {}
+
+    function renderMyRoster() {
+      const el = document.getElementById('myrosterBody');
+      if (!el || !isTrainerView()) return;
+      if (!roster.loaded) {
+        el.innerHTML = '<div class="panel-card"><div class="muted">Memuat roster…</div></div>';
+        return;
       }
-      try { renderCurrentModule(); } catch (e) {}
+      const mine = roster.rows.filter(r => sameName(r.trainer, auth.name));
+      if (!mine.length) {
+        el.innerHTML = `<div class="panel-card"><div class="muted">Tidak ditemukan roster untuk <strong>${escapeHtml(auth.name)}</strong> di bulan ${escapeHtml(rosterMonth)}.</div>
+          <div class="controls-row" style="margin-top:12px"><select id="myRosterMonth" class="select-box" onchange="rosterMonth=this.value;fetchRoster().then(()=>renderMyRoster())">${ROSTER_MONTHS.map(n => `<option value="${n}" ${n === rosterMonth ? 'selected' : ''}>📅 ${n.charAt(0) + n.slice(1).toLowerCase()}</option>`).join('')}</select></div></div>`;
+        return;
+      }
+      const now = new Date();
+      const todayDay = rosterMonth === ROSTER_MONTHS[now.getMonth()] ? now.getDate() : 0;
+      const cls = { E: 'sh-e', M: 'sh-m', L: 'sh-l', X: 'sh-x' };
+      el.innerHTML = `
+        <div class="panel-card filter-bar">
+          <div class="controls-row">
+            <select id="myRosterMonth" class="select-box" onchange="rosterMonth=this.value;fetchRoster().then(()=>renderMyRoster())">${ROSTER_MONTHS.map(n => `<option value="${n}" ${n === rosterMonth ? 'selected' : ''}>📅 ${n.charAt(0) + n.slice(1).toLowerCase()}</option>`).join('')}</select>
+          </div>
+        </div>
+        <div class="panel-card">
+          <div class="muted" style="font-size:.85rem;margin-bottom:12px">Roster <strong>${escapeHtml(auth.name)}</strong> · ${escapeHtml(rosterMonth)}</div>
+          ${mine.map(r => `
+            <div class="muted" style="font-size:.78rem;margin-bottom:6px">${escapeHtml(r.store)} · ${r.wa ? waBtn(r.wa) : ''}</div>
+            <div class="table-container" style="max-height:none;margin-bottom:16px"><table class="roster rost">
+              <thead><tr>${roster.days.map(d => `<th class="dc${d.day === todayDay ? ' today' : ''}">${escapeHtml(d.wd)}<br>${d.day}</th>`).join('')}</tr></thead>
+              <tbody><tr>${r.shifts.map(v => `<td class="sh">${v ? `<span class="pill ${cls[v] || ''}">${escapeHtml(v)}</span>` : ''}</td>`).join('')}</tr></tbody>
+            </table></div>
+          `).join('')}
+        </div>`;
     }
-    function loginRefresh() { if (!AUTH) lgFillAreas(); }
-    (function () {
-      try { const c = JSON.parse(localStorage.getItem('recap_cache') || '[]'); if (c.length && !recapMasterData.length) { recapMasterData = c; buildStoreIndex(); } } catch (e) {}
-    })();
+
+    function renderMyEntries() {
+      if (!isTrainerView()) return;
+      const type = document.getElementById('myEntriesType')?.value || 'ops';
+      const monthSel = document.getElementById('myEntriesMonth');
+      let data = myData(type);
+      // fill month options
+      if (monthSel) {
+        const months = monthEntries(data.map(getRowMeta));
+        const cur = monthSel.value || 'all';
+        monthSel.innerHTML = `<option value="all">📅 Semua Bulan</option>` + months.map(([l]) => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
+        if ([...monthSel.options].some(o => o.value === cur)) monthSel.value = cur;
+        if (monthSel.value && monthSel.value !== 'all') data = data.filter(r => getRowMeta(r).month === monthSel.value);
+      }
+      data = sortNewest(data);
+      const thead = document.getElementById('myEntriesThead');
+      const tbody = document.getElementById('myEntriesTbody');
+      const pag = document.getElementById('myEntriesPagination');
+      if (!data.length) {
+        thead.innerHTML = '';
+        tbody.innerHTML = '<tr><td style="text-align:center;padding:24px">Belum ada data.</td></tr>';
+        if (pag) pag.innerHTML = '<span>0 data</span>';
+        return;
+      }
+      const spec = tableSpec(type);
+      thead.innerHTML = spec.map(c => `<th>${escapeHtml(c.h)}</th>`).join('');
+      tbody.innerHTML = data.slice(0, 100).map(row => `<tr>${spec.map(c => {
+        let v = c.f(row);
+        if (v === undefined || v === null || v === '') v = '-';
+        return `<td>${c.html ? v : escapeHtml(v)}</td>`;
+      }).join('')}</tr>`).join('');
+      if (pag) pag.innerHTML = `<div>Menampilkan <strong>${Math.min(100, data.length)}</strong> dari <strong>${data.length}</strong> entry milikmu</div>`;
+    }
+
+    function renderMyRapor() {
+      const el = document.getElementById('myraporBody');
+      if (!el || !isTrainerView()) return;
+      const rec = trainerRecs.find(r => sameName(r.nama, auth.name) && (!auth.store || norm(r.store) === norm(auth.store)))
+        || trainerRecs.find(r => sameName(r.nama, auth.name));
+      if (!rec) {
+        el.innerHTML = `<div class="panel-card"><div class="muted">Profil tidak ditemukan di sheet Recap untuk <strong>${escapeHtml(auth.name)}</strong>.</div></div>`;
+        return;
+      }
+      // reuse existing renderRapor logic by temporarily setting the select
+      const idx = storeIndex.get(norm(rec.store));
+      const prof = [['Store', rec.store], ['Type Store', rec.type || '-'], ['NIK', rec.nik || '-'], ['Work Experience', rec.exp && rec.exp !== 'Empty' ? rec.exp : '-'], ['Total Employee', idx ? idx.employees : '-']];
+      const mine = { ops: myData('ops'), ems: myData('ems'), pnr: myData('pnr') };
+      const act = (t, rows, lines) => `<div class="mod-card" onclick="openDrill(${reg(() => ({ title: `${t.toUpperCase()} · ${rec.nama}`, sub: `${rows.length} entry`, ...detailRows(t, rows) }))})"><div class="kpi-title">${t.toUpperCase()}</div><div class="v">${fmt(rows.length)}</div><div class="muted" style="font-size:.72rem">entry</div>${lines.map(l => `<div class="ln">${l}</div>`).join('')}</div>`;
+      const monthsOf = rows => new Set(rows.map(r => getRowMeta(r).month).filter(Boolean)).size;
+      const ops = mine.ops, pnr = mine.pnr;
+      const dv = pnr.filter(r => getRowMeta(r).status === 'Delivered'), pl = pnr.filter(r => getRowMeta(r).status === 'Planning');
+      const tg = findTarget(rec.nama);
+      let tgLine = 'Min target: belum terbaca';
+      if (tg) {
+        let lk = -1, lb = '';
+        pnr.forEach(r => { const m = getRowMeta(r); if (m.month && m.monthKey > lk) { lk = m.monthKey; lb = m.month; } });
+        const hrs = r1(dv.filter(r => getRowMeta(r).month === lb).reduce((a, r) => a + getRowMeta(r).hours, 0));
+        tgLine = `Min target ${r1(tg.hours)} jam/bulan · ${lb || '-'}: ${hrs} jam (${pct(hrs, tg.hours)})`;
+      }
+      const mt = new Map();
+      ['ops', 'ems', 'pnr'].forEach(t => mine[t].forEach(r => { const m = getRowMeta(r); if (!m.month) return; const e = mt.get(m.month) || { k: m.monthKey, ops: 0, ems: 0, pnr: 0 }; e[t]++; mt.set(m.month, e); }));
+      const mrows = Array.from(mt.entries()).sort((a, b) => b[1].k - a[1].k).map(([l, e]) => [escapeHtml(l), e.ops, e.ems, e.pnr, `<strong>${e.ops + e.ems + e.pnr}</strong>`]);
+      el.innerHTML = `<div class="panel-card sum-wrap">
+        <div class="rapor-grid">${prof.map(([l, v]) => `<div class="cap"><div class="l">${l}</div><div class="v" style="font-size:${String(v).length > 14 ? '1rem' : '1.4rem'}">${escapeHtml(v)}</div></div>`).join('')}</div>
+        <div class="sum-title">Summary Aktivitas · ${escapeHtml(rec.nama)}</div>
+        <div class="rapor-grid">${act('ops', ops, [`${fmt(ops.reduce((a, r) => a + partOf(r), 0))} peserta · ${fmt(ops.reduce((a, r) => a + unitsOf(r), 0))} unit terjual`, `${monthsOf(ops)} bulan aktif`])}${act('ems', mine.ems, [`${monthsOf(mine.ems)} bulan aktif`])}${act('pnr', pnr, [`Delivered ${dv.length} · Planning ${pl.length}`, tgLine])}</div>
+        <div class="sum-title">Entry per Bulan</div>${miniTable(['Bulan', 'OPS', 'EMS', 'PNR', 'Total'], mrows, 260)}
+      </div>`;
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
-      applyAuth(false);
       initSummaryHosts();
-      fetchLatestData();
+      // Auth check
+      if (loadAuth()) {
+        applyAuth();
+      } else {
+        document.getElementById('loginOv').classList.remove('hidden');
+        document.getElementById('appShell').style.display = 'none';
+      }
+      fetchLatestData().then(() => {
+        fillLoginTrainers();
+        if (isTrainerView()) renderCurrentModule();
+      });
       setInterval(fetchLatestData, AUTO_REFRESH_INTERVAL);
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') fetchLatestData();
