@@ -485,7 +485,7 @@
     html[dir=rtl] body{text-align:right}
     html[dir=rtl] .lg-row label{min-width:74px}
 
-    .hsw{position:absolute;left:0;top:0;width:100%;height:100%;margin:0;opacity:.01;z-index:5;cursor:pointer;touch-action:manipulation;transform-origin:0 0}
+    .hsw{position:absolute;left:0;top:0;width:100%;height:100%;margin:0;opacity:.01;z-index:5;cursor:pointer;touch-action:pan-x pan-y;transform-origin:0 0}
     html[data-haptic=off] .hsw{display:none}
     .rk-cell{grid-column:1/-1}
     @media(min-width:601px){.peer-scores{grid-template-columns:repeat(3,1fr)}}
@@ -612,7 +612,7 @@
     </div>
   </div>
 
-  <div class="modal-ov" id="settingsOv" onclick="if(event.target===this)closeSettings()"><div class="pop"><div class="pop-h"><div class="modal-t">Pengaturan</div><button class="btn-theme" onclick="closeSettings()" aria-label="Tutup">✕</button></div><div class="muted" style="font-size:.8rem;margin-bottom:6px">Muat ulang data dashboard atau jalankan update data dari GitHub.</div><button class="btn-primary" id="manualSyncBtn"><i class="fill"></i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg><span class="lbl">Refresh</span></button><button class="btn-run" id="ghRunBtn" onclick="runGithubAction()" title="Jalankan GitHub Action sync-data.yml"><i class="fill"></i><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Run Sync</span></button><button class="btn-run" style="background:rgba(255,69,58,.15);color:#ff453a;border:1px solid rgba(255,69,58,.35)" onclick="lgLogout()">Keluar (Logout)</button><div class="lang-row"><label for="themeSel">🎨 Tema</label><select id="themeSel" class="select-box" onchange="setThemePref(this.value)"><option value="auto">Auto (ikut perangkat)</option><option value="light">Terang</option><option value="dark">Gelap</option></select></div><div class="lang-row"><label for="hapSw">📳 Getaran</label><div style="display:flex;gap:10px;align-items:center"><button class="btn-run" onclick="hapticTest()" style="flex:1">📳 Tes getar</button><input type="checkbox" id="hapSw" checked onchange="setHaptic(this.checked)" aria-label="Getaran" style="width:22px;height:22px"></div><div class="muted" id="hapStatus" style="font-size:.72rem"></div></div><div class="lang-row"><label for="langSel">🌐 Change language</label><select id="langSel" class="select-box" onchange="setLang(this.value)"></select></div><div class="wm">All right reserved ©Frans &amp; Trainer HO Team @2026</div></div></div>
+  <div class="modal-ov" id="settingsOv" onclick="if(event.target===this)closeSettings()"><div class="pop"><div class="pop-h"><div class="modal-t">Pengaturan</div><button class="btn-theme" onclick="closeSettings()" aria-label="Tutup">✕</button></div><div class="muted" style="font-size:.8rem;margin-bottom:6px">Muat ulang data dashboard atau jalankan update data dari GitHub.</div><button class="btn-primary" id="manualSyncBtn"><i class="fill"></i><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg><span class="lbl">Refresh</span></button><button class="btn-run" id="ghRunBtn" onclick="runGithubAction()" title="Jalankan GitHub Action sync-data.yml"><i class="fill"></i><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Run Sync</span></button><button class="btn-run" style="background:rgba(255,69,58,.15);color:#ff453a;border:1px solid rgba(255,69,58,.35)" onclick="lgLogout()">Keluar (Logout)</button><div class="lang-row"><label for="langSel">🌐 Change language</label><select id="langSel" class="select-box" onchange="setLang(this.value)"></select></div><div class="wm">All right reserved ©Frans &amp; Trainer HO Team @2026</div></div></div>
   <div class="modal-ov" id="modalOv" onclick="if(event.target===this)closeModal()">
     <div class="modal">
       <div class="modal-h"><div><div class="modal-t" id="modalT"></div><div class="muted" id="modalS" style="font-size:.82rem;margin-top:2px"></div></div><button class="btn-theme" onclick="closeModal()" aria-label="Tutup">✕</button></div>
@@ -2913,33 +2913,47 @@
       const st = document.getElementById('hapStatus');
       if (st) st.textContent = IS_IOS ? `iPhone/iPad: ${n} area sentuh aktif. Ketuk tombol mana pun, getar datang dari switch asli iOS. Pastikan Settings > Sounds & Haptics > System Haptics aktif.` : `navigator.vibrate: ${r}`;
     }
-    /* overlay switch asli (hanya iOS) */
-    const HX_SEL = 'button,a[href],[onclick],[role=button],.chip,.tab-btn';
+    /* overlay switch asli (hanya iOS) - sengaja DIBATASI agar scroll tidak terhambat:
+       hanya tombol kecil (bukan tab bar), di luar tabel / kontainer yang bisa di-scroll / kalender / kartu besar. */
+    const HX_SEL = 'button';
     const HX_NESTED = 'button,a[href],select,input:not(.hsw),textarea,[onclick],[role=button]';
     const HX_Q = new Set(); let HX_RAF = 0;
+    function hxBlocked(el) { // true bila overlay di elemen ini berpotensi mengganggu scroll
+      if (el.classList && (el.classList.contains('tab-btn') || el.classList.contains('chip-scroll'))) return true;
+      if (el.closest && el.closest('.nav-tabs,table,.table-container,.cal,.matrix-wrap,.mcap')) return true;
+      for (let p = el.parentElement; p && p !== document.body && p !== document.documentElement; p = p.parentElement) {
+        const c = getComputedStyle(p);
+        if (/(auto|scroll)/.test((c.overflowX || '') + ' ' + (c.overflowY || '')) && (p.scrollWidth > p.clientWidth + 1 || p.scrollHeight > p.clientHeight + 1)) return true;
+      }
+      return false;
+    }
     function hxAttach(el) {
-      if (!IS_IOS || !el || el.__hx || el.nodeType !== 1) return;
-      if (el.disabled || /^(SELECT|INPUT|TEXTAREA|CANVAS|LABEL|OPTION)$/.test(el.tagName)) return;
+      if (!IS_IOS || !el || el.__hx || el.__hxn || el.nodeType !== 1 || el.tagName !== 'BUTTON' || el.disabled) return;
       if (el.closest && el.closest('.hsw')) return;
-      if (el.querySelector && el.querySelector(HX_NESTED)) return; // hanya elemen "daun", agar kontrol di dalamnya tetap bisa disentuh
+      if (el.querySelector && el.querySelector(HX_NESTED)) { el.__hxn = true; return; }
+      const r = el.getBoundingClientRect ? el.getBoundingClientRect() : null;
+      if (r && (r.width < 2 || r.height < 2)) return;              // masih tersembunyi: dicoba lagi nanti
+      if (r && (r.height > 80 || r.width > 520)) { el.__hxn = true; return; } // terlalu besar: area scroll
+      if (hxBlocked(el)) { el.__hxn = true; return; }
       const cs = getComputedStyle(el);
       if (cs.display === 'none' || cs.display === 'inline' || cs.display === 'contents' || cs.pointerEvents === 'none') return;
       if (cs.position === 'static') el.style.position = 'relative';
       const i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.className = 'hsw'; i.tabIndex = -1; i.setAttribute('aria-hidden', 'true');
-      i.addEventListener('click', () => { i.checked = false; }); // klik tetap menggelembung ke onclick milik elemen
+      i.addEventListener('click', () => { i.checked = false; }); // klik tetap menggelembung ke onclick milik tombol
       el.appendChild(i); el.__hx = true; HX_Q.add(i); hxSchedule();
     }
     function hxScan(root) {
-      if (!IS_IOS || !root || root.nodeType !== 1 || root.classList && root.classList.contains('hsw')) return;
-      const hit = n => { if (n.tagName === 'TR' && n.hasAttribute && n.hasAttribute('onclick')) Array.from(n.cells || []).forEach(hxAttach); else hxAttach(n); };
-      if (root.matches && root.matches(HX_SEL)) hit(root);
-      if (root.querySelectorAll) root.querySelectorAll(HX_SEL + ',tr[onclick]').forEach(hit);
+      if (!IS_IOS || !root || root.nodeType !== 1 || (root.classList && root.classList.contains('hsw'))) return;
+      if (root.matches && root.matches(HX_SEL)) hxAttach(root);
+      if (root.querySelectorAll) root.querySelectorAll(HX_SEL).forEach(hxAttach);
     }
     function hxSchedule() { if (HX_RAF) return; HX_RAF = requestAnimationFrame(() => { HX_RAF = 0; hxFit(); }); }
-    function hxFit() { // skala switch bawaan (ukuran tetap) agar menutupi seluruh elemen induknya
+    function hxFit() { // skala switch bawaan (ukuran tetap) agar menutupi tombolnya; lepas overlay bila konteksnya jadi bisa di-scroll
       const all = Array.from(document.querySelectorAll('.hsw')); if (!all.length) return;
-      all.forEach(i => { i.style.transform = ''; });
-      const m = all.map(i => { const p = i.parentNode.getBoundingClientRect(), r = i.getBoundingClientRect(); return [i, p, r]; });
+      all.forEach(i => { const h = i.parentNode; if (h && hxBlocked(h)) { try { h.removeChild(i); } catch (e) {} h.__hx = false; h.__hxn = true; } });
+      const live = Array.from(document.querySelectorAll('.hsw'));
+      live.forEach(i => { i.style.transform = ''; });
+      const m = live.map(i => { const p = i.parentNode.getBoundingClientRect(), r = i.getBoundingClientRect(); return [i, p, r]; });
       m.forEach(([i, p, r]) => { if (r.width > 1 && r.height > 1 && p.width > 1 && p.height > 1) { i.style.transformOrigin = '0 0'; i.style.transform = 'scale(' + (p.width / r.width) + ',' + (p.height / r.height) + ')'; } });
       HX_Q.clear();
     }
@@ -2963,7 +2977,7 @@
       }
       window.addEventListener('resize', hxSchedule); window.addEventListener('orientationchange', hxSchedule);
       document.addEventListener('click', () => setTimeout(hxSchedule, 80), true);
-      setInterval(() => { if (!document.hidden) hxSchedule(); }, 2500);
+      setInterval(() => { if (!document.hidden) { hxScan(document.body); hxSchedule(); } }, 2500);
     }
     if (typeof document !== 'undefined') document.addEventListener('click', hapticTap, true);
 
