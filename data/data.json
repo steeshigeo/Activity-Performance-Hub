@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-10-31T23:30:44.136Z",
+  "last_updated": "2026-11-01T02:52:35.739Z",
   "sheets": {
     "ops": [
       {
@@ -211357,6 +211357,18 @@
         "Date": 31,
         "Score": 90,
         "Any Comment": "Good"
+      },
+      {
+        "Timestamp": "2026-11-01T02:51:33.000Z",
+        "Store": "M237 Digimap Solo Square",
+        "Trainer Name": "Fadlan Hidayatullah",
+        "Participants name": "Siti nurhalisa",
+        "Participants Sales Coach": "sitinurhalisa.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "November",
+        "Date": 1,
+        "Score": 90,
+        "Any Comment": "All good"
       }
     ],
     "pnr": [
