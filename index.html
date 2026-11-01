@@ -481,6 +481,15 @@
     html[dir=rtl] .table-container,html[dir=rtl] .cal,html[dir=rtl] .chart-cv,html[dir=rtl] .nav-tabs,html[dir=rtl] .mcap-wrap{direction:ltr}
     html[dir=rtl] body{text-align:right}
     html[dir=rtl] .lg-row label{min-width:74px}
+
+    .rk-cell{grid-column:1/-1}
+    @media(min-width:601px){.peer-scores{grid-template-columns:repeat(3,1fr)}}
+    @media(min-width:769px){
+      body.role-trainer .prof-grid{grid-template-columns:repeat(2,1fr)}
+      body.role-trainer .prof-grid .rk-cell{grid-column:auto;display:flex}
+      body.role-trainer .prof-grid .rk-cell .rk-cap{margin-bottom:0;width:100%;display:flex;flex-direction:column;justify-content:center}
+      body.role-trainer .my-charts{grid-template-columns:repeat(2,1fr)}
+    }
   </style>
 </head>
 <body class="locked">
@@ -2233,7 +2242,7 @@
       ['ops', 'ems', 'pnr'].forEach(t => mine[t].forEach(r => { const m = getRowMeta(r); if (!m.month) return; const e = mt.get(m.month) || { k: m.monthKey, ops: 0, ems: 0, pnr: 0 }; e[t]++; mt.set(m.month, e); }));
       const mrows = Array.from(mt.entries()).sort((a, b) => b[1].k - a[1].k).map(([l, e]) => [escapeHtml(l), e.ops, e.ems, e.pnr, `<strong>${e.ops + e.ems + e.pnr}</strong>`]);
       const isTrR = AUTH && AUTH.role === 'trainer';
-      body.innerHTML = `<div class="rapor-grid">${prof.map(([l, v]) => `<div class="cap"><div class="l">${l}</div><div class="v" style="font-size:${String(v).length > 14 ? '1rem' : '1.4rem'}">${escapeHtml(v)}</div></div>${isTrR && l === 'Total Employee' ? `<div style="grid-column:1/-1">${rankCapsule(rec, rm)}</div>` : ''}`).join('')}</div>
+      body.innerHTML = `<div class="rapor-grid prof-grid">${prof.map(([l, v]) => `<div class="cap"><div class="l">${l}</div><div class="v" style="font-size:${String(v).length > 14 ? '1rem' : '1.4rem'}">${escapeHtml(v)}</div></div>${isTrR && l === 'Total Employee' ? `<div class="rk-cell">${rankCapsule(rec, rm)}</div>` : ''}`).join('')}</div>
         <div class="sum-title">Pencapaian Aktivitas · ${escapeHtml(rec.nama)}${rm === 'all' ? '' : ' · ' + escapeHtml(rm)} <span class="muted" style="text-transform:none">(OPS &amp; EMS = data store ${escapeHtml(shortStore(rec.store))} seperti di Data Detail · klik kartu untuk detail)</span></div>
         <div class="rapor-grid act-stack">${act('ops', ops, 'entry store (Data Detail OPS)', [`${fmt(ops.reduce((a, r) => a + partOf(r), 0))} peserta · ${fmt(ops.reduce((a, r) => a + unitsOf(r), 0))} unit terjual`, slotLine(ops), `${monthsOf(ops)} bulan aktif`], bar(ops.length, tOps, 'sesi', 'Target store'))}${act('ems', ems, 'entry store (Data Detail EMS)', [`${monthsOf(ems)} bulan aktif`], bar(ems.length, tEms, 'sesi', 'Target store'))}${act('pnr', pnr, 'entry trainer', [`Delivered ${dv.length} · Planning ${pl.length}`], bar(dvH, tPnr, 'jam', 'Target trainer (Delivered)'))}</div>
         ${isTrR ? '' : peerHtml(rec, rm)}
@@ -2856,6 +2865,17 @@
     }
     function mkChartT(ctx, cfg) { return new globalThis.Chart(ctx, i18nCfg(cfg)); }
 
+
+    /* ---------- Getar (haptic) saat tap di HP ---------- */
+    let HAP_LAST = 0;
+    function haptic(p) { try { if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(p || 12); } catch (e) {} }
+    function hapticTap(e) {
+      const t = e && e.target; if (!t || !t.closest) return;
+      const now = Date.now(); if (now - HAP_LAST < 40) return;
+      if (t.closest('button,a,select,canvas,[onclick],.chip,.tab-btn,[role=button],label,input[type=checkbox],input[type=radio],summary')) { HAP_LAST = now; haptic(12); }
+    }
+    if (typeof document !== 'undefined') document.addEventListener('click', hapticTap, true);
+
     /* ---------- Login & role ---------- */
     const HO_PASS = 'Trainerhebat';
     let AUTH = null;
@@ -2886,6 +2906,7 @@
     }
     function lgFail(msg) {
       lgEl('lgErr').textContent = msg;
+      haptic([40, 50, 40]);
       const c = lgEl('lgCard'); c.classList.remove('shake'); void c.offsetWidth; c.classList.add('shake');
     }
     function lgSubmit() {
