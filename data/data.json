@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-11-01T09:43:34.616Z",
+  "last_updated": "2026-11-01T09:51:52.592Z",
   "sheets": {
     "ops": [
       {
@@ -95877,6 +95877,21 @@
         "Store": "M267 Digimap Mall Cijantung",
         "Open Studio Topics": "Preview App",
         "Sessions": "13:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "iPad",
+        "Bulan": "November 2026",
+        "Date": "01 November 2026"
+      },
+      {
+        "Timestamp": "2026-11-01T09:44:30.000Z",
+        "Email": "Jonathan.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Jonathan Maisa",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-10-31T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 0,
+        "Store": "M268 Digimap Diana Mall Timika",
+        "Open Studio Topics": "Markup on iPad",
+        "Sessions": "15:00",
         "Report Photo": "",
         "Unit yang terjual setelah Open Studio": 0,
         "Produk apa yang pelanggan minati": "iPad",
