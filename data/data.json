@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-11-01T02:52:35.739Z",
+  "last_updated": "2026-11-01T04:38:42.478Z",
   "sheets": {
     "ops": [
       {
@@ -211369,6 +211369,42 @@
         "Date": 1,
         "Score": 90,
         "Any Comment": "All good"
+      },
+      {
+        "Timestamp": "2026-11-01T04:02:57.000Z",
+        "Store": "M244 Digimap Java Mall Semarang",
+        "Trainer Name": "Yuniar Puspitasari",
+        "Participants name": "Sa'id Rohmadtulloh",
+        "Participants Sales Coach": "Said.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "November",
+        "Date": 1,
+        "Score": 90,
+        "Any Comment": "Good bagus"
+      },
+      {
+        "Timestamp": "2026-11-01T04:08:05.000Z",
+        "Store": "M294 Digimap Bojonegoro Street",
+        "Trainer Name": "Muhammad Iqbal Augustiyant",
+        "Participants name": "Tirta Bayu Indianto",
+        "Participants Sales Coach": "tirtabayu.digimap@gmail.com",
+        "Topic": "Demo Aksesoris",
+        "Month": "November",
+        "Date": 1,
+        "Score": 90,
+        "Any Comment": "Tidak ada"
+      },
+      {
+        "Timestamp": "2026-11-01T04:33:42.000Z",
+        "Store": "M223 Digimap Roxy Square Jember",
+        "Trainer Name": "Atha Albarru Dewantara",
+        "Participants name": "Dyah Retnaning Tyas",
+        "Participants Sales Coach": "dyahretnaning.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "November",
+        "Date": 1,
+        "Score": 100,
+        "Any Comment": "Sangat baik."
       }
     ],
     "pnr": [
