@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-11-01T20:43:25.927Z",
+  "last_updated": "2026-11-02T00:00:14.792Z",
   "sheets": {
     "ops": [
       {
@@ -96542,6 +96542,36 @@
         "Produk apa yang pelanggan minati": "Apple Watch",
         "Bulan": "November 2026",
         "Date": "01 November 2026"
+      },
+      {
+        "Timestamp": "2026-11-01T22:00:36.000Z",
+        "Email": "lesta.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Lesta",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-10-31T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 0,
+        "Store": "M283 Digimap Basuki Rahmat Tulungagung",
+        "Open Studio Topics": "Markup on iPad",
+        "Sessions": "13:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "just exercise ",
+        "Bulan": "November 2026",
+        "Date": "02 November 2026"
+      },
+      {
+        "Timestamp": "2026-11-01T22:01:15.000Z",
+        "Email": "amaralaputra.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Putra",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-10-31T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 0,
+        "Store": "M283 Digimap Basuki Rahmat Tulungagung",
+        "Open Studio Topics": "Preview App",
+        "Sessions": "18:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "just exercise ",
+        "Bulan": "November 2026",
+        "Date": "02 November 2026"
       },
       {
         "Timestamp": "",
@@ -212764,6 +212794,18 @@
         "Date": 1,
         "Score": 90,
         "Any Comment": "Menjelaskan step by step try on iPad"
+      },
+      {
+        "Timestamp": "2026-11-01T22:05:37.000Z",
+        "Store": "M283 Digimap Basuki Rahmat Tulungagung",
+        "Trainer Name": "Sultan Amaral Ageng Putra ",
+        "Participants name": "Lesta",
+        "Participants Sales Coach": "lesta.digimap@gmail.com",
+        "Topic": "Question Exercise",
+        "Month": "November",
+        "Date": 1,
+        "Score": 80,
+        "Any Comment": "Lesta sudah mampu menjelaskan fitur Markup pada iPhone dan iPad, sehingga manfaat utama fitur tersebut tetap dapat tersampaikan kepada customer. Namun, urutan saat melakukan demo secara langsung masih perlu dilatih agar lebih runtut dan natural, sehingga tidak hanya memahami penjelasannya, tetapi juga dapat mengikuti cara penggunaannya dengan mudah."
       }
     ],
     "pnr": [
