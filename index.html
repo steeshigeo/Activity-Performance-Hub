@@ -717,6 +717,18 @@
         if (st && st !== '0') cur.trainers.add(st);
         if (isTr && r.nama) trainerRecs.push(r);
       });
+      // Semua nama pada kolom Store Trainer di Recap ikut terdaftar sebagai trainer (walau belum ada aktivitas / posisinya bukan "trainer")
+      const trKeys = new Set(trainerRecs.map(r => norm(r.nama) + '|' + norm((storeIndex.get(norm(r.store)) || {}).name || r.store)));
+      storeIndex.forEach(cur => {
+        cur.trainers.forEach(st => {
+          const k = norm(st) + '|' + norm(cur.name);
+          if (trKeys.has(k)) return;
+          if (trainerRecs.some(r => norm(r.store) === norm(cur.name) && sameName(r.nama, st))) { trKeys.add(k); return; }
+          const own = recapMasterData.find(r => norm(r.nama) === norm(st)) || recapMasterData.find(r => r.nama && sameName(r.nama, st));
+          trainerRecs.push({ ...(own || { email: '', position: 'Store Trainer', nik: '', exp: '', type: cur.type }), nama: own && own.nama ? own.nama : st, store: cur.name, trainerHO: cur.ho || (own && own.trainerHO) || '', storeTrainer: st });
+          trKeys.add(k);
+        });
+      });
       const seenS = new Set();
       recapMasterData.forEach(r => {
         if (!r.nama || r.nama === '0' || !r.store) return;
@@ -1753,9 +1765,8 @@
     // Daftar staff (sheet Recap) sesuai filter aktif; PNR = store trainer saja. Staff tanpa aktivitas ikut dihitung (0).
     function staffPool(type, p) {
       const seen = new Set(), out = [];
-      recapMasterData.forEach(r => {
+      (type === 'pnr' ? trainerRecs : recapMasterData).forEach(r => { // PNR: semua Store Trainer di Recap (termasuk yang posisinya bukan "trainer" / belum punya baris sendiri)
         if (!r.nama || r.nama === '0' || !r.store) return;
-        if (type === 'pnr' && !/trainer/i.test(r.position)) return;
         const st = resolveStore(r.store), ix = storeIndex.get(norm(st));
         if (!ix) return;
         if (p.store !== 'all' && norm(st) !== norm(p.store)) return;
@@ -1793,7 +1804,7 @@
       return barList(title, entries, 5, k => detailFn(keyMap.get(k)), { label: `Lihat semua ${active.length} yang aktif`, fn: all });
     }
     // Kelompok yang tidak punya aktivitas sama sekali (0 entry), ditampilkan sebagai capsule
-    function zeroBlock(title, items, heads, rowFn, limit) {
+    function zeroBlock(title, items, heads, rowFn, limit, tegurFn) {
       const lim = limit || 24, rows = items.map(rowFn);
       const detail = () => ({ title, sub: `${items.length} tanpa aktivitas sama sekali (0 entry)`, heads, rows: rows.map(r => r.cells.map(escapeHtml)) });
       const cap = (r, x) => `<span class="capsule clickable${x}" onclick="openDrill(${reg(() => ({ title: r.label, sub: 'Tidak ada aktivitas (0 entry)', heads, rows: [r.cells.map(escapeHtml)] }))})">${escapeHtml(r.label)}</span>`;
@@ -1802,7 +1813,8 @@
         html += rows.slice(lim, 300).map(r => cap(r, ' zx')).join('') + (rows.length > 300 ? `<span class="capsule clickable zx" onclick="openDrill(${reg(detail)})">+${rows.length - 300} lainnya ›</span>` : '')
           + `<span class="capsule zbtn clickable" onclick="this.parentNode.classList.toggle('open')"><i class="m">Show more (${rows.length - lim})</i><i class="l">Show less</i></span>`;
       } else if (rows.length > lim) html += `<span class="capsule clickable" onclick="openDrill(${reg(detail)})">+${rows.length - lim} lainnya ›</span>`;
-      return `<div class="sum-block"><div class="sum-title">${title} (${items.length})</div><div class="capsules">${html || '<span class="muted">Semua sudah punya aktivitas</span>'}</div></div>`;
+      const head = tegurFn ? `<div class="tegur-row" style="margin-bottom:6px"><div class="sum-title" style="margin:0">${title} (${items.length})</div><button class="btn-run tegur-btn" onclick="DR[${reg(tegurFn)}]()">📣 Tegur</button></div>` : `<div class="sum-title">${title} (${items.length})</div>`;
+      return `<div class="sum-block">${head}<div class="capsules">${html || '<span class="muted">Semua sudah punya aktivitas</span>'}</div></div>`;
     }
     const zStoreRow = s => ({ label: s.name, cells: [s.name, s.ho || '-', Array.from(s.trainers).join(', ') || '-', String(s.employees)] });
     const zStaffRow = x => ({ label: x.s.store ? `${x.s.nama} · ${shortStore(x.s.store)}` : x.s.nama, cells: [x.s.nama, x.s.store || '-', x.s.ho || '-', x.s.pos || '-'] });
@@ -1812,7 +1824,8 @@
       const act = new Set(data.map(r => getRowMeta(r).store).filter(Boolean));
       const stores = Array.from(storeIndex.values()).filter(s => !act.has(s.name) && (p.store === 'all' || norm(s.name) === norm(p.store)) && (p.trainerHO === 'all' || s.ho === p.trainerHO) && (!isPNR || !p.st || p.st === 'all' || s.trainers.has(p.st)));
       const { zero } = staffSplit(staffPool(type, p), data.map(r => getRowMeta(r).trainer));
-      return `<div class="sum-cols" style="margin-top:18px">${zeroBlock('Store Tanpa Aktivitas', stores, Z_STORE_HEADS, zStoreRow, 5)}${!isPNR && p.trainer !== 'all' ? '' : zeroBlock(isPNR ? 'Store Trainer Tanpa Aktivitas' : 'Staff Tanpa Aktivitas', zero, Z_STAFF_HEADS, zStaffRow, 5)}</div>`;
+      const ctx = { mod: type.toUpperCase(), month: p.month, area: p.trainerHO, store: p.store };
+      return `<div class="sum-cols" style="margin-top:18px">${zeroBlock('Store Tanpa Aktivitas', stores, Z_STORE_HEADS, zStoreRow, 5, () => tegurStores(stores.map(s => s.name), ctx))}${!isPNR && p.trainer !== 'all' ? '' : zeroBlock(isPNR ? 'Store Trainer Tanpa Aktivitas' : 'Staff Tanpa Aktivitas', zero, Z_STAFF_HEADS, zStaffRow, 5, () => tegurPeople(zero, isPNR ? 'Store Trainer' : 'Staff', ctx))}</div>`;
     }
     function staffBlock(type, data) {
       const title = (type === 'pnr' ? 'Trainer' : 'Staff') + ' Paling Sedikit Aktivitas';
@@ -2911,27 +2924,36 @@
 
     /* ---------- Generator teks teguran (Trainer HO, tab Summary) ---------- */
     function dayPart() { const h = new Date().getHours(); return h >= 4 && h < 11 ? 'pagi' : h >= 11 && h < 15 ? 'siang' : h >= 15 && h < 18 ? 'sore' : 'malam'; }
-    function tegurHead(judul) {
-      const per = allMonth === 'all' ? 'Seluruh periode' : allMonth;
-      const scope = (allArea === 'all' ? 'Semua Area' : 'Area ' + allArea) + (allStore === 'all' ? '' : ' · ' + shortStore(allStore));
+    function tegurHead(judul, ctx) {
+      const month = ctx ? ctx.month : allMonth, area = ctx ? ctx.area : allArea, store = ctx ? ctx.store : allStore;
+      const per = month === 'all' ? 'Seluruh periode' : month;
+      const scope = (area === 'all' ? 'Semua Area' : 'Area ' + area) + (store === 'all' ? '' : ' · ' + shortStore(store));
       return `📣 *${judul}*\nPeriode : ${per}\nCakupan : ${scope}\n\nSelamat ${dayPart()}, Team 🙏\n\n`;
     }
     const TEGUR_FOOT = '\n\nMohon segera ditindaklanjuti dan aktivitasnya diinput di dashboard. Mohon konfirmasi rencana tindak lanjutnya hari ini.\n\nTerima kasih 🙏\n— Trainer HO Team';
+    const tegurAct = ctx => ctx ? ctx.mod : 'OPS / EMS / PNR';
     function tegurGroup(list, areaOf) {
       const g = new Map(); list.forEach(x => { const a = areaOf(x) || 'Tanpa Area'; if (!g.has(a)) g.set(a, []); g.get(a).push(x); });
       return Array.from(g.entries()).sort((a, b) => byName(a[0], b[0]));
     }
-    function tegurStores(idle) {
-      if (!idle.length) return openTegur('Teks Teguran · Store', tegurHead('INFO AKTIVITAS OPS / EMS / PNR') + 'Semua store sudah memiliki aktivitas pada periode ini. Tidak ada yang perlu ditegur 🎉\n\nTerima kasih 🙏\n— Trainer HO Team');
+    function tegurSec(judul, list, withPos) {
+      return !list.length ? '' : `*${judul}* (${list.length})\n` + tegurGroup(list, x => x.s.ho).map(([a, arr]) => `_Area ${a}_\n` + arr.sort((x, y) => byName(x.s.nama, y.s.nama)).map(x => `• ${x.s.nama}${withPos && x.s.pos ? ' (' + x.s.pos + ')' : ''}${x.s.store ? ' — ' + shortStore(x.s.store) : ''}`).join('\n')).join('\n\n');
+    }
+    function tegurNone(title, ctx) { openTegur(title, tegurHead('INFO AKTIVITAS ' + tegurAct(ctx), ctx) + 'Semua sudah memiliki aktivitas pada periode ini. Tidak ada yang perlu ditegur 🎉\n\nTerima kasih 🙏\n— Trainer HO Team'); }
+    function tegurStores(idle, ctx) {
+      if (!idle.length) return tegurNone('Teks Teguran · Store', ctx);
       const items = idle.map(n => { const ix = storeIndex.get(norm(n)); return { n, ho: ix && ix.ho, tr: ix && ix.trainers.size ? Array.from(ix.trainers).join(', ') : '-' }; });
       const body = tegurGroup(items, x => x.ho).map(([a, arr]) => `*Area ${a}* (${arr.length})\n` + arr.sort((x, y) => byName(x.n, y.n)).map((x, i) => `${i + 1}. ${x.n} — Store Trainer: ${x.tr}`).join('\n')).join('\n\n');
-      openTegur('Teks Teguran · Store', tegurHead('TEGURAN: STORE BELUM ADA AKTIVITAS') + `Berdasarkan data Activity Performance Hub, terdapat *${items.length} store* yang BELUM ada aktivitas OPS / EMS / PNR (0 entry) pada periode ini:\n\n` + body + TEGUR_FOOT);
+      openTegur('Teks Teguran · Store' + (ctx ? ' ' + ctx.mod : ''), tegurHead('TEGURAN: STORE BELUM ADA AKTIVITAS' + (ctx ? ' ' + ctx.mod : ''), ctx) + `Berdasarkan data Activity Performance Hub, terdapat *${items.length} store* yang BELUM ada aktivitas ${tegurAct(ctx)} (0 entry) pada periode ini:\n\n` + body + TEGUR_FOOT);
     }
-    function tegurStaff(staffZero, trZero) {
-      if (!staffZero.length && !trZero.length) return openTegur('Teks Teguran · Staff & Store Trainer', tegurHead('INFO AKTIVITAS OPS / EMS / PNR') + 'Semua staff dan store trainer sudah memiliki aktivitas pada periode ini. Tidak ada yang perlu ditegur 🎉\n\nTerima kasih 🙏\n— Trainer HO Team');
-      const sec = (judul, list, withPos) => !list.length ? '' : `*${judul}* (${list.length})\n` + tegurGroup(list, x => x.s.ho).map(([a, arr]) => `_Area ${a}_\n` + arr.sort((x, y) => byName(x.s.nama, y.s.nama)).map(x => `• ${x.s.nama}${withPos && x.s.pos ? ' (' + x.s.pos + ')' : ''}${x.s.store ? ' — ' + shortStore(x.s.store) : ''}`).join('\n')).join('\n\n');
-      const parts = [sec('Staff tanpa aktivitas', staffZero, true), sec('Store Trainer tanpa aktivitas', trZero, false)].filter(Boolean).join('\n\n');
-      openTegur('Teks Teguran · Staff & Store Trainer', tegurHead('TEGURAN: STAFF & STORE TRAINER BELUM ADA AKTIVITAS') + `Berdasarkan data Activity Performance Hub, berikut yang BELUM ada aktivitas (0 entry) pada periode ini:\n\n` + parts + TEGUR_FOOT);
+    function tegurPeople(list, label, ctx) { // satu daftar: Staff (OPS/EMS) atau Store Trainer (PNR)
+      if (!list.length) return tegurNone('Teks Teguran · ' + label, ctx);
+      openTegur('Teks Teguran · ' + label + ' ' + ctx.mod, tegurHead('TEGURAN: ' + label.toUpperCase() + ' BELUM ADA AKTIVITAS ' + ctx.mod, ctx) + `Berdasarkan data Activity Performance Hub, berikut yang BELUM ada aktivitas ${ctx.mod} (0 entry) pada periode ini:\n\n` + tegurSec(label + ' tanpa aktivitas ' + ctx.mod, list, label === 'Staff') + TEGUR_FOOT);
+    }
+    function tegurStaff(staffZero, trZero, ctx) {
+      if (!staffZero.length && !trZero.length) return tegurNone('Teks Teguran · Staff & Store Trainer', ctx);
+      const parts = [tegurSec('Staff tanpa aktivitas', staffZero, true), tegurSec('Store Trainer tanpa aktivitas', trZero, false)].filter(Boolean).join('\n\n');
+      openTegur('Teks Teguran · Staff & Store Trainer', tegurHead('TEGURAN: STAFF & STORE TRAINER BELUM ADA AKTIVITAS', ctx) + `Berdasarkan data Activity Performance Hub, berikut yang BELUM ada aktivitas (0 entry) pada periode ini:\n\n` + parts + TEGUR_FOOT);
     }
     function openTegur(title, text) {
       document.getElementById('tegurTitle').textContent = title; document.getElementById('tegurTxt').value = text;
