@@ -1273,7 +1273,11 @@
       const mode = { planning: 'Planning', delivered: 'Delivered', all: 'Semua status' }[pnrStatusMode];
       const trainers = n => { const ix = storeIndex.get(norm(n)); return ix && ix.trainers.size ? Array.from(ix.trainers).join(', ') : '-'; };
       const rowsHtml = list.map(e => {
-        const dr = reg(() => ({ title: e.name, sub: `${N} · ${isPNR ? 'delivered' : 'aktual'} ${f(e.actual)} / target ${f(e.target)} ${u.toLowerCase()} (${e.pct === null ? '-' : e.pct + '%'}) · ${INDT(e.pct)}${isPNR ? ` · planning ${f(e.planned)} · tampil: ${mode}` : ''}`, ...detailRows(type, e.rows) }));
+        const dr = reg(() => { // entry store dikelompokkan & diberi peringkat: OPS per Presenter, EMS per Participant, PNR per Topik (terbanyak -> tersedikit)
+          const g = groupedDetail(type, e.rows, isPNR ? (r => getTopics('pnr', r, 'all')) : (r => [getRowMeta(r).trainer]), e.name, isPNR ? 'topik' : isOps ? 'presenter' : 'participant');
+          g.sub = `${N} · ${isPNR ? 'delivered' : 'aktual'} ${f(e.actual)} / target ${f(e.target)} ${u.toLowerCase()} (${e.pct === null ? '-' : e.pct + '%'}) · ${INDT(e.pct)}${isPNR ? ` · planning ${f(e.planned)} · tampil: ${mode}` : ''} · ${fmt(g.groups.length)} ${isPNR ? 'topik' : isOps ? 'presenter' : 'participant'} (peringkat terbanyak)`;
+          return g;
+        });
         const c = isOps ? [escapeHtml(e.name), e.s['13:00'], e.s['15:00'], e.s['18:00'], `<strong>${e.actual}</strong>`, e.target, pcCell(e.pct), IND(e.pct)]
           : isPNR ? [escapeHtml(e.name), escapeHtml(trainers(e.name)), e.target ? f(e.target) : '-', `<strong>${f(e.actual)}</strong>`, f(e.planned), pcCell(e.pct), IND(e.pct)]
           : [escapeHtml(e.name), `<strong>${f(e.actual)}</strong>`, f(e.target), pcCell(e.pct), IND(e.pct)];
