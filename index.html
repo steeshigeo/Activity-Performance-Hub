@@ -2076,8 +2076,14 @@
         roster.title = (grid.find(r => /roster/i.test(r[0] || '')) || [''])[0];
         roster.legend = (grid.find(r => /legend/i.test(r[0] || '')) || [''])[0];
         roster.days = days;
-        roster.rows = grid.slice(hi + (hasDays ? 2 : 1)).filter(r => r[iStore] && !/^\s*q\S*\d\S*(\s|$)/i.test(r[iStore]))
-          .map(r => ({ store: r[iStore], trainer: iTr >= 0 ? r[iTr] || '' : '', wa: iWa >= 0 ? r[iWa] || '' : '', shifts: days.map(d => (r[d.i] || '').toUpperCase()) }));
+        // Toko dengan 2+ trainer biasanya sel "Nama Toko" digabung (merged): baris trainer ke-2 dst. kosong di kolom toko -> pakai toko baris di atasnya
+        let lastStore = '';
+        roster.rows = grid.slice(hi + (hasDays ? 2 : 1)).map(r => {
+          const st = r[iStore] || '', trn = iTr >= 0 ? r[iTr] || '' : '';
+          if (st) lastStore = st; else if (!trn) lastStore = '';
+          const store = st || (trn ? lastStore : '');
+          return store ? { store, trainer: trn, wa: iWa >= 0 ? r[iWa] || '' : '', shifts: days.map(d => (r[d.i] || '').toUpperCase()) } : null;
+        }).filter(r => r && !/^\s*q\S*\d\S*(\s|$)/i.test(r.store));
         const now = new Date();
         const ti = rosterMonth === ROSTER_MONTHS[now.getMonth()] ? days.findIndex(d => d.day === now.getDate()) : -1;
         if (roster.day >= days.length || !roster.loaded) roster.day = ti >= 0 ? ti : 0;
@@ -2773,7 +2779,7 @@
     }
     /* ---- My Roster ---- */
     const mr = { q: '', sort: 'fb' };
-    function mineRoster() { return roster.rows.filter(r => sameName(r.trainer, AUTH.name) || norm(r.store) === norm(AUTH.store)); }
+    function mineRoster() { const me = norm(AUTH.store); return roster.rows.filter(r => sameName(r.trainer, AUTH.name) || norm(r.store) === me || norm(resolveStore(r.store)) === me); }
     function dayEntries(rec, date) {
       return myEntryItems(rec).filter(x => x.m.date && x.m.date.getFullYear() === date.getFullYear() && x.m.date.getMonth() === date.getMonth() && x.m.date.getDate() === date.getDate());
     }
