@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-11-03T23:45:11.873Z",
+  "last_updated": "2026-11-04T03:37:27.280Z",
   "sheets": {
     "ops": [
       {
@@ -100427,6 +100427,21 @@
         "Produk apa yang pelanggan minati": "-",
         "Bulan": "November 2026",
         "Date": "03 November 2026"
+      },
+      {
+        "Timestamp": "2026-11-04T01:17:32.000Z",
+        "Email": "dirgadigimap1@gmail.com",
+        "Presenter Name\nFill in your full name": "Dirga Agustira",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-11-03T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 1,
+        "Store": "M228 Digimap Citimall Cianjur 2",
+        "Open Studio Topics": "Markup on iPad",
+        "Sessions": "13:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "iPhone",
+        "Bulan": "November 2026",
+        "Date": "04 November 2026"
       },
       {
         "Timestamp": "",
@@ -217789,6 +217804,54 @@
         "Date": 3,
         "Score": 80,
         "Any Comment": "Secara keseluruhan, penampilan roleplay sudah cukup baik. Penyampaian penawaran aksesoris iPhone Duo sudah menunjukkan pemahaman terhadap produk yang ditawarkan. Ke depannya, perlu lebih meningkatkan kemampuan dalam menjelaskan fungsi, manfaat, serta keunggulan masing-masing aksesoris agar pelanggan semakin memahami nilai tambah dari produk tersebut."
+      },
+      {
+        "Timestamp": "2026-11-04T02:23:25.000Z",
+        "Store": "M273 Digimap Metro Lampung",
+        "Trainer Name": "Ria Ambar Wati",
+        "Participants name": "Gibran Habib Widawan",
+        "Participants Sales Coach": "gibran.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "November",
+        "Date": 4,
+        "Score": 70,
+        "Any Comment": "Yang sudah baik: Gibran sudah berusaha menjelaskan fungsi dasar Apple Watch dan cukup berani untuk tampil demo di depan.\nYang perlu ditingkatkan: Penjelasan masih kurang detail dan kurang mengalir, terutama di bagian pairing, gesture, dan demo live fitur workout serta health sensor. Perlu lebih banyak latihan product knowledge dan cara demo yang lebih interaktif supaya customer lebih tertarik dan mudah paham."
+      },
+      {
+        "Timestamp": "2026-11-04T03:13:46.000Z",
+        "Store": "M265 Digimap Merr Street",
+        "Trainer Name": "Dipa Arya Dyaksa",
+        "Participants name": "dipa arya dyaksa ",
+        "Participants Sales Coach": "dipa.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "November",
+        "Date": 1,
+        "Score": 90,
+        "Any Comment": "sudah baik bisa di pertahankan lagi untuk cara menjelaskannya"
+      },
+      {
+        "Timestamp": "2026-11-04T03:15:25.000Z",
+        "Store": "M265 Digimap Merr Street",
+        "Trainer Name": "Dipa Arya Dyaksa",
+        "Participants name": "randy januar putra",
+        "Participants Sales Coach": "randyjp.digimap@gmail.com",
+        "Topic": "Demo Aksesoris",
+        "Month": "November",
+        "Date": 1,
+        "Score": 80,
+        "Any Comment": "sudah baik bisa di pertahankan lagi untuk cara menjelaskannya"
+      },
+      {
+        "Timestamp": "2026-11-04T03:29:21.000Z",
+        "Store": "M223 Digimap Roxy Square Jember",
+        "Trainer Name": "Atha Albarru Dewantara",
+        "Participants name": "Abdillah Arifin",
+        "Participants Sales Coach": "arfin.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "November",
+        "Date": 4,
+        "Score": 100,
+        "Any Comment": "All good"
       }
     ],
     "pnr": [
@@ -419093,25 +419156,25 @@
         "Target PnR": ""
       },
       {
-        "Timestamp": "",
-        "Year": "",
-        "Location of training": "",
-        "Trainer Name": "",
-        "Participants name": "",
-        "Total Employee": "",
-        "Modules": "",
+        "Timestamp": "2026-11-04T03:25:14.000Z",
+        "Year": 2026,
+        "Location of training": "M273 Digimap Metro Lampung",
+        "Trainer Name": "Ria Ambar Wati",
+        "Participants name": "Gibran Habib Widawan",
+        "Total Employee": 7,
+        "Modules": "Other",
         "Mandatory": "",
-        "Other": "",
-        "Type of Training\n(Classroom/VILT/In-Store Coaching/Online)": "",
-        "Total Session": "",
-        "Total Staff Trained": "",
-        "Month": "",
-        "Date": "",
-        "Status": "",
-        "Pre-Session quiz score (AVERAGE)": "",
-        "Post-Session quiz score (AVERAGE)": "",
-        "Any Comment": "",
-        "Hours": 0,
+        "Other": "Roleplay Open Studio",
+        "Type of Training\n(Classroom/VILT/In-Store Coaching/Online)": "In-Store Coaching",
+        "Total Session": 0.5,
+        "Total Staff Trained": 1,
+        "Month": "November",
+        "Date": 4,
+        "Status": "Delivered",
+        "Pre-Session quiz score (AVERAGE)": "None",
+        "Post-Session quiz score (AVERAGE)": "None",
+        "Any Comment": "penjelasan masih terkesan berputar putar sehingga point masih sulit dipahami",
+        "Hours": 1.5,
         "Target PnR": ""
       },
       {
@@ -421289,7 +421352,7 @@
         "Pre-Session quiz score (AVERAGE)": "",
         "Post-Session quiz score (AVERAGE)": "",
         "Any Comment": "",
-        "Hours": "",
+        "Hours": 0,
         "Target PnR": ""
       },
       {
