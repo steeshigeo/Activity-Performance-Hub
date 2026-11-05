@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-11-05T14:34:37.160Z",
+  "last_updated": "2026-11-05T15:40:39.848Z",
   "sheets": {
     "ops": [
       {
@@ -104700,6 +104700,36 @@
         "Report Photo": "",
         "Unit yang terjual setelah Open Studio": 0,
         "Produk apa yang pelanggan minati": "tidak ada pelanggan",
+        "Bulan": "November 2026",
+        "Date": "05 November 2026"
+      },
+      {
+        "Timestamp": "2026-11-05T14:37:55.000Z",
+        "Email": "gilangyabi.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Gilang Yabi Bakar Hakim",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-11-04T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 0,
+        "Store": "M132 Digimap Plaza Senayan",
+        "Open Studio Topics": "Markup on iPad",
+        "Sessions": "18:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "iPad",
+        "Bulan": "November 2026",
+        "Date": "05 November 2026"
+      },
+      {
+        "Timestamp": "2026-11-05T15:34:09.000Z",
+        "Email": "dimasseptiawan.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Dimas Septiawan",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-11-04T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 0,
+        "Store": "M285 Digimap Blitar Square",
+        "Open Studio Topics": "Heart Rate",
+        "Sessions": "18:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "Macbook",
         "Bulan": "November 2026",
         "Date": "05 November 2026"
       },
