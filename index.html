@@ -932,14 +932,27 @@
       }
       return total;
     }
+    /* Koreksi manual nama di data aktivitas -> nama staff di Recap (berlaku per toko, prioritas di atas pencocokan otomatis).
+       Tambahkan baris baru bila ada nama lain yang salah terdeteksi: { raw: nama di data, store: kode / nama toko, nama: nama lengkap di Recap } */
+    const NAME_ALIASES = [
+      { raw: 'Amara', store: 'M263', nama: 'Ama Rasully' }   // M263 Digimap Citimall Sampit
+    ];
+    function aliasFor(raw, store) {
+      const r = norm(raw), st = norm(store);
+      const hit = NAME_ALIASES.find(a => norm(a.raw) === r && st && st.includes(norm(a.store)));
+      if (!hit) return '';
+      const rec = recapByName.get(norm(hit.nama));
+      return rec && rec.nama ? rec.nama : hit.nama;
+    }
     function resolveStaff(raw, store) {
       const s0 = String(raw == null ? '' : raw).trim();
       if (!s0) return '';
       const key = norm(s0) + '|' + norm(store);
       if (staffCache.has(key)) return staffCache.get(key);
       let out = s0;
-      const exact = recapByName.get(norm(s0));
-      if (exact && exact.nama) out = exact.nama;
+      const exact = recapByName.get(norm(s0)), al = aliasFor(s0, store);
+      if (al) out = al;
+      else if (exact && exact.nama) out = exact.nama;
       else {
         const ta = tokensOf(s0), scored = [];
         if (ta.length) staffList.forEach(x => {
@@ -1274,7 +1287,7 @@
       const trainers = n => { const ix = storeIndex.get(norm(n)); return ix && ix.trainers.size ? Array.from(ix.trainers).join(', ') : '-'; };
       const rowsHtml = list.map(e => {
         const dr = reg(() => { // entry store dikelompokkan & diberi peringkat: OPS per Presenter, EMS per Participant, PNR per Topik (terbanyak -> tersedikit)
-          const g = groupedDetail(type, e.rows, isPNR ? (r => getTopics('pnr', r, 'all')) : (r => [getRowMeta(r).trainer]), e.name, isPNR ? 'topik' : isOps ? 'presenter' : 'participant');
+          const g = groupedDetail(type, e.rows, isPNR ? (r => getTopics('pnr', r, 'all')) : (presenterKeys), e.name, isPNR ? 'topik' : isOps ? 'presenter' : 'participant');
           g.sub = `${N} · ${isPNR ? 'delivered' : 'aktual'} ${f(e.actual)} / target ${f(e.target)} ${u.toLowerCase()} (${e.pct === null ? '-' : e.pct + '%'}) · ${INDT(e.pct)}${isPNR ? ` · planning ${f(e.planned)} · tampil: ${mode}` : ''} · ${fmt(g.groups.length)} ${isPNR ? 'topik' : isOps ? 'presenter' : 'participant'} (peringkat terbanyak)`;
           return g;
         });
@@ -1690,6 +1703,7 @@
     }
 
     /* ---------- Detail entry yang di-grouping & diberi peringkat (terbanyak -> tersedikit) ---------- */
+    const presenterKeys = r => String(getRowMeta(r).trainer || '').split(/\s*,\s*/).filter(Boolean); // entry dengan 2+ nama: tiap orang dihitung sendiri
     function groupedDetail(type, rows, keysOf, title, unit) {
       const map = new Map();
       rows.forEach(r => { const ks = (keysOf(r) || []).filter(Boolean); (ks.length ? ks : ['(tanpa nama)']).forEach(k => { if (!map.has(k)) map.set(k, []); map.get(k).push(r); }); });
@@ -1886,7 +1900,7 @@
       const isPNR = type === 'pnr', p = state.pages[type], mm = data.map(getRowMeta);
       const by = pred => data.filter((r, i) => pred(mm[i]));
       const D = (title, rows) => () => ({ title, sub: `${fmt(rows.length)} entry`, ...detailRows(type, rows) });
-      const DG = (title, rows) => () => groupedDetail(type, rows, r => [getRowMeta(r).trainer], title, type === 'ems' ? 'participant' : 'presenter'); // OPS/EMS: dikelompokkan per Presenter / Participant, peringkat terbanyak
+      const DG = (title, rows) => () => groupedDetail(type, rows, presenterKeys, title, type === 'ems' ? 'participant' : 'presenter'); // OPS/EMS: dikelompokkan per Presenter / Participant, peringkat terbanyak
       const stores = new Set(mm.map(m => m.store).filter(Boolean)), staff = new Set(mm.map(m => norm(m.trainer)).filter(Boolean));
       const months = monthEntries(mm);
       const storeCnt = countBy(mm, m => m.store), staffCnt = countBy(mm, m => m.trainer);
@@ -2739,7 +2753,7 @@
         if (m === 'ops') extra = `${fmt(o.rows.reduce((a, r) => a + partOf(r), 0))} peserta<br>${['13:00', '15:00', '18:00'].map(k => `${k} · ${o.rows.filter(r => getRowMeta(r).slot === k).length}`).join('  |  ')}`;
         if (m === 'ems') extra = `${new Set(o.rows.map(r => norm(participantName(r))).filter(Boolean)).size} staff berpartisipasi`;
         if (m === 'pnr') extra = `Delivered ${o.dv.length} · Planning ${o.pl.length} (${fmt(o.plH)} jam)`;
-        return `<div class="mod-card" onclick="openDrill(${reg(() => groupedDetail(m, o.rows, m === 'pnr' ? (r => getTopics('pnr', r, 'all')) : (r => [getRowMeta(r).trainer]), `${TR_LBL[m]} · ${rec.nama}`, m === 'ops' ? 'presenter' : m === 'ems' ? 'participant' : 'topik'))})"><div class="kpi-title">Performa ${TR_LBL[m]}</div>
+        return `<div class="mod-card" onclick="openDrill(${reg(() => groupedDetail(m, o.rows, m === 'pnr' ? (r => getTopics('pnr', r, 'all')) : (presenterKeys), `${TR_LBL[m]} · ${rec.nama}`, m === 'ops' ? 'presenter' : m === 'ems' ? 'participant' : 'topik'))})"><div class="kpi-title">Performa ${TR_LBL[m]}</div>
           <div class="tg"><div><span>Target</span><b>${o.target ? fmt(r1(o.target)) : '-'}</b></div><div><span>Actual</span><b>${fmt(r1(o.actual))}</b></div><div><span>Achievement</span><b>${pc === null ? '-' : pc + '%'}</b></div></div>
           ${pc === null ? '<div class="ln">Target belum terbaca</div>' : `<div class="peer-bar"><i style="width:${Math.min(100, pc)}%"></i></div>${GRADE(pc)}`}
           <div class="ln" style="margin-top:8px">${extra}</div></div>`;
