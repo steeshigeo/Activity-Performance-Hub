@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-11-06T16:25:44.271Z",
+  "last_updated": "2026-11-06T21:40:33.681Z",
   "sheets": {
     "ops": [
       {
@@ -106877,6 +106877,36 @@
         "Produk apa yang pelanggan minati": "Apple Watch",
         "Bulan": "November 2026",
         "Date": "06 November 2026"
+      },
+      {
+        "Timestamp": "2026-11-06T16:59:18.000Z",
+        "Email": "billasabrina96@gmail.com",
+        "Presenter Name\nFill in your full name": "billa zabrina",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-11-05T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 1,
+        "Store": "M201 Digimap Trans Studio Mall Cibubur",
+        "Open Studio Topics": "Markup on iPad",
+        "Sessions": "18:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 1,
+        "Produk apa yang pelanggan minati": "iPad",
+        "Bulan": "November 2026",
+        "Date": "06 November 2026"
+      },
+      {
+        "Timestamp": "2026-11-06T17:05:36.000Z",
+        "Email": "andy.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Andy Firmansyah",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-11-05T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 0,
+        "Store": "M206 Digimap Pakuwon Mall Surabaya",
+        "Open Studio Topics": "Find My on Apple Watch",
+        "Sessions": "18:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "Apple Watch",
+        "Bulan": "November 2026",
+        "Date": "07 November 2026"
       },
       {
         "Timestamp": "",
@@ -226435,6 +226465,54 @@
         "Date": 6,
         "Score": 80,
         "Any Comment": "all good staf dapat menjawab dengan baik pertanyaan yang di lontarkan "
+      },
+      {
+        "Timestamp": "2026-11-06T16:42:19.000Z",
+        "Store": "M130 Digimap Sunset Road Bali",
+        "Trainer Name": "Natasya Amelia Ang Supardi",
+        "Participants name": "Gede Wahyu Surya",
+        "Participants Sales Coach": "Wahyusurya.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "November",
+        "Date": 6,
+        "Score": 90,
+        "Any Comment": "Wahde menjelaskan fitur Iphone mirroring"
+      },
+      {
+        "Timestamp": "2026-11-06T16:43:33.000Z",
+        "Store": "M130 Digimap Sunset Road Bali",
+        "Trainer Name": "Ni Kadek Arum Darmayanti",
+        "Participants name": "Setyo",
+        "Participants Sales Coach": "Setyo.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "November",
+        "Date": 6,
+        "Score": 90,
+        "Any Comment": "Baik"
+      },
+      {
+        "Timestamp": "2026-11-06T17:07:14.000Z",
+        "Store": "M206 Digimap Pakuwon Mall Surabaya",
+        "Trainer Name": "Andy Firmansyah",
+        "Participants name": "Arief Oktavianto",
+        "Participants Sales Coach": "arief.digimap@gmail.com",
+        "Topic": "Demo Aksesoris",
+        "Month": "November",
+        "Date": 6,
+        "Score": 80,
+        "Any Comment": "Staff menjelaskan fitur AirPods Gen 4 ANC"
+      },
+      {
+        "Timestamp": "2026-11-06T17:08:44.000Z",
+        "Store": "M206 Digimap Pakuwon Mall Surabaya",
+        "Trainer Name": "Andy Firmansyah",
+        "Participants name": "Arabella Carmeinita",
+        "Participants Sales Coach": "arabella.digimap@gmail.com",
+        "Topic": "Question Exercise",
+        "Month": "November",
+        "Date": 6,
+        "Score": 80,
+        "Any Comment": "Staff menjelaskan benefit menggunakan papan klip universal "
       }
     ],
     "pnr": [
