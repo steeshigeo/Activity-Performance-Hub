@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-11-09T10:01:31.795Z",
+  "last_updated": "2026-11-09T10:07:02.667Z",
   "sheets": {
     "ops": [
       {
@@ -111735,6 +111735,36 @@
         "Report Photo": "",
         "Unit yang terjual setelah Open Studio": 0,
         "Produk apa yang pelanggan minati": "iPhone",
+        "Bulan": "November 2026",
+        "Date": "09 November 2026"
+      },
+      {
+        "Timestamp": "2026-11-09T10:01:39.000Z",
+        "Email": "fachrulsultan.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Fachrul Faiq Sultan",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-11-08T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 0,
+        "Store": "M236 Digimap Palu Grand Mall",
+        "Open Studio Topics": "Preview App",
+        "Sessions": "18:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "iPad",
+        "Bulan": "November 2026",
+        "Date": "09 November 2026"
+      },
+      {
+        "Timestamp": "2026-11-09T10:04:35.000Z",
+        "Email": "Mario.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Annisa Yunita Puteri",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-11-08T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 0,
+        "Store": "M272 Digimap Kota Baru Parahyangan",
+        "Open Studio Topics": "Heart Rate",
+        "Sessions": "15:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "Apple Watch",
         "Bulan": "November 2026",
         "Date": "09 November 2026"
       },
@@ -234704,7 +234734,7 @@
         "Post-Session quiz score (AVERAGE)": "None",
         "Any Comment": "None",
         "Hours": 1.5,
-        "Target PnR": "Audy Arfianto"
+        "Target PnR": "Fifi Amanda Sari"
       },
       {
         "Timestamp": "2025-10-06T10:20:37.000Z",
@@ -234726,7 +234756,7 @@
         "Post-Session quiz score (AVERAGE)": "None",
         "Any Comment": "None",
         "Hours": 1.5,
-        "Target PnR": ""
+        "Target PnR": "Audy Arfianto"
       },
       {
         "Timestamp": "2025-10-06T10:21:49.000Z",
