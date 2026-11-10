@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-11-09T20:58:19.043Z",
+  "last_updated": "2026-11-10T03:07:14.315Z",
   "sheets": {
     "ops": [
       {
@@ -234595,6 +234595,18 @@
         "Date": 9,
         "Score": 90,
         "Any Comment": "Demo LOB fokus pada Mac neo, dengan menjelaskan beberapa benefit yang dimiliki berdasarkan needs and value customers"
+      },
+      {
+        "Timestamp": "2026-11-10T03:01:33.000Z",
+        "Store": "M249 Digimap Lippo Plaza Palangkaraya",
+        "Trainer Name": "M Ridha",
+        "Participants name": "Mustika",
+        "Participants Sales Coach": "mustika.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "November",
+        "Date": 10,
+        "Score": 90,
+        "Any Comment": "Ok"
       }
     ],
     "pnr": [
