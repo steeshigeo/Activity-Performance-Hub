@@ -407,7 +407,7 @@
     @keyframes lgshake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
     .lg-user{display:none;font-size:.78rem;color:var(--text-muted);align-items:center;gap:6px;padding:6px 12px;border-radius:99px;border:1px solid var(--glass-border);background:rgba(255,255,255,.05);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
     body.authed .lg-user{display:inline-flex}
-    body.role-trainer .btn-export,body.role-trainer #ghRunBtn{display:none!important}
+    body.role-trainer .btn-export:not(.tr-ok),body.role-trainer #ghRunBtn{display:none!important}
     @media(max-width:600px){.lg-user{display:none!important}.lg-card{padding:28px 20px 22px;border-radius:24px}}
 
     /* ---------- Peer comparison ---------- */
@@ -2533,6 +2533,21 @@
     }
     function buildExport(tab) {
       const secs = [];
+      if (tab === 'myrapor') { // hanya data milik Store Trainer yang sedang login
+        if (!AUTH || AUTH.role !== 'trainer') return [];
+        const rec = myRec(), sel = document.getElementById('raporMonthSel'), rm = sel && sel.value ? sel.value : 'all', st = trStats(rec, rm), per = rm === 'all' ? T('Semua Bulan') : rm;
+        const prof = Array.from(document.querySelectorAll('#raporBody .prof-grid > .cap')).map(c => [T(plain(c.querySelector('.l').textContent)), plain(c.querySelector('.v').textContent)]);
+        secs.push({ title: `${T('Rapor pribadi')} · ${rec.nama} · ${per}`, heads: [T('Field'), T('Isi')], rows: prof });
+        const ri = rankInfo(rec, rm);
+        if (ri.length) secs.push({ title: `${T('Peringkat')} · ${T('Skor Gabungan')}`, heads: [T('Peringkat'), T('Total'), T('Trainer')], rows: ri.map(g => [T(g.lbl), '#' + g.rk, String(g.n)]) });
+        secs.push({ title: `${T('Pencapaian Aktivitas')} · ${per}`, heads: [T('Modul'), T('Target'), T('Actual'), T('Achievement'), 'Unit'], rows: ['ops', 'ems', 'pnr'].map(m => [TR_LBL[m], st[m].target ? String(r1(st[m].target)) : '-', String(r1(st[m].actual)), st[m].pct === null ? '-' : Math.round(st[m].pct) + '%', st[m].unit]) });
+        const months = monthList().slice().reverse().map(x => x[0]);
+        if (months.length) secs.push({ title: T('Monthly Performance'), heads: [T('Bulan'), 'OPS Actual', 'OPS Target', 'OPS %', 'EMS Actual', 'EMS Target', 'EMS %', 'PNR Actual', 'PNR Target', 'PNR %'],
+          rows: months.map(l => { const x = trStats(rec, l), c = m => [String(r1(x[m].actual)), x[m].target ? String(r1(x[m].target)) : '-', x[m].pct === null ? '-' : Math.round(x[m].pct) + '%']; return [trText(l), ...c('ops'), ...c('ems'), ...c('pnr')]; }) });
+        const items = myEntryItems(rec).filter(x => rm === 'all' || x.m.month === rm);
+        secs.push({ title: `${T('Entry')} · ${per}`, heads: ENT_HEADS.map(h => T(h)), rows: items.map(x => entryCols(x).map(plain)) });
+        return secs.filter(x => x.heads.length);
+      }
       if (tab === 'ops' || tab === 'ems' || tab === 'pnr') {
         const th = document.getElementById(`${tab}Thead`);
         secs.push(domSection(th && th.closest('table'), `Komparasi Target vs Aktual ${tab.toUpperCase()}`));
@@ -2559,12 +2574,12 @@
     let exportTarget = null;
     function openExport(t) { exportTarget = t; document.getElementById('exportOv').classList.add('open'); document.body.style.overflow = 'hidden'; }
     function closeExport() { document.getElementById('exportOv').classList.remove('open'); document.body.style.overflow = ''; }
-    function doExport(fmt) { const t = exportTarget; closeExport(); if (!t) return; if (fmt === 'pdf') exportPdf(t); else exportTab(t); }
+    function doExport(fmt) { const t = exportTarget; closeExport(); if (!t) return; if (AUTH && AUTH.role === 'trainer' && t !== 'myrapor') return; if (fmt === 'pdf') exportPdf(t); else exportTab(t); }
     function exportPdf(tab) { // buka halaman cetak, pilih "Save as PDF" di dialog print
       const secs = buildExport(tab);
       if (!secs.length) { alert(T('Belum ada data untuk diexport.')); return; }
       const esc = v => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      const name = `Activity Performance Hub · ${tab.toUpperCase()}`;
+      const name = tab === 'myrapor' ? `My Rapor · ${AUTH ? AUTH.name : ''}` : `Activity Performance Hub · ${tab.toUpperCase()}`;
       const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(name)}</title><style>@page{size:A4 landscape;margin:10mm}body{font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:9px;color:#111}h1{font-size:15px;margin:0 0 2px}h2{font-size:12px;margin:16px 0 6px}table{border-collapse:collapse;width:100%;margin-bottom:10px}th,td{border:1px solid #bbb;padding:3px 5px;text-align:left;vertical-align:top}th{background:#0a84ff;color:#fff}tr{page-break-inside:avoid}thead{display:table-header-group}</style></head><body><h1>${esc(name)}</h1><div>${new Date().toLocaleDateString('id-ID')}</div>${secs.map(x => `<h2>${esc(x.title)}</h2><table><thead><tr>${x.heads.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${x.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`).join('')}</body></html>`;
       const w = window.open('', '_blank');
       if (w) { w.document.open(); w.document.write(html); w.document.close(); w.focus(); setTimeout(() => w.print(), 500); return; }
@@ -2575,7 +2590,7 @@
     function exportTab(tab) {
       const secs = buildExport(tab);
       if (!secs.length) { alert(T('Belum ada data untuk diexport.')); return; }
-      exportXls(`Activity-Performance-Hub_${tab.toUpperCase()}_${new Date().toISOString().slice(0, 10)}.xls`, secs);
+      exportXls((tab === 'myrapor' ? `My-Rapor_${String(AUTH ? AUTH.name : '').replace(/\s+/g, '-')}` : `Activity-Performance-Hub_${tab.toUpperCase()}`) + `_${new Date().toISOString().slice(0, 10)}.xls`, secs);
     }
 
     /* ---------- GitHub Action (sync-data.yml) ---------- */
@@ -2836,7 +2851,7 @@
       const host = document.getElementById('panel-myrapor'); if (!host || !AUTH) return;
       if (!host.dataset.ready) {
         host.dataset.ready = '1';
-        host.innerHTML = `<div class="panel-card sum-wrap"><div class="panel-header"><div><div class="muted" style="font-size:.8rem">Rapor pribadi · ${escapeHtml(AUTH.name)}</div></div><div class="rapor-sel"><select id="raporMonthSel" class="select-box" onchange="renderRapor()"></select><select id="raporAreaSel" class="select-box" style="display:none"></select><select id="raporSel" class="select-box" style="display:none"></select></div></div><div id="raporBody"></div></div>`;
+        host.innerHTML = `<div class="panel-card sum-wrap"><div class="panel-header"><div><div class="muted" style="font-size:.8rem">Rapor pribadi · ${escapeHtml(AUTH.name)}</div></div><div class="rapor-sel"><select id="raporMonthSel" class="select-box" onchange="renderRapor()"></select><select id="raporAreaSel" class="select-box" style="display:none"></select><select id="raporSel" class="select-box" style="display:none"></select>${EXPORT_BTN('myrapor').replace('class="btn-export"', 'class="btn-export tr-ok"')}</div></div><div id="raporBody"></div></div>`;
       }
       fillRaporOptions();
       const sel = document.getElementById('raporSel'); sel.value = AUTH.name + '@@' + AUTH.store;
