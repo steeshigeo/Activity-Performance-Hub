@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-11-14T17:14:19.941Z",
+  "last_updated": "2026-11-14T21:37:17.004Z",
   "sheets": {
     "ops": [
       {
@@ -249399,6 +249399,18 @@
         "Month": "November",
         "Date": 14,
         "Score": 100,
+        "Any Comment": "Good"
+      },
+      {
+        "Timestamp": "2026-11-14T17:13:50.000Z",
+        "Store": "M126 Digimap Ciputra World Surabaya",
+        "Trainer Name": "Rachel Jennifer Victoria",
+        "Participants name": "Arya Dwi Persada",
+        "Participants Sales Coach": "aryapersada.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "November",
+        "Date": 14,
+        "Score": 90,
         "Any Comment": "Good"
       }
     ],
