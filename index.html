@@ -867,30 +867,39 @@
       }
       return -1;
     }
-    function parseAnyDate(v) {
-      const s = String(v).trim(), low = s.toLowerCase();
+    function parseAnyDate(v, refYear) { // refYear = tahun acuan bila teks tanggal tidak memuat tahun (mis. "6 November")
+      const s = String(v).trim(), low = s.toLowerCase(), cy = refYear || new Date().getFullYear();
       let m = s.match(/^Date\((\d{4}),\s*(\d{1,2}),\s*(\d{1,2})/);
       if (m) return new Date(+m[1], +m[2], +m[3]);
       const yr = low.match(/\b((?:19|20)\d{2})\b/), mi = monthFromText(low);
       if (mi >= 0 && yr) { const dm = low.replace(yr[1], ' ').match(/(?<!\d)(0?[1-9]|[12]\d|3[01])(?!\d)/); return new Date(+yr[1], mi, dm ? +dm[1] : 1); }
+      if (mi >= 0) { const dm = low.match(/(?<!\d)(0?[1-9]|[12]\d|3[01])(?!\d)/); return dm ? new Date(cy, mi, +dm[1]) : null; } // "6 November" / "Jumat, 7 Nov": jangan dibaca JS sebagai tahun 2001
       m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/);
       if (m) return new Date(+m[3], +m[2] - 1, +m[1]); // dd/mm/yyyy
+      m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2})(?!\d)/);
+      if (m) return new Date(2000 + +m[3], +m[2] - 1, +m[1]); // dd/mm/yy
+      m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})(?![\d\/\-.])/);
+      if (m && +m[1] <= 31 && +m[2] <= 12) return new Date(cy, +m[2] - 1, +m[1]); // dd/mm tanpa tahun
       if (/^\d{1,3}$/.test(s)) return null;
       const d = new Date(s);
-      return isNaN(d.getTime()) ? null : d;
+      if (isNaN(d.getTime())) return null;
+      if (d.getFullYear() === 2001 && !/2001/.test(s)) d.setFullYear(cy); // tahun bawaan JS bila tahun tidak ada
+      return d;
     }
     function getRowMonthInfo(row) {
       const kv = names => { const k = Object.keys(row).find(k => names.includes(norm(k))); return k && row[k] != null ? String(row[k]).trim() : ''; };
       const mName = kv(['month', 'bulan']), yr = kv(['year', 'tahun']), dd = kv(['date', 'tanggal']);
       if (mName && /^\d{4}$/.test(yr)) { // kolom Month + Date + Year terpisah (mis. data PnR)
         const mi = monthFromText(norm(mName));
-        if (mi >= 0) return { label: `${MONTH_NAMES_ID[mi]} ${yr}`, key: +yr * 100 + mi, date: new Date(+yr, mi, /^\d{1,2}$/.test(dd) ? +dd : (parseAnyDate(dd) || { getDate: () => 1 }).getDate()) };
+        if (mi >= 0) return { label: `${MONTH_NAMES_ID[mi]} ${yr}`, key: +yr * 100 + mi, date: new Date(+yr, mi, /^\d{1,2}$/.test(dd) ? +dd : (parseAnyDate(dd, +yr) || { getDate: () => 1 }).getDate()) };
       }
       const direct = getFlexibleValue(row, ['bulan', 'month']);
       const cands = [direct, ...['tanggal', 'date', 'waktu', 'timestamp'].map(k => getFlexibleValue(row, [k]))];
+      const yearIn = t => { const x = String(t || '').match(/\b((?:19|20)\d{2})\b/); return x ? +x[1] : 0; };
+      const refYear = (/^\d{4}$/.test(yr) ? +yr : 0) || cands.map(yearIn).find(Boolean) || 0; // tahun dari kolom lain (mis. Timestamp) untuk tanggal yang tidak memuat tahun
       for (const v of cands) {
         if (!v) continue;
-        const d = parseAnyDate(v);
+        const d = parseAnyDate(v, refYear);
         if (d && d.getFullYear() > 1990) return { label: `${MONTH_NAMES_ID[d.getMonth()]} ${d.getFullYear()}`, key: d.getFullYear() * 100 + d.getMonth(), date: d };
       }
       return direct ? { label: direct, key: monthKeyFromLabel(direct), date: null } : null;
@@ -1288,7 +1297,13 @@
       const rowsHtml = list.map(e => {
         const dr = reg(() => { // entry store dikelompokkan & diberi peringkat: OPS per Presenter, EMS per Participant, PNR per Topik (terbanyak -> tersedikit)
           const g = groupedDetail(type, e.rows, isPNR ? (r => getTopics('pnr', r, 'all')) : (presenterKeys), e.name, isPNR ? 'topik' : isOps ? 'presenter' : 'participant');
-          g.sub = `${N} · ${isPNR ? 'delivered' : 'aktual'} ${f(e.actual)} / target ${f(e.target)} ${u.toLowerCase()} (${e.pct === null ? '-' : e.pct + '%'}) · ${INDT(e.pct)}${isPNR ? ` · planning ${f(e.planned)} · tampil: ${mode}` : ''} · ${fmt(g.groups.length)} ${isPNR ? 'topik' : isOps ? 'presenter' : 'participant'} (peringkat terbanyak)`;
+          const core = storeTokens(e.name);
+          const lost = core.length ? (state[type] || []).filter(r => { const raw = rawStoreOf(r); if (!raw) return false; const m = getRowMeta(r); return norm(m.store) !== norm(e.name) && core.every(x => storeTokens(raw).includes(x)); }) : [];
+          const nodate = (state[type] || []).filter(r => { const m = getRowMeta(r); return norm(m.store) === norm(e.name) && !m.date; });
+          if (lost.length) g.groups.push({ label: `⚠️ Nama store mirip "${e.name}" tetapi terbaca sebagai store lain / tidak cocok`, rank: '⚠️', warn: true, count: lost.length, rows: detailRows(type, lost).rows });
+          if (nodate.length) g.groups.push({ label: '⚠️ Tanggal tidak terbaca (tidak masuk hitungan harian)', rank: '⚠️', warn: true, count: nodate.length, rows: detailRows(type, nodate).rows });
+          const warnN = lost.length + nodate.length;
+          g.sub = `${N} · ${isPNR ? 'delivered' : 'aktual'} ${f(e.actual)} / target ${f(e.target)} ${u.toLowerCase()} (${e.pct === null ? '-' : e.pct + '%'}) · ${INDT(e.pct)}${isPNR ? ` · planning ${f(e.planned)} · tampil: ${mode}` : ''} · ${fmt(g.groups.filter(x => !x.warn).length)} ${isPNR ? 'topik' : isOps ? 'presenter' : 'participant'} (peringkat terbanyak)${warnN ? ` · ⚠️ ${fmt(warnN)} entry perlu dicek` : ''}`;
           return g;
         });
         const c = isOps ? [escapeHtml(e.name), e.s['13:00'], e.s['15:00'], e.s['18:00'], `<strong>${e.actual}</strong>`, e.target, pcCell(e.pct), IND(e.pct)]
@@ -1713,13 +1728,13 @@
       return { title, sub: `${fmt(rows.length)} entry · ${fmt(groups.length)} ${unit} · peringkat terbanyak ke tersedikit`, heads, rows: [], groups };
     }
     function renderGroups(o, q) {
-      const max = Math.max(1, ...o.groups.map(g => g.count)), total = o.groups.reduce((a, g) => a + g.count, 0), openAll = total <= 150;
+      const max = Math.max(1, ...o.groups.filter(g => !g.warn).map(g => g.count)), total = o.groups.reduce((a, g) => a + g.count, 0), openAll = total <= 150;
       let budget = 600, trunc = false;
       const html = o.groups.map((g, gi) => {
         const hit = q && g.label.toLowerCase().includes(q), rows = !q || hit ? g.rows : g.rows.filter(r => r.join(' ').toLowerCase().includes(q));
         if (!rows.length) return '';
         const take = rows.slice(0, Math.max(0, budget)); budget -= take.length; if (take.length < rows.length) trunc = true;
-        return `<details class="grp"${(openAll || gi < 3 || q) ? ' open' : ''}><summary><span class="grp-rk">${g.rank === 1 ? '🥇' : g.rank === 2 ? '🥈' : g.rank === 3 ? '🥉' : '#' + g.rank}</span><span class="grp-nm">${escapeHtml(g.label)}</span><span class="grp-ct">${fmt(g.count)} entry</span><span class="grp-bar"><i style="width:${Math.round(g.count / max * 100)}%"></i></span></summary><div class="grp-tb"><table><thead><tr>${o.heads.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${take.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details>`;
+        return `<details class="grp"${(openAll || gi < 3 || q || g.warn) ? ' open' : ''}><summary><span class="grp-rk">${g.warn ? '⚠️' : g.rank === 1 ? '🥇' : g.rank === 2 ? '🥈' : g.rank === 3 ? '🥉' : '#' + g.rank}</span><span class="grp-nm">${escapeHtml(g.label)}</span><span class="grp-ct">${fmt(g.count)} entry</span><span class="grp-bar"><i style="width:${Math.round(g.count / max * 100)}%"></i></span></summary><div class="grp-tb"><table><thead><tr>${o.heads.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${take.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details>`;
       }).join('');
       return (html || '<div class="muted" style="padding:24px;text-align:center">Tidak ada data.</div>') + (trunc ? '<div class="muted" style="padding:10px">Sebagian baris disembunyikan, gunakan pencarian untuk menyaring.</div>' : '');
     }
