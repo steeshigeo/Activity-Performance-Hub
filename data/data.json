@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-11-17T00:33:48.665Z",
+  "last_updated": "2026-11-17T04:14:35.476Z",
   "sheets": {
     "ops": [
       {
@@ -255595,6 +255595,78 @@
         "Date": 7,
         "Score": 90,
         "Any Comment": "Dirga"
+      },
+      {
+        "Timestamp": "2026-11-17T02:55:40.000Z",
+        "Store": "M273 Digimap Metro Lampung",
+        "Trainer Name": "Ria Ambar Wati",
+        "Participants name": "sinta fitriyani",
+        "Participants Sales Coach": "sinta.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "November",
+        "Date": 17,
+        "Score": 90,
+        "Any Comment": "sudah cukup baik ketika mendemokan macbook"
+      },
+      {
+        "Timestamp": "2026-11-17T03:03:52.000Z",
+        "Store": "M249 Digimap Lippo Plaza Palangkaraya",
+        "Trainer Name": "M Ridha",
+        "Participants name": "Mustika",
+        "Participants Sales Coach": "mustika.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "November",
+        "Date": 17,
+        "Score": 90,
+        "Any Comment": "Ok"
+      },
+      {
+        "Timestamp": "2026-11-17T03:20:02.000Z",
+        "Store": "M223 Digimap Roxy Square Jember",
+        "Trainer Name": "Atha Albarru Dewantara",
+        "Participants name": "Abdillah Arifin",
+        "Participants Sales Coach": "arfin.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "November",
+        "Date": 17,
+        "Score": 100,
+        "Any Comment": "Staff membawakan demo dan rekomendasi Mac yang sesuai dengan kebutuhan pelanggan dengan baik"
+      },
+      {
+        "Timestamp": "2026-11-17T03:41:45.000Z",
+        "Store": "M228 Digimap Citimall Cianjur 2",
+        "Trainer Name": "Sugilar Rahman",
+        "Participants name": "Dirga agustira",
+        "Participants Sales Coach": "Dirgadigimap1@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "November",
+        "Date": 17,
+        "Score": 90,
+        "Any Comment": "Dirga"
+      },
+      {
+        "Timestamp": "2026-11-17T03:57:20.000Z",
+        "Store": "M236 Digimap Palu Grand Mall",
+        "Trainer Name": "Amanda Amelia",
+        "Participants name": "Fachrul Faiq Sultan",
+        "Participants Sales Coach": "fachrulsultan.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "November",
+        "Date": 16,
+        "Score": 100,
+        "Any Comment": "berjalan dengan baik "
+      },
+      {
+        "Timestamp": "2026-11-17T03:58:39.000Z",
+        "Store": "M236 Digimap Palu Grand Mall",
+        "Trainer Name": "Amanda Amelia",
+        "Participants name": "Zaky Ridwan",
+        "Participants Sales Coach": "zaky.digimap@gmail.com",
+        "Topic": "Demo Aksesoris",
+        "Month": "November",
+        "Date": 16,
+        "Score": 90,
+        "Any Comment": "berjalan dengan baik "
       }
     ],
     "pnr": [
