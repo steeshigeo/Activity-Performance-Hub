@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-11-22T15:45:05.750Z",
+  "last_updated": "2026-11-22T21:22:51.203Z",
   "sheets": {
     "ops": [
       {
@@ -140524,6 +140524,36 @@
         "Date": "22 November 2026"
       },
       {
+        "Timestamp": "2026-11-22T16:49:31.000Z",
+        "Email": "Chandrahalim.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Chandra Halim",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-11-21T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 1,
+        "Store": "M214 Digimap AEON Mall Sentul",
+        "Open Studio Topics": "Heart Rate",
+        "Sessions": "18:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "Apple Watch",
+        "Bulan": "November 2026",
+        "Date": "22 November 2026"
+      },
+      {
+        "Timestamp": "2026-11-22T16:55:05.000Z",
+        "Email": "bobby.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Bobby anggara",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-11-21T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 1,
+        "Store": "M254 Digimap basko city mall",
+        "Open Studio Topics": "Find My on Apple Watch",
+        "Sessions": "13:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "Apple Watch",
+        "Bulan": "November 2026",
+        "Date": "22 November 2026"
+      },
+      {
         "Timestamp": "",
         "Email": "",
         "Presenter Name\nFill in your full name": "",
@@ -272476,6 +272506,42 @@
         "Date": 22,
         "Score": 80,
         "Any Comment": "all good sudah bagus penjelasannya "
+      },
+      {
+        "Timestamp": "2026-11-22T16:08:43.000Z",
+        "Store": "M121 Digimap Tunjungan Plaza 3 Surabaya",
+        "Trainer Name": "Zulva Alianti",
+        "Participants name": "Hyskia Indra Aphista",
+        "Participants Sales Coach": "hyskiaindra.digimap@gmail.com",
+        "Topic": "Demo Aksesoris",
+        "Month": "November",
+        "Date": 22,
+        "Score": 100,
+        "Any Comment": "Staf mampu memperkenalkan iPhone Crossbody Strap dan menjelaskan fungsinya sebagai tali selempang untuk memudahkan customer membawa iPhone dengan lebih praktis dan nyaman"
+      },
+      {
+        "Timestamp": "2026-11-22T16:10:02.000Z",
+        "Store": "M121 Digimap Tunjungan Plaza 3 Surabaya",
+        "Trainer Name": "Zulva Alianti",
+        "Participants name": "Achmad Rafi Kurnia T.",
+        "Participants Sales Coach": "rafi.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "November",
+        "Date": 22,
+        "Score": 100,
+        "Any Comment": "Staf mampu mendemonstrasikan fitur telepon pada Apple Watch dan menjelaskan kemudahan melakukan serta menerima panggilan tanpa harus selalu mengeluarkan iPhone dari saku atau tas."
+      },
+      {
+        "Timestamp": "2026-11-22T16:51:23.000Z",
+        "Store": "M126 Digimap Ciputra World Surabaya",
+        "Trainer Name": "Rachel Jennifer Victoria",
+        "Participants name": "Arya Dwi Persada",
+        "Participants Sales Coach": "aryapersada.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "November",
+        "Date": 22,
+        "Score": 90,
+        "Any Comment": "Good"
       }
     ],
     "pnr": [
