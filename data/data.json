@@ -1,6 +1,6 @@
 {
   "status": "success",
-  "last_updated": "2026-11-27T21:43:30.651Z",
+  "last_updated": "2026-11-28T03:37:54.498Z",
   "sheets": {
     "ops": [
       {
@@ -151084,6 +151084,36 @@
         "Date": "28 November 2026"
       },
       {
+        "Timestamp": "2026-11-28T00:31:57.000Z",
+        "Email": "Novita.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Novita Ayu Lestari",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-11-25T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 1,
+        "Store": "M267 Digimap Mall Cijantung",
+        "Open Studio Topics": "iPhone Photography",
+        "Sessions": "18:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "iPhone",
+        "Bulan": "November 2026",
+        "Date": "28 November 2026"
+      },
+      {
+        "Timestamp": "2026-11-28T00:32:40.000Z",
+        "Email": "Novita.digimap@gmail.com",
+        "Presenter Name\nFill in your full name": "Novita Ayu Lestari",
+        "Tanggal ( Hari, Bulan, Tahun ) Hari ini": "2026-11-26T17:00:00.000Z",
+        "Total Participants\nBerapa banyak pelanggan yang mengikuti sesi Open Studio": 2,
+        "Store": "M267 Digimap Mall Cijantung",
+        "Open Studio Topics": "Multitaksing with Mac",
+        "Sessions": "18:00",
+        "Report Photo": "",
+        "Unit yang terjual setelah Open Studio": 0,
+        "Produk apa yang pelanggan minati": "Macbook",
+        "Bulan": "November 2026",
+        "Date": "28 November 2026"
+      },
+      {
         "Timestamp": "",
         "Email": "",
         "Presenter Name\nFill in your full name": "",
@@ -286516,6 +286546,78 @@
         "Date": 27,
         "Score": 100,
         "Any Comment": "Good"
+      },
+      {
+        "Timestamp": "2026-11-28T02:06:23.000Z",
+        "Store": "M215 Digimap Mall Taman Anggrek",
+        "Trainer Name": "Agung Prasetiyo",
+        "Participants name": "Wendy",
+        "Participants Sales Coach": "ivy.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "November",
+        "Date": 27,
+        "Score": 60,
+        "Any Comment": "Wendy perlu banyak improve karna masih banyak yang harus di tingkatkan"
+      },
+      {
+        "Timestamp": "2026-11-28T02:08:46.000Z",
+        "Store": "M215 Digimap Mall Taman Anggrek",
+        "Trainer Name": "Agung Prasetiyo",
+        "Participants name": "Alif",
+        "Participants Sales Coach": "aliframadhan.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "November",
+        "Date": 27,
+        "Score": 70,
+        "Any Comment": "Alif sudah good dalam menjelaskan, tetapi masih belum maksimal dalam menggunakan sor nya"
+      },
+      {
+        "Timestamp": "2026-11-28T02:12:24.000Z",
+        "Store": "M215 Digimap Mall Taman Anggrek",
+        "Trainer Name": "Agung Prasetiyo",
+        "Participants name": "Nesya",
+        "Participants Sales Coach": "nesyaalifa.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "November",
+        "Date": 27,
+        "Score": 60,
+        "Any Comment": "Nesya belum bisa memaksimalkan fitur2 yang relevan di tahun ini"
+      },
+      {
+        "Timestamp": "2026-11-28T03:04:00.000Z",
+        "Store": "M244 Digimap Java Mall Semarang",
+        "Trainer Name": "Yuniar Puspitasari",
+        "Participants name": "Sa'id Rohmadtulloh",
+        "Participants Sales Coach": "Said.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "November",
+        "Date": 28,
+        "Score": 90,
+        "Any Comment": "Sudah cukup bagus good"
+      },
+      {
+        "Timestamp": "2026-11-28T03:05:58.000Z",
+        "Store": "M223 Digimap Roxy Square Jember",
+        "Trainer Name": "Atha Albarru Dewantara",
+        "Participants name": "Dyah Retnaning Tyas",
+        "Participants Sales Coach": "dyahretnaning.digimap@gmail.com",
+        "Topic": "Demo Apple Watch",
+        "Month": "November",
+        "Date": 28,
+        "Score": 100,
+        "Any Comment": "Staff membawakan demo dengan baik."
+      },
+      {
+        "Timestamp": "2026-11-28T03:22:59.000Z",
+        "Store": "M249 Digimap Lippo Plaza Palangkaraya",
+        "Trainer Name": "M Ridha",
+        "Participants name": "Mustika",
+        "Participants Sales Coach": "mustika.digimap@gmail.com",
+        "Topic": "Demo Mac",
+        "Month": "November",
+        "Date": 28,
+        "Score": 90,
+        "Any Comment": "Ok"
       }
     ],
     "pnr": [
